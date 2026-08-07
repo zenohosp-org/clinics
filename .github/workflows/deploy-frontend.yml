@@ -5,6 +5,8 @@ on:
     paths:
       - 'clinics-frontend/**'
       - '.github/workflows/deploy-frontend.yml'
+  # Manual trigger from the Actions tab — for redeploying without a code change.
+  workflow_dispatch:
 jobs:
   deploy:
     runs-on: ubuntu-latest

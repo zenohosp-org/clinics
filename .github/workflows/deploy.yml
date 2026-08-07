@@ -5,6 +5,9 @@ on:
     paths:
       - 'clinics-backend/**'
       - '.github/workflows/deploy.yml'
+  # Manual trigger from the Actions tab — for redeploying without a code
+  # change (config edit on the VPS, rolling back, re-running a failed deploy).
+  workflow_dispatch:
 jobs:
   deploy:
     runs-on: ubuntu-latest
