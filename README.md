@@ -17,10 +17,17 @@ runs its day.
 
 Clinics deliberately avoids every port already taken by a sibling app.
 
-| Service | Dev port | Notes |
+| Service | Dev port | Production |
 |---|---|---|
-| clinics-backend | `9003` | 9000 directory · 9001 HMS · 9002 people |
-| clinics-frontend | `5177` | 5173 pharmacy · 5174 HMS/finance · 5175 labs · 5176 people |
+| clinics-backend | `9003` | `127.0.0.1:8110` (container listens on 8080) |
+| clinics-frontend | `5177` | static, served by nginx from `/var/www/clinics` |
+
+Dev neighbours: 9000 directory · 9001 HMS · 9002 people (backends);
+5173 pharmacy · 5174 HMS/finance · 5175 labs · 5176 people (frontends).
+
+In production every zenohosp backend listens on **8080 inside its container**
+and publishes to a unique `127.0.0.1:81xx`. The `EXPOSE 9003` in the Dockerfile
+is cosmetic — see [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Running locally
 
@@ -68,6 +75,12 @@ Because of that, clinics runs `spring.jpa.hibernate.ddl-auto=none` while HMS
 runs `update`. HMS is the sole owner of the schema; clinics only ever moves
 rows. Two services running `update` against one schema would race on boot and
 let entity drift silently alter production columns.
+
+A second guard matters just as much: `clinics.data-seeder.enabled=false`. The
+inherited `DataSeeder` issues raw DDL outside Hibernate — column renames,
+constraint drops, `CREATE TABLE` — which `ddl-auto=none` does **not** prevent.
+It is disabled because HMS has already applied all of it to the shared
+database.
 
 **Consequence:** a schema change needed by a clinics feature has to land in
 HMS's entities first, then clinics picks it up. Adding a column straight to a

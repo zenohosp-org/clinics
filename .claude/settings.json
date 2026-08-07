@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(git count-objects *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(scp -i /private/tmp/claude-502/-Users-karthikeyan-zc034-clinics/0fa619d8-e6bf-4bcc-ac4b-b39656e54189/scratchpad/clinics_deploy ~/directory/directory-backend/src/main/java/com/zenlocare/zenohosp/entity/User.java root@200.97.163.220:/opt/zenohosp/directory-backend/src/main/java/com/zenlocare/zenohosp/entity/User.java)"
     ]
   }
 }

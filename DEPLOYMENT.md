@@ -1,223 +1,167 @@
-# Clinics — production runbook
+# Clinics — deployment
 
-Target: **https://clinics.zenohosp.com** (SPA) and
-**https://api-clinics.zenohosp.com** (Spring Boot, port 9003), on the existing
-`/opt/zenohosp` VPS alongside HMS, labs, pharmacy and directory.
+**Status: live.** https://clinics.zenohosp.com · https://api-clinics.zenohosp.com
 
-Work through the stages in order. Stage 1 gates everything else: **clinics SSO
-cannot work until Directory knows about `clinics-client`.**
+This is both a record of the deployment and the runbook for repeating or
+rolling it back. Everything below is already done unless marked otherwise.
 
 ---
 
-## Stage 0 — DNS
+## What runs where
 
-Add two A records pointing at the same VPS IP as `hms.zenohosp.com`:
-
-```
-clinics.zenohosp.com.      A    <VPS_IP>
-api-clinics.zenohosp.com.  A    <VPS_IP>
-```
-
-Verify before continuing — certbot will fail otherwise:
-
-```bash
-dig +short clinics.zenohosp.com api-clinics.zenohosp.com
-```
-
----
-
-## Stage 1 — Register the clinics OAuth2 client in Directory
-
-The Directory source at `~/directory` has **already been patched** with the
-clinics registration:
-
-- `directory-backend/.../service/OAuth2AuthorizationService.java`
-  — added `clinicsClientId` / `clinicsClientSecret` / `clinicsRedirectUri`
-  `@Value` fields and a `clientRegistry.put(clinicsClientId, …)` entry.
-- `directory-backend/src/main/resources/application.properties`
-  — added the `oauth2.client.clinics.*` block.
-
-Those changes compile but are **not deployed**. To ship them:
-
-1. Choose a strong client secret (do not keep the `clinics-secret-key-2026`
-   default):
-
-   ```bash
-   openssl rand -base64 36
-   ```
-
-2. Add it to `/opt/zenohosp/.env` on the VPS:
-
-   ```bash
-   OAUTH_CLINICS_CLIENT_ID=clinics-client
-   OAUTH_CLINICS_CLIENT_SECRET=<the generated secret>
-   OAUTH_CLINICS_REDIRECT_URI=https://api-clinics.zenohosp.com/login/oauth2/code/directory
-   ```
-
-3. Redeploy the directory service and confirm the registry log line lists
-   `clinics-client`:
-
-   ```bash
-   docker compose up -d --build directory-backend
-   docker compose logs directory-backend | grep "OAuth2 clients registered"
-   ```
-
-> The `redirect-uri` must match the clinics backend's `OAUTH_REDIRECT_URI`
-> **byte for byte**, including scheme and trailing path. A mismatch surfaces as
-> an opaque `invalid_grant` at the token exchange.
-
----
-
-## Stage 2 — Check out the repo on the VPS
-
-```bash
-cd /opt/zenohosp
-git clone https://github.com/KarthiZenoHosp/clinics.git
-```
-
-The deploy workflows `cd /opt/zenohosp/clinics && git pull origin main`, so the
-directory name must be exactly `clinics`.
-
----
-
-## Stage 3 — Environment variables
-
-Append to `/opt/zenohosp/.env`. `DB_*`, `JWT_SECRET` and `GOOGLE_*` are already
-there for HMS — clinics reuses the same values (same database, same signing
-secret). Only the clinics-specific OAuth entries from Stage 1 are new.
-
-```bash
-# Already present for HMS — clinics shares them verbatim.
-# DB_URL / DB_USER / DB_PASS
-# JWT_SECRET               ← must equal what Directory signs with
-# GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET
-
-# New for clinics (Stage 1)
-CLINICS_CLIENT_ID=clinics-client
-CLINICS_CLIENT_SECRET=<same secret as OAUTH_CLINICS_CLIENT_SECRET>
-```
-
-`JWT_SECRET` mismatching Directory's is the single most common cause of a
-"logs in, then instantly bounces back to /login" loop: the cookie is set, but
-every `/api/auth/me` fails signature validation and returns 401.
-
----
-
-## Stage 4 — Add the compose service
-
-Merge the `clinics-backend` block from
-[`deploy/docker-compose.clinics.yml`](deploy/docker-compose.clinics.yml) into
-the `services:` map of `/opt/zenohosp/docker-compose.yml`.
-
-It must live in that file specifically — the deploy workflow runs
-`docker compose up -d --build clinics-backend` from `/opt/zenohosp`.
-
-The service binds `127.0.0.1:9003:9003` on purpose: nginx is the only thing
-that should reach it. Then:
-
-```bash
-cd /opt/zenohosp
-docker compose up -d --build clinics-backend
-docker compose logs -f clinics-backend        # wait for "Started ClinicsApplication"
-curl -s localhost:9003/actuator/health        # {"status":"UP"}
-```
-
----
-
-## Stage 5 — nginx + TLS
-
-```bash
-# Shared proxy snippet (sets X-Forwarded-Proto — required for OAuth redirect_uri)
-sudo mkdir -p /etc/nginx/snippets
-sudo cp /opt/zenohosp/clinics/deploy/nginx/clinics-proxy.conf /etc/nginx/snippets/
-
-# Vhosts
-sudo cp /opt/zenohosp/clinics/deploy/nginx/clinics.zenohosp.com.conf \
-        /etc/nginx/sites-available/clinics.zenohosp.com
-sudo cp /opt/zenohosp/clinics/deploy/nginx/api-clinics.zenohosp.com.conf \
-        /etc/nginx/sites-available/api-clinics.zenohosp.com
-sudo ln -sf ../sites-available/clinics.zenohosp.com     /etc/nginx/sites-enabled/
-sudo ln -sf ../sites-available/api-clinics.zenohosp.com /etc/nginx/sites-enabled/
-
-# Web root for the SPA
-sudo mkdir -p /var/www/clinics
-```
-
-Both vhosts reference `/etc/letsencrypt/live/...` certificates that do not
-exist yet, so `nginx -t` will fail until certbot has run. Issue the
-certificates first — certbot manages its own temporary config:
-
-```bash
-sudo certbot --nginx -d clinics.zenohosp.com -d api-clinics.zenohosp.com
-sudo nginx -t && sudo systemctl reload nginx
-```
-
----
-
-## Stage 6 — GitHub Actions
-
-In **Settings → Secrets and variables → Actions** on
-`KarthiZenoHosp/clinics`, add the same three secrets the HMS repo uses:
-
-| Secret | Value |
+| | |
 |---|---|
-| `VPS_HOST` | VPS IP or hostname |
-| `VPS_USER` | deploy user (the one owning `/opt/zenohosp`) |
-| `VPS_SSH_KEY` | private key whose public half is in that user's `authorized_keys` |
+| VPS | `200.97.163.220`, `/opt/zenohosp` |
+| Backend container | `zenohosp-clinics-backend-1`, published `127.0.0.1:8110` |
+| Frontend | static build in `/var/www/clinics` |
+| Config | `/opt/zenohosp/env/clinics.env` (mode 600) |
+| nginx | `/etc/nginx/sites-available/{clinics,api-clinics}` |
+| TLS | Let's Encrypt, auto-renewing, expires 2026-11-05 |
 
-After that, a push to `main` touching `clinics-backend/**` rebuilds the
-container, and one touching `clinics-frontend/**` rebuilds the SPA into
-`/var/www/clinics`.
+### The port convention (easy to get wrong)
 
-First deploy can be triggered by hand:
+Every zenohosp backend listens on **8080 inside its container** and publishes to
+a unique `127.0.0.1:81xx` host port. The `x-backend-defaults` anchor at the top
+of `/opt/zenohosp/docker-compose.yml` sets `PORT: 8080`, and compose
+`environment:` beats `env_file:`, so a `PORT=` line in an env file is inert.
+
+**`EXPOSE 9003` in the clinics Dockerfile is cosmetic.** The real address is
+`127.0.0.1:8110`.
+
+Host ports in use: 8101 pharmacy · 8102 asset · 8103 finance · 8104 inventory ·
+8105 directory · 8106 ot · 8107 labs · 8108 people · 8109 hms · **8110 clinics**
+
+Local dev is different again: backend `9003`, Vite `5177`.
+
+---
+
+## The shared database
+
+Clinics uses **HMS's Supabase database and tables**. Two guards keep it from
+damaging that schema, and both matter:
+
+1. **`spring.jpa.hibernate.ddl-auto=none`** — Hibernate never emits DDL.
+2. **`clinics.data-seeder.enabled=false`** — the inherited `DataSeeder` is a
+   `CommandLineRunner` that issues raw DDL outside Hibernate (drops NOT NULL,
+   renames `hospital_services.specialization_id → department_id`, drops and
+   re-adds foreign keys, creates tables). `ddl-auto=none` does **not** stop it.
+   On the very first clinics boot it ran against HMS's live schema before this
+   gate existed; the rename failed on a FK violation so nothing changed.
+
+Disabling the seeder loses nothing — HMS has already applied all of it to the
+shared database, and clinics reads the same rows.
+
+**Consequence:** a schema change for a clinics feature must land in HMS first.
+
+---
+
+## SSO: clinics as a Directory module
+
+Registering the OAuth2 client is **not sufficient**. Directory gates SSO on a
+database-backed module system, so onboarding an app touches 8 files. All of
+this shipped in `zenohosp-org/directory-backend@6674653`:
+
+| File | Purpose |
+|---|---|
+| `OAuth2AuthorizationService` | `clinics-client` id / secret / redirect-uri |
+| `OAuth2Controller` | `registerGate(clinicsClientId, "clinics", "Clinics")` — **the SSO login gate** |
+| `AuthService` | includes `clinics` in the JWT `modules` claim |
+| `entity/User` | `can_access_clinics` column, defaults `true` |
+| `UserDTO`, `UpdateUserModulesRequest` | admin UI toggle |
+| `UserService` | reset block, module→flag switch, update handler |
+| `DataSeeder` | seeds the `Clinics` module row, backfills the flag |
+
+Directory runs `ddl-auto=update`, so it created `users.can_access_clinics`
+itself on boot and backfilled it (`20 pre-existing users`).
+
+**Clinics defaults to ON** for every hospital and user, matching how Labs was
+onboarded. To make it opt-in instead, change the `User` default to `false` and
+drop the backfill in `DataSeeder.backfillUserModuleAccessFlags()`.
+
+### The flow
+
+1. `clinics.zenohosp.com/oauth2/authorization/directory` (nginx → backend)
+2. → `api-directory.zenohosp.com/oauth2/authorize?client_id=clinics-client`
+3. → Directory login → consent
+4. → `https://api-clinics.zenohosp.com/login/oauth2/code/directory`
+5. Backend exchanges the code, sets HttpOnly `sso_token` on `.zenohosp.com`
+6. → `https://clinics.zenohosp.com/sso/callback` → `/dashboard`
+
+`OAUTH_REDIRECT_URI` in `clinics.env` and `OAUTH_CLINICS_REDIRECT_URI` in
+`directory.env` must match **byte for byte**, or step 4 fails `invalid_grant`.
+
+---
+
+## Deploys
+
+Both repos deploy on push to `main` via GitHub Actions → SSH → VPS.
+
+- `KarthiZenoHosp/clinics` — `clinics-backend/**` rebuilds the container;
+  `clinics-frontend/**` rebuilds into `/var/www/clinics`.
+- `zenohosp-org/directory-backend` — any push pulls and rebuilds directory.
+
+Requires repo secrets `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`.
+
+> **Still to do:** add those three secrets to `KarthiZenoHosp/clinics`
+> (Settings → Secrets and variables → Actions). Until then, clinics deploys
+> must be run by hand on the VPS.
+
+The clinics backend workflow deliberately omits HMS's pre-deploy `pg_dump`
+gate: with `ddl-auto=none` and the seeder disabled, a clinics deploy cannot
+alter the schema. **Restore that gate if either guard is ever removed.**
+
+### Manual deploy
 
 ```bash
+cd /opt/zenohosp/clinics && git pull origin main
+
+# backend
+cd /opt/zenohosp && docker compose up -d --build clinics-backend
+
+# frontend
 cd /opt/zenohosp/clinics/clinics-frontend
 npm ci && npm run build
-sudo rm -rf /var/www/clinics/* && sudo cp -r dist/* /var/www/clinics/
+rm -rf /var/www/clinics/* && cp -r dist/* /var/www/clinics/
 ```
 
 ---
 
-## Stage 7 — Verify the SSO round trip
+## Verify
 
-1. Open `https://clinics.zenohosp.com` → should redirect to `/login`.
-2. Click **Sign in with ZenoHosp Directory**.
-   Browser goes `clinics.zenohosp.com/oauth2/authorization/directory`
-   → nginx → backend → `api-directory.zenohosp.com/oauth2/authorize`.
-3. After consent, Directory redirects to
-   `https://api-clinics.zenohosp.com/login/oauth2/code/directory`.
-4. Backend exchanges the code, sets the HttpOnly `sso_token` cookie on
-   `.zenohosp.com`, and redirects to `https://clinics.zenohosp.com/sso/callback`.
-5. The callback page calls `/api/auth/me` and lands you on `/dashboard`.
+```bash
+curl -s https://api-clinics.zenohosp.com/actuator/health     # {"status":"UP"}
+curl -so /dev/null -w '%{http_code}\n' https://clinics.zenohosp.com/patients/1  # 200 (SPA fallback)
+curl -sD- -o /dev/null https://clinics.zenohosp.com/oauth2/authorization/directory | grep -i location
+# → must contain client_id=clinics-client and the api-clinics redirect_uri
+```
 
-Cross-app check: sign out of clinics, then reload an open HMS tab — it should
-drop to its login screen within ~30s. Both apps poll `/auth/me` on that
-interval and force-logout on the first 401, which is how a logout in one
-zenohosp app propagates to the rest.
+Cross-app logout: sign out of clinics, reload an HMS tab — it drops to login
+within ~30s. Both poll `/auth/me` and force-logout on the first 401.
 
-### If it fails
+### Failure modes
 
 | Symptom | Cause |
 |---|---|
-| `invalid_grant` at callback | `OAUTH_REDIRECT_URI` ≠ Directory's registered `redirect-uri` |
+| `invalid_grant` at callback | redirect URIs differ between `clinics.env` and `directory.env` |
 | Login loops back to `/login` | `JWT_SECRET` differs from Directory's |
-| `redirect_uri` is `http://` not `https://` | `X-Forwarded-Proto` missing — the proxy snippet isn't included |
-| CORS error in console | origin absent from `SecurityConfig.corsConfigurationSource()` |
-| 404 on `/patients/123` refresh | SPA fallback missing — check `try_files … /index.html` |
+| `redirect_uri` is `http://` | `X-Forwarded-Proto` missing from the nginx vhost |
+| Clinics missing from a user's modules | `can_access_clinics` NULL/false, or hospital activation row absent |
+| 404 on `/patients/123` refresh | SPA `try_files … /index.html` missing |
 
 ---
 
 ## Rollback
 
+**Clinics** — no DB rollback needed (it cannot alter the schema):
+
 ```bash
-cd /opt/zenohosp/clinics
-git log --oneline -5
-git checkout <previous-sha>
+cd /opt/zenohosp/clinics && git checkout <previous-sha>
 cd /opt/zenohosp && docker compose up -d --build clinics-backend
 ```
 
-No database rollback is needed: clinics runs `ddl-auto=none` and cannot alter
-the shared schema. That is also why the clinics deploy workflow omits the
-pre-deploy `pg_dump` gate that HMS's workflow performs — **if clinics is ever
-switched to `ddl-auto=update`, restore that gate first.**
+**Directory** — `git revert 6674653 && git push` (CI redeploys). Pre-change
+file backups are also at `/root/*.bak`. Note that reverting leaves the
+`users.can_access_clinics` column and `Clinics` module row in place; both are
+inert once nothing reads them.
+
+Compose file backups: `/opt/zenohosp/docker-compose.yml.bak.*`
