@@ -1,0 +1,134 @@
+/* ===================================================================
+   HMS DESIGN SYSTEM — Foundation Layer (base.css)
+   -------------------------------------------------------------------
+   Purpose
+     Defines every design token used by the hms-* component class set.
+     Tokens are exposed as CSS custom properties on :root so they are
+     readable from every stylesheet and every JS-driven inline style.
+
+   Conventions
+     * Token prefix: --hms-*  (avoids collisions with other libraries
+       and with Tailwind's residual variables during transition).
+     * Colour scale is light-only — dark mode has been removed by
+       product decision; do NOT add .dark { … } blocks here.
+     * Spacing/radius/shadow scales mirror Ziranly's published values
+       so component behaviour is identical to the reference app.
+
+   Load order
+     Must be the FIRST sheet imported in src/index.css. Component
+     primitives in hms-system.css resolve var(--hms-*) at parse time;
+     a missing token here surfaces as broken styling later.
+   =================================================================== */
+
+/* -------------------------------------------------------------------
+   Design tokens
+   ------------------------------------------------------------------- */
+:root {
+    /* Brand — pure neutral, matches Ziranly identity */
+    --hms-brand-primary: #000000;
+    --hms-brand-primary-hover: #171717;
+    --hms-brand-primary-active: #262626;
+    --hms-brand-primary-dark: #1c1c1c;
+    --hms-brand-primary-light: #dcdcdc;
+    --hms-brand-primary-lighter: #e5e5e5;
+    --hms-brand-primary-lightest: #f5f5f5;
+    --hms-brand-glow: rgba(0, 0, 0, 0.05);
+    --hms-brand-primary-glow: rgba(89, 137, 132, 0.10);
+
+    /* Primary action color — the slate-900 used by .hms-btn-primary. Several
+       module buttons (lab/nursing/io *-form__save-btn) and focus borders read
+       these; they were previously UNDEFINED, which rendered those primary
+       buttons backgroundless (invisible white-on-white until hover). */
+    --hms-primary: #0f172a;
+    --hms-primary-hover: #1e293b;
+
+    /* Neutral palette (Tailwind slate–compatible) */
+    --hms-white: #ffffff;
+    --hms-gray-50: #f9fafb;
+    --hms-gray-100: #f3f4f6;
+    --hms-gray-200: #e5e7eb;
+    --hms-gray-300: #d1d5db;
+    --hms-gray-400: #9ca3af;
+    --hms-gray-500: #6b7280;
+    --hms-gray-600: #4b5563;
+    --hms-gray-700: #374151;
+    --hms-gray-800: #1f2937;
+    --hms-gray-900: #111827;
+
+    /* Semantic colour pairs (text · background · border) */
+    --hms-success: #10b981;
+    --hms-success-bg: #dcfce7;
+    --hms-success-border: #bbf7d0;
+    --hms-warning: #f59e0b;
+    --hms-warning-bg: #fef3c7;
+    --hms-warning-border: #fde68a;
+    --hms-danger: #ef4444;
+    --hms-danger-bg: #fef2f2;
+    --hms-danger-border: #fecaca;
+    --hms-info: #3b82f6;
+    --hms-info-bg: #eff6ff;
+    --hms-info-border: #dbeafe;
+
+    /* Clinical accents (existing HMS conventions retained so the
+       chief-complaint / vitals / rx / external-lab focus rings keep
+       their semantic colour mapping when those forms are migrated). */
+    --hms-accent-consult: #0f172a;
+    --hms-accent-consult-glow: rgba(15, 23, 42, 0.08);
+    --hms-accent-vitals: #0f172a;
+    --hms-accent-rx: #047857;
+    --hms-accent-external: #7c3aed;
+    --hms-accent-external-glow: rgba(124, 58, 237, 0.12);
+
+    /* Spacing scale — branded (--hms-*) mirror of the portable --zu-* scale
+       in ui/tokens.css. MUST be kept byte-identical to that file: the two
+       namespaces style the same screens, so any drift shows up as two
+       components on one page disagreeing about spacing.
+       Interpolates 1200px viewport (75%) -> 1500px (100%); see tokens.css
+       for why the ramp completes at 1500 rather than 1512 or 1600.
+       xs/sm stay fixed — 4-8px is grid rhythm, not airiness. */
+    --hms-space-xs: 4px;
+    --hms-space-sm: 8px;
+    --hms-space-md: clamp(12px, calc(1.3333vw - 4px), 16px);
+    --hms-space-20: clamp(15px, calc(1.6667vw - 5px), 20px);
+    --hms-space-lg: clamp(18px, calc(2vw - 6px), 24px);
+    --hms-space-28: clamp(21px, calc(2.3333vw - 7px), 28px);
+    --hms-space-xl: clamp(24px, calc(2.6667vw - 8px), 32px);
+    --hms-space-2xl: 48px;
+    --hms-space-3xl: 64px;
+    --hms-space-4xl: 96px;
+
+    /* Radius */
+    --hms-radius-sm: 4px;
+    --hms-radius: 8px;
+    --hms-radius-lg: 12px;
+    --hms-radius-xl: 16px;
+    --hms-radius-full: 9999px;
+
+    /* Transitions (easing matches Ziranly) */
+    --hms-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --hms-transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --hms-transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Elevation */
+    --hms-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --hms-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.10), 0 1px 2px -1px rgba(0, 0, 0, 0.10);
+    --hms-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.10), 0 2px 4px -2px rgba(0, 0, 0, 0.10);
+    --hms-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.10), 0 4px 6px -4px rgba(0, 0, 0, 0.10);
+    --hms-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.10), 0 8px 10px -6px rgba(0, 0, 0, 0.10);
+    --hms-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+    --hms-shadow-card-hover: 0 1px 3px rgba(0, 0, 0, 0.05), 0 20px 25px -5px rgba(0, 0, 0, 0.10), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+    /* Typography — Lexend loaded via <link> in index.html; applied on body via var(--hms-font-family). */
+    --hms-font-family: "Lexend", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
+    /* Stacking layers — single source of truth so nested modals,
+       drawers, dropdowns and toasts no longer fight over z-50/60/70. */
+    --hms-z-dropdown: 1000;
+    --hms-z-sticky: 1020;
+    --hms-z-drawer: 1040;
+    --hms-z-modal-overlay: 1050;
+    --hms-z-modal: 1060;
+    --hms-z-popover: 1070;
+    --hms-z-toast: 1080;
+    --hms-z-print: 1090;
+}

@@ -1,0 +1,725 @@
+/* ===================================================================
+   HMS — IPD Lab Order Workflow
+   =================================================================== */
+
+/* ── Summary strip ────────────────────────────────────────────────── */
+
+.lab-summary {
+    display: flex;
+    gap: 8px;
+    padding: 14px var(--hms-space-md) 0;
+    flex-wrap: wrap;
+}
+
+.lab-summary__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    border: 1px solid;
+}
+
+.lab-summary__pill.is-pending {
+    background: #fefce8;
+    color: #854d0e;
+    border-color: #fde68a;
+}
+
+.lab-summary__pill.is-collected {
+    background: #eff6ff;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+
+.lab-summary__pill.is-resulted {
+    background: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+/* ── Action row ───────────────────────────────────────────────────── */
+
+.lab-actions {
+    padding: 12px var(--hms-space-md) 0;
+}
+
+.lab-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--hms-gray-50);
+    color: var(--hms-gray-700);
+    border: 1px solid var(--hms-gray-200);
+    cursor: pointer;
+    transition: background 0.12s;
+    font-family: var(--hms-font-family);
+}
+
+.lab-add-btn:hover {
+    background: var(--hms-gray-100);
+}
+
+/* ── New-order form ───────────────────────────────────────────────── */
+
+.lab-form {
+    margin: 10px var(--hms-space-md) 0;
+    padding: 14px;
+    background: var(--hms-gray-50);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 10px;
+}
+
+.lab-form__fields {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.lab-form__field {
+    display: flex;
+    flex-direction: column;
+    min-width: 120px;
+}
+
+.lab-form__field--grow {
+    flex: 1;
+}
+
+.lab-form__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--hms-gray-500);
+    margin-bottom: 4px;
+}
+
+.lab-form__hint {
+    font-size: 11px;
+    color: var(--hms-gray-500);
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+.lab-form__hint strong {
+    color: var(--hms-gray-900);
+    font-weight: 700;
+}
+
+/* ── Kind filter pills (All / Pathology / Radiology) ───────────────── */
+
+.lab-kind-pills {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    background: var(--hms-gray-100);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.lab-kind-pill {
+    padding: 5px 11px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: var(--hms-gray-500);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+    font-family: inherit;
+}
+
+.lab-kind-pill:hover {
+    color: var(--hms-gray-700);
+}
+
+.lab-kind-pill.is-active {
+    background: var(--hms-white);
+    color: var(--hms-gray-900);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+/* ── Kind chip on each order card (Pathology / Radiology) ──────────── */
+
+.lab-kind-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-left: 6px;
+}
+
+.lab-kind-chip.is-lab {
+    background: #ede9fe;
+    color: #6d28d9;
+    border: 1px solid #ddd6fe;
+}
+
+.lab-kind-chip.is-radiology {
+    background: #dbeafe;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.lab-form__input,
+.lab-form__select {
+    padding: 7px 10px;
+    border-radius: 7px;
+    font-size: 12px;
+    border: 1px solid var(--hms-gray-200);
+    background: #fff;
+    color: var(--hms-gray-900);
+    font-family: var(--hms-font-family);
+    outline: none;
+    transition: border-color 0.12s;
+}
+
+.lab-form__input:focus,
+.lab-form__select:focus {
+    border-color: var(--hms-primary);
+}
+
+.lab-form__actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.lab-form__save-btn {
+    padding: 8px 18px;
+    border-radius: 7px;
+    font-size: 12.6px;
+    font-weight: 600;
+    background: var(--hms-primary);
+    color: #fff;
+    border: 1px solid var(--hms-primary);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.18);
+    cursor: pointer;
+    transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+    font-family: var(--hms-font-family);
+}
+
+.lab-form__save-btn:hover:not(:disabled) {
+    background: var(--hms-primary-hover);
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.22);
+    transform: translateY(-1px);
+}
+
+.lab-form__save-btn:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.lab-form__save-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.lab-form__cancel-btn {
+    padding: 6px 12px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 500;
+    background: transparent;
+    color: var(--hms-gray-600);
+    border: 1px solid var(--hms-gray-200);
+    cursor: pointer;
+    transition: background 0.12s;
+    font-family: var(--hms-font-family);
+}
+
+.lab-form__cancel-btn:hover {
+    background: var(--hms-gray-100);
+}
+
+/* ── Order list ───────────────────────────────────────────────────── */
+
+.lab-list {
+    padding: 12px var(--hms-space-md);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* ── Order card ───────────────────────────────────────────────────── */
+
+.lab-card {
+    background: #fff;
+    border: 1px solid var(--hms-gray-150, #e8eaed);
+    border-radius: 10px;
+    padding: 12px 14px;
+    transition: box-shadow 0.12s;
+}
+
+.lab-card:hover {
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.lab-card.is-resulted {
+    background: #fafffe;
+    border-color: #bbf7d0;
+}
+
+.lab-card__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.lab-card__title-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.lab-card__icon {
+    color: var(--hms-primary);
+    flex-shrink: 0;
+}
+
+.lab-card__name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+}
+
+.lab-card__code {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--hms-gray-400);
+    background: var(--hms-gray-50);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: var(--hms-font-mono, monospace);
+}
+
+.lab-card__badges {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+/* ── Status badge ─────────────────────────────────────────────────── */
+
+.lab-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border: 1px solid;
+}
+
+.lab-status-badge.is-pending {
+    background: #fefce8;
+    color: #854d0e;
+    border-color: #fde68a;
+}
+
+.lab-status-badge.is-collected {
+    background: #eff6ff;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+
+.lab-status-badge.is-resulted {
+    background: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+.lab-status-badge.is-awaiting {
+    background: #eff6ff;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+
+.lab-status-badge.is-progress {
+    background: #e0e7ff;
+    color: #4338ca;
+    border-color: #c7d2fe;
+}
+
+.lab-status-badge.is-reported {
+    background: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+.lab-status-badge.is-billed {
+    background: #f0fdfa;
+    color: #0f766e;
+    border-color: #99f6e4;
+}
+
+.lab-status-badge.is-cancelled {
+    background: #ffe4e6;
+    color: #9f1239;
+    border-color: #fecdd3;
+}
+
+/* ── Priority badge ───────────────────────────────────────────────── */
+
+.lab-priority-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10.5px;
+    font-weight: 700;
+    border: 1px solid;
+}
+
+.lab-priority-badge.is-routine {
+    background: var(--hms-gray-50);
+    color: var(--hms-gray-500);
+    border-color: var(--hms-gray-200);
+}
+
+.lab-priority-badge.is-urgent {
+    background: #fff7ed;
+    color: #c2410c;
+    border-color: #fed7aa;
+}
+
+.lab-priority-badge.is-stat {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+/* ── Card meta & sub-rows ─────────────────────────────────────────── */
+
+.lab-card__meta {
+    display: flex;
+    gap: 8px;
+    margin-top: 5px;
+    font-size: 11px;
+    color: var(--hms-gray-400);
+}
+
+.lab-card__meta span + span::before {
+    content: "·";
+    margin-right: 8px;
+}
+
+.lab-card__collected-info {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 6px 0 0;
+    font-size: 11.5px;
+    color: #1e40af;
+}
+
+/* ── Result block (RESULTED state) ───────────────────────────────── */
+
+.lab-result-block {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+}
+
+.lab-result-block__value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.lab-result-block__value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #166534;
+}
+
+.lab-result-block__unit {
+    font-size: 12px;
+    font-weight: 500;
+    color: #166534;
+    opacity: 0.7;
+}
+
+.lab-result-block__range {
+    font-size: 11.5px;
+    color: #166534;
+    opacity: 0.7;
+}
+
+.lab-result-block__notes {
+    font-size: 12px;
+    color: #166534;
+    margin: 6px 0 0;
+    line-height: 1.5;
+}
+
+.lab-result-block__meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #166534;
+    opacity: 0.6;
+    margin: 6px 0 0;
+}
+
+.lab-result-block__billed {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: 8px;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: #ecfdf5;
+    color: #047857;
+    opacity: 1;
+    font-weight: 600;
+}
+
+/* ── Card action buttons ──────────────────────────────────────────── */
+
+.lab-card__actions {
+    display: flex;
+    gap: 7px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.lab-card__action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 7px;
+    font-size: 11.5px;
+    font-weight: 600;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all 0.12s;
+    font-family: var(--hms-font-family);
+}
+
+.lab-card__action-btn.is-collect {
+    background: #eff6ff;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+
+.lab-card__action-btn.is-collect:hover {
+    background: #dbeafe;
+}
+
+.lab-card__action-btn.is-result {
+    background: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+.lab-card__action-btn.is-result:hover {
+    background: #dcfce7;
+}
+
+.lab-card__action-btn.is-link {
+    background: transparent;
+    color: var(--hms-gray-600);
+    border-color: var(--hms-gray-200);
+    text-decoration: none;
+}
+
+.lab-card__action-btn.is-link:hover {
+    background: var(--hms-gray-50);
+    color: #0f172a;
+    border-color: var(--hms-gray-300);
+}
+
+/* ── Lifecycle timestamp strip (read-only) ─────────────────────────── */
+.lab-card__lifecycle {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+    margin: 8px 0 0;
+}
+
+.lab-card__lifecycle-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--hms-gray-500);
+    background: var(--hms-gray-50);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 6px;
+    padding: 2px 8px;
+    white-space: nowrap;
+}
+
+.lab-card__meta-line {
+    margin: 6px 0 0;
+    font-size: 11.5px;
+    color: var(--hms-gray-600);
+}
+
+.lab-card__meta-line code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    color: var(--hms-gray-700);
+    background: var(--hms-gray-100);
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+.lab-card__meta-line.is-muted {
+    color: var(--hms-gray-500);
+}
+
+.lab-card__action-btn.is-cancel {
+    background: transparent;
+    color: var(--hms-gray-500);
+    border-color: var(--hms-gray-200);
+}
+
+.lab-card__action-btn.is-cancel:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+/* ── Result entry form ────────────────────────────────────────────── */
+
+.lab-result-form {
+    margin-top: 10px;
+    padding: 12px;
+    background: var(--hms-gray-50);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 8px;
+}
+
+.lab-result-form__fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+}
+
+.lab-result-form__field {
+    display: flex;
+    flex-direction: column;
+}
+
+.lab-result-form__field--full {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 520px) {
+    .lab-result-form__fields {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .lab-form__fields {
+        flex-direction: column;
+    }
+}
+
+/* ── Queued tests list (multi-order builder) ──────────────────────── */
+
+.lab-queue {
+    margin-top: 10px;
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.lab-queue__scroll {
+    max-height: 224px;
+    overflow-y: auto;
+}
+
+.lab-queue__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-bottom: 1px solid var(--hms-gray-100);
+}
+
+.lab-queue__row:last-child {
+    border-bottom: none;
+}
+
+/* Reuse the card's discipline chip, but it leads the row here (no left gap). */
+.lab-queue__row .lab-kind-chip {
+    margin-left: 0;
+    flex-shrink: 0;
+}
+
+.lab-queue__name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--hms-gray-900);
+}
+
+.lab-queue__price {
+    flex-shrink: 0;
+    font-size: 11.5px;
+    color: var(--hms-gray-700);
+    font-variant-numeric: tabular-nums;
+}
+
+.lab-queue__remove {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--hms-gray-400);
+    cursor: pointer;
+    transition: all 0.12s;
+}
+
+.lab-queue__remove:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.lab-queue__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 12px;
+    font-size: 11.5px;
+    color: var(--hms-gray-500);
+    background: var(--hms-gray-50);
+    border-top: 1px solid var(--hms-gray-200);
+}
+
+.lab-queue__footer strong {
+    color: var(--hms-gray-900);
+    font-weight: 700;
+}

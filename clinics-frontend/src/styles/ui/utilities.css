@@ -1,0 +1,234 @@
+/* ===================================================================
+   HMS DESIGN SYSTEM — Atomic utilities (utilities.css)
+   -------------------------------------------------------------------
+   Mirrors Tailwind's idioms (.flex, .gap-3, .items-center, …) so that
+   when the Tailwind layer is removed in the final cleanup phase, every
+   class in the codebase keeps resolving — only the source of the class
+   shifts from Tailwind's compiled output to this stylesheet.
+
+   Conventions
+     * Token-driven where applicable. Spacing/colour scales mirror the
+       --zu-* token set; raw px values appear only when there is no
+       matching token (e.g. fine-grained 2px/4px increments).
+     * Single-property, single-purpose. No compound utilities — those
+       belong in hms-system.css or modules/<area>.css.
+     * No `!important`. Pattern classes win by specificity; module
+       classes win by source order. Utilities are last-applied per
+       element, so the inline-equivalent intent is preserved.
+   =================================================================== */
+
+
+/* ---------------------------------------------------------- Display */
+.block { display: block; }
+.inline-block { display: inline-block; }
+.flex { display: flex; }
+.inline-flex { display: inline-flex; }
+.grid { display: grid; }
+.hidden { display: none; }
+
+
+/* ---------------------------------------------------------- Position */
+.relative { position: relative; }
+.fixed { position: fixed; }
+.sticky { position: sticky; }
+
+
+/* ---------------------------------------------------------- Flex */
+.flex-col { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-1 { flex: 1 1 0%; }
+.shrink-0 { flex-shrink: 0; }
+
+
+/* ---------------------------------------------------------- Align / Justify */
+.items-start { align-items: flex-start; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.justify-between { justify-content: space-between; }
+
+
+/* ---------------------------------------------------------- Sizing */
+.w-full { width: 100%; }
+.h-screen { height: 100vh; }
+.min-h-screen { min-height: 100vh; }
+.min-w-0 { min-width: 0; }
+.min-w-56 { min-width: 14rem; }
+.max-w-md { max-width: 28rem; }
+.max-w-3xl { max-width: 48rem; }
+.max-w-5xl { max-width: 64rem; }
+.max-w-7xl { max-width: 80rem; }
+
+/* Small fixed sizes (for dots, indicators) */
+.w-1 { width: 4px; }
+.h-1 { height: 4px; }
+.w-2 { width: 8px; }
+.h-2 { height: 8px; }
+.w-3 { width: 12px; }
+.h-3 { height: 12px; }
+.w-4 { width: 16px; }
+.h-4 { height: 16px; }
+.w-5 { width: 20px; }
+.h-5 { height: 20px; }
+.w-6 { width: 24px; }
+.h-6 { height: 24px; }
+.w-8 { width: 32px; }
+.h-8 { height: 32px; }
+.w-10 { width: 40px; }
+.h-10 { height: 40px; }
+.w-12 { width: 48px; }
+.h-12 { height: 48px; }
+.h-64 { height: 256px; }
+
+
+/* ---------------------------------------------------------- Overflow */
+.overflow-hidden { overflow: hidden; }
+.overflow-x-auto { overflow-x: auto; }
+
+
+/* ---------------------------------------------------------- Gap (flex + grid) */
+.gap-0 { gap: 0; }
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.gap-5 { gap: 20px; }
+.gap-6 { gap: 24px; }
+.gap-8 { gap: 32px; }
+
+
+/* ---------------------------------------------------------- Margin */
+.m-0 { margin: 0; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.ml-auto { margin-left: auto; }
+.mt-0 { margin-top: 0; }
+.mb-0 { margin-bottom: 0; }
+.mt-1 { margin-top: 4px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mt-6 { margin-top: 24px; }
+.mb-1 { margin-bottom: 4px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-5 { margin-bottom: 20px; }
+.mb-6 { margin-bottom: 24px; }
+.mb-8 { margin-bottom: 32px; }
+.ml-1 { margin-left: 4px; }
+.ml-2 { margin-left: 8px; }
+.mr-1 { margin-right: 4px; }
+.mr-2 { margin-right: 8px; }
+
+
+/* ---------------------------------------------------------- Padding */
+.p-0 { padding: 0; }
+.p-1 { padding: 4px; }
+.p-2 { padding: 8px; }
+.p-4 { padding: 16px; }
+.p-8 { padding: 32px; }
+.px-4 { padding-left: 16px; padding-right: 16px; }
+.px-8 { padding-left: 32px; padding-right: 32px; }
+.py-2 { padding-top: 8px; padding-bottom: 8px; }
+.py-4 { padding-top: 16px; padding-bottom: 16px; }
+.py-6 { padding-top: 24px; padding-bottom: 24px; }
+.py-16 { padding-top: 64px; padding-bottom: 64px; }
+.pt-1 { padding-top: 4px; }
+.pt-2 { padding-top: 8px; }
+.pt-3 { padding-top: 12px; }
+.pt-4 { padding-top: 16px; }
+.pb-3 { padding-bottom: 12px; }
+.pl-9 { padding-left: 36px; }
+.pr-9 { padding-right: 36px; }
+
+
+/* ---------------------------------------------------------- Typography */
+.text-11 { font-size: 11px; }
+.text-12 { font-size: 12px; }
+.text-13 { font-size: 13px; }
+.text-14 { font-size: 14px; }
+.text-sm { font-size: 13px; }
+.text-18 { font-size: 18px; }
+.text-22 { font-size: 22px; }
+
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+.uppercase { text-transform: uppercase; }
+.lowercase { text-transform: lowercase; }
+.capitalize { text-transform: capitalize; }
+.tracking-wide { letter-spacing: 0.05em; }
+
+.tabular-nums { font-variant-numeric: tabular-nums; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.whitespace-nowrap { white-space: nowrap; }
+
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+
+/* ---------------------------------------------------------- Colours */
+.text-gray-300 { color: var(--zu-gray-300); }
+.text-gray-400 { color: var(--zu-gray-400); }
+.text-gray-500 { color: var(--zu-gray-500); }
+.text-gray-600 { color: var(--zu-gray-600); }
+.text-gray-700 { color: var(--zu-gray-700); }
+.text-gray-900 { color: var(--zu-gray-900); }
+.text-info { color: var(--zu-info); }
+.text-success { color: var(--zu-success); }
+.text-warning { color: var(--zu-warning); }
+.text-danger { color: var(--zu-danger); }
+.text-red-500 { color: var(--zu-danger); }
+.hover\:text-red-700:hover { color: var(--zu-danger-hover); }
+.text-rose { color: #be123c; }
+.text-amber { color: #b45309; }
+.text-emerald { color: #059669; }
+.text-accent-external { color: var(--zu-accent-external); }
+.font-normal { font-weight: 400; }
+.bg-gray-50 { background: var(--zu-gray-50); }
+
+/* Solid colour backgrounds (using --zu-* tokens — for dots, badges, accent strips) */
+.bg-info { background: var(--zu-info); }
+
+
+/* ---------------------------------------------------------- Borders */
+.border { border: 1px solid var(--zu-gray-200); }
+.border-dashed { border-style: dashed; }
+.border-t { border-top-width: 1px; border-top-style: solid; border-top-color: var(--zu-gray-200); }
+.border-b { border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: var(--zu-gray-200); }
+
+
+/* ---------------------------------------------------------- Radius */
+.rounded { border-radius: var(--zu-radius-sm); }
+.rounded-md { border-radius: var(--zu-radius-md); }
+.rounded-full { border-radius: var(--zu-radius-full); }
+
+
+/* ---------------------------------------------------------- Shadow */
+
+
+/* ---------------------------------------------------------- Interactivity */
+
+
+/* ---------------------------------------------------------- Lists */
+
+
+/* ---------------------------------------------------------- Opacity */
+.opacity-25 { opacity: 0.25; }
+.opacity-30 { opacity: 0.3; }
+.opacity-40 { opacity: 0.4; }
+.opacity-50 { opacity: 0.5; }
+
+
+/* ---------------------------------------------------------- Transitions */
+.transition { transition: all 0.15s; }
+
+
+/* ---------------------------------------------------------- Animations */
+@keyframes util-spin { to { transform: rotate(360deg); } }
+.animate-spin { animation: util-spin 1s linear infinite; }
+
+
+/* ---------------------------------------------------------- Grid helpers */
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }

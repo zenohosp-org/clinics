@@ -1,0 +1,871 @@
+/* ===================================================================
+   HMS — application shell
+   -------------------------------------------------------------------
+   Layout/Sidebar/Header/FocusLayout pieces. Lives separately from
+   hms-system.css (primitives) because these classes assume a specific
+   composition (collapsible sidebar + sticky header + scrollable main).
+   =================================================================== */
+
+
+/* ─────────────────────────── App shell (Layout.jsx) ─────────────────────────── */
+.hms-app-shell {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--hms-gray-50);
+}
+
+.hms-app-shell.is-focus {
+    flex-direction: column;
+}
+
+.hms-app-shell__main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+.hms-app-shell__content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--hms-space-lg);
+}
+
+.hms-app-shell.is-focus .hms-app-shell__content,
+.hms-app-shell__content.is-focus {
+    padding: 0;
+    overflow: hidden;
+}
+
+@media print {
+    .hms-app-shell__content {
+        padding: 0;
+        overflow: visible;
+    }
+}
+
+
+/* ─────────────────────────── Sidebar (Sidebar.jsx) ─────────────────────────── */
+.hms-sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    background: var(--hms-white);
+    border-right: 1px solid var(--hms-gray-200);
+    width: 260px;
+}
+
+.hms-sidebar.is-collapsed {
+    width: 64px;
+}
+
+
+/* Logo strip at the top */
+.hms-sidebar__logo {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--hms-gray-200);
+    height: auto;
+    min-height: 56px;
+    gap: 8px;
+    /* Static: the sidebar is a fixed 260px rail, so its internal spacing has
+       no free space to reclaim. Fluid spacing applies to the content area. */
+    padding: 0px 20px;
+}
+
+.hms-sidebar.is-collapsed .hms-sidebar__logo {
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+}
+
+.hms-sidebar__logo-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--hms-gray-900);
+    color: var(--hms-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.hms-sidebar__brand {
+    overflow: hidden;
+}
+
+.hms-sidebar__brand-name {
+    margin: 0;
+    font-weight: 800;
+    font-size: 18px;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    color: #020617;
+}
+
+.hms-sidebar__brand-sub {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--hms-gray-600);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* Scrollable nav body */
+.hms-sidebar__nav {
+    flex: 1;
+    padding: 1rem 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.hms-sidebar__section-label {
+    padding: 1rem 1.25rem 0.5rem;
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+}
+
+.hms-sidebar__section-label.is-spaced {
+    margin-top: 0;
+}
+
+
+/* Nav items (link + accordion trigger) — Zenlocare semantic structure */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sidebar-nav-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 9px 1rem;
+    margin: 0 0 0 12px;
+    width: calc(100% - 1.5rem);
+    border-radius: 0.5rem;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    color: #020617;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--hms-font-family);
+    transition: background 150ms ease, color 150ms ease;
+    text-align: left;
+}
+
+.sidebar-nav-item:hover {
+    background: #f3f4f6;
+    color: #000000;
+}
+
+.sidebar-nav-item.active {
+    background: #e4e4e4;
+    color: #020617;
+    font-weight: 500;
+}
+
+.sidebar-nav-item.is-icon-only {
+    justify-content: center;
+    padding: 12px 0;
+    width: 44px;
+    margin: 0 auto;
+}
+
+.hms-sidebar__link-icon {
+    width: 18px;
+    height: 18px;
+    color: #020617;
+    flex-shrink: 0;
+}
+
+.sidebar-nav-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hms-sidebar__acc-chevron {
+    width: 14px;
+    height: 14px;
+    transition: transform 200ms ease;
+    opacity: 0.5;
+    color: var(--hms-gray-400);
+}
+
+.hms-sidebar__acc-chevron.is-open {
+    transform: rotate(180deg);
+}
+
+/* Submenu with the vertical left-line accent from Ziranly/Zenlocare */
+.sidebar-submenu {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 0 0 0 0.75rem;
+    margin: 2px 0.75rem 2px 34px;
+    border-left: 1px solid #e5e7eb;
+}
+
+.sidebar-submenu li {
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-submenu a {
+    display: block;
+    font-size: 14px;
+    font-weight: 400;
+    padding: 7px 0.75rem;
+    border-radius: 0.5rem;
+    width: 100%;
+    text-decoration: none;
+    color: #020617;
+    transition: background 150ms ease, color 150ms ease;
+}
+
+.sidebar-submenu a:hover {
+    background: #f3f4f6;
+    color: #000000;
+}
+
+.sidebar-submenu a.active {
+    background: #e4e4e4;
+    color: #020617;
+    font-weight: 500;
+}
+
+
+/* Footer (external apps) */
+.hms-sidebar__footer {
+    border-top: 1px solid var(--hms-gray-200);
+    background: var(--hms-gray-50);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.hms-sidebar__ext {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--hms-gray-700);
+    transition: background 150ms ease, color 150ms ease;
+}
+
+.hms-sidebar__ext.is-icon-only {
+    justify-content: center;
+    padding: 12px 0;
+    width: 100%;
+}
+
+.hms-sidebar__ext:hover {
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-900);
+}
+
+
+/* ─────────────────────────── Header (Header.jsx) ─────────────────────────── */
+.hms-header {
+    height: 56px;
+    background: var(--hms-white);
+    border-bottom: 1px solid var(--hms-gray-200);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--hms-space-md);
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.hms-header__burger,
+.hms-header__bell {
+    background: transparent;
+    border: 0;
+    color: var(--hms-gray-500);
+    padding: 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease;
+    position: relative;
+}
+
+.hms-header__burger:hover,
+.hms-header__bell:hover {
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-800);
+}
+
+.hms-header__bell {
+    padding: 8px;
+}
+
+.hms-header__bell-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--hms-gray-900);
+}
+
+.hms-header__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--hms-gray-700);
+    flex: 1;
+}
+
+.hms-header__right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.hms-header__divider {
+    height: 32px;
+    width: 1px;
+    background: var(--hms-gray-200);
+    margin: 0 8px;
+}
+
+.hms-header__user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: 4px;
+}
+
+.hms-header__user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: var(--hms-gray-100);
+    border: 1px solid var(--hms-gray-300);
+    color: var(--hms-gray-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.hms-header__user-text {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+@media (min-width: 640px) {
+    .hms-header__user-text {
+        display: flex;
+    }
+}
+
+.hms-header__user-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--hms-gray-900);
+    line-height: 1.2;
+}
+
+.hms-header__user-role {
+    font-size: 13px;
+    color: var(--hms-gray-500);
+}
+
+.hms-header__logout {
+    background: transparent;
+    border: 0;
+    color: var(--hms-gray-600);
+    padding: 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease;
+    flex-shrink: 0;
+}
+
+.hms-header__logout:hover {
+    background: #fef2f2;
+    color: #f43f5e;
+}
+
+
+/* ─────────────────────────── Login page (Login.jsx) ─────────────────────────── */
+.hms-login {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--hms-white);
+}
+
+@media (min-width: 1024px) {
+    .hms-login {
+        flex-direction: row;
+    }
+}
+
+.hms-login__form-pane {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--hms-space-xl);
+}
+
+@media (min-width: 1024px) {
+    .hms-login__form-pane {
+        width: 45%;
+        padding: 48px;
+    }
+}
+
+.hms-login__form-inner {
+    width: 100%;
+    max-width: 384px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.hms-login__brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.hms-login__brand-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--hms-gray-900);
+    color: var(--hms-white);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--hms-shadow-lg);
+}
+
+.hms-login__brand-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    line-height: 1;
+}
+
+.hms-login__brand-sub {
+    margin: 4px 0 0;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--hms-gray-600);
+}
+
+.hms-login__heading {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hms-login__heading h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+}
+
+.hms-login__heading p {
+    margin: 0;
+    font-size: 15px;
+    color: var(--hms-gray-500);
+}
+
+.hms-login__alert {
+    padding: 12px var(--hms-space-md);
+    border-radius: 8px;
+    font-size: 15px;
+    border: 1px solid;
+}
+
+.hms-login__alert.is-info {
+    background: var(--hms-gray-50);
+    border-color: var(--hms-gray-200);
+    color: var(--hms-gray-600);
+}
+
+.hms-login__alert.is-danger {
+    background: #fff1f2;
+    border-color: #fecdd3;
+    color: #be123c;
+}
+
+.hms-login__sso-btn {
+    width: 100%;
+    padding: var(--hms-space-md);
+    background: var(--hms-gray-900);
+    color: var(--hms-white);
+    font-weight: 700;
+    font-size: 15px;
+    border: 0;
+    border-radius: 8px;
+    box-shadow: var(--hms-shadow-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 200ms ease, transform 100ms ease;
+}
+
+.hms-login__sso-btn:hover {
+    background: var(--hms-gray-800);
+}
+
+.hms-login__sso-btn:active {
+    transform: scale(0.98);
+}
+
+.hms-login__terms {
+    margin: 0;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--hms-gray-600);
+}
+
+.hms-login__terms-link {
+    color: var(--hms-gray-900);
+    cursor: pointer;
+}
+
+.hms-login__terms-link:hover {
+    text-decoration: underline;
+}
+
+
+/* Right pane — auto-rotating feature carousel (Zoho-style clean).
+   Hidden on small screens; takes 55% on desktop. White surface with a
+   centered "stage" (hero icon + 3 floating orbs) and a caption block
+   that rotates every 4.5s. All visuals are inline lucide icons + CSS,
+   no images and no network round-trips, so the panel paints instantly. */
+.hms-login__visual {
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    .hms-login__visual {
+        display: flex;
+        width: 55%;
+        background: var(--hms-white);
+        border-left: 1px solid var(--hms-gray-200);
+        position: relative;
+        overflow: hidden;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px;
+    }
+}
+
+.hms-login__carousel {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    height: 380px;
+    flex-shrink: 0;
+}
+
+.hms-login__slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 500ms ease, transform 500ms ease;
+    pointer-events: none;
+    will-change: opacity, transform;
+}
+
+.hms-login__slide.is-active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.hms-login__slide-stage {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hms-login__slide-hero {
+    width: 112px;
+    height: 112px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 14px 36px -10px rgba(15, 23, 42, 0.18);
+    animation: hms-login-pulse-hero 3.2s ease-in-out infinite;
+}
+
+.hms-login__slide.is-blue   .hms-login__slide-hero { background: #dbeafe; color: #2563eb; }
+.hms-login__slide.is-violet .hms-login__slide-hero { background: #ede9fe; color: #7c3aed; }
+.hms-login__slide.is-amber  .hms-login__slide-hero { background: #fef3c7; color: #d97706; }
+.hms-login__slide.is-green  .hms-login__slide-hero { background: #d1fae5; color: #059669; }
+
+@keyframes hms-login-pulse-hero {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.04); }
+}
+
+.hms-login__slide-orb {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    color: var(--hms-gray-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.12);
+    animation: hms-login-orb-float 4s ease-in-out infinite;
+}
+
+.hms-login__slide-orb.is-orb-1 { top: 6%;    right: 4%;  animation-delay: 0s;    }
+.hms-login__slide-orb.is-orb-2 { bottom: 14%; right: 0%;  animation-delay: 0.7s; }
+.hms-login__slide-orb.is-orb-3 { bottom: 6%;  left: 10%;  animation-delay: 1.4s; }
+
+@keyframes hms-login-orb-float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+}
+
+.hms-login__slide-caption {
+    text-align: center;
+    max-width: 380px;
+}
+
+.hms-login__slide-caption h3 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+}
+
+.hms-login__slide-caption p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--hms-gray-600);
+    line-height: 1.55;
+}
+
+.hms-login__dots {
+    display: flex;
+    gap: 8px;
+    margin-top: 36px;
+}
+
+.hms-login__dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: var(--hms-gray-300);
+    cursor: pointer;
+    transition: width 220ms ease, background-color 220ms ease;
+}
+
+.hms-login__dot.is-active {
+    width: 26px;
+    background: var(--hms-gray-900);
+}
+
+
+/* ─────────────────────────── Unauthorized + SsoCallback (centered states) ─────────────────────────── */
+.hms-page-center {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hms-gray-50);
+    padding: var(--hms-space-lg);
+}
+
+.hms-page-center__card {
+    width: 100%;
+    max-width: 28rem;
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 12px;
+    box-shadow: var(--hms-shadow-md);
+    padding: var(--hms-space-xl);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--hms-space-md);
+    text-align: center;
+}
+
+.hms-page-center__title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+}
+
+.hms-page-center__desc {
+    margin: 0;
+    font-size: 15px;
+    color: var(--hms-gray-600);
+}
+
+.hms-page-center__emoji {
+    font-size: 3.75rem;
+    margin-bottom: 4px;
+}
+
+.hms-page-center__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.hms-page-center__action-secondary {
+    background: var(--hms-white);
+    color: var(--hms-gray-600);
+    font-weight: 700;
+    padding: 10px var(--hms-space-20);
+    border-radius: 8px;
+    border: 1px solid var(--hms-gray-200);
+    cursor: pointer;
+    transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
+    font-size: 15px;
+    font-family: var(--hms-font-family);
+}
+
+.hms-page-center__action-secondary:hover {
+    background: var(--hms-gray-50);
+    border-color: var(--hms-gray-300);
+    color: var(--hms-gray-800);
+}
+
+.hms-page-center__action-link {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    font-size: 15px;
+    color: #ef4444;
+    cursor: pointer;
+    transition: color 150ms ease;
+    font-family: var(--hms-font-family);
+}
+
+.hms-page-center__action-link:hover {
+    color: #dc2626;
+}
+
+
+/* ─────────────────────────── SSO callback spinner + error states ─────────────────────────── */
+.hms-sso {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hms-white);
+}
+
+.hms-sso__card {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--hms-space-md);
+    align-items: center;
+}
+
+.hms-sso__spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #10b981;
+    border-top-color: transparent;
+    border-radius: 999px;
+    animation: hms-sso-spin 800ms linear infinite;
+}
+
+@keyframes hms-sso-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.hms-sso__error-icon {
+    width: 48px;
+    height: 48px;
+    background: #fee2e2;
+    color: #ef4444;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hms-sso__title {
+    margin: 0;
+    font-weight: 600;
+    color: var(--hms-gray-700);
+    font-size: 15px;
+}
+
+.hms-sso__title.is-danger {
+    color: #ef4444;
+}
+
+.hms-sso__desc {
+    margin: 0;
+    font-size: 15px;
+    color: var(--hms-gray-400);
+}

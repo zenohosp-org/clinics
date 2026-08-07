@@ -1,0 +1,440 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Write Prescription — compact table layout
+   Used exclusively by WritePrescriptionModal.jsx + PrescriptionDrugRow.jsx
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Column grid shared by header + every drug row ───────────────────────── */
+/*  #28 | drug:1fr | dose:80 | freq:96 | days:54 | qty:60 | route:88 | del:36 */
+.hms-rx-col-grid {
+    display: grid;
+    grid-template-columns: 28px minmax(180px, 1fr) 80px 96px 54px 60px 88px 36px;
+}
+
+/* ── Table container ─────────────────────────────────────────────────────── */
+
+.hms-rx-table {
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 10px;
+    overflow: visible; /* allow dropdowns to overflow row bounds */
+    background: var(--hms-white);
+}
+
+/* ── Table header row ────────────────────────────────────────────────────── */
+
+.hms-rx-table-head {
+    display: grid;
+    grid-template-columns: 28px minmax(180px, 1fr) 80px 96px 54px 60px 88px 36px;
+    background: var(--hms-gray-50);
+    border-bottom: 1px solid var(--hms-gray-200);
+    border-radius: 10px 10px 0 0;
+}
+
+.hms-rx-table-head__cell {
+    padding: 7px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--hms-gray-500);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.hms-rx-table-head__cell:not(:first-child) {
+    border-left: 1px solid var(--hms-gray-150, #eaecf0);
+}
+
+/* ── Drug row ────────────────────────────────────────────────────────────── */
+
+.hms-rx-row {
+    border-bottom: 1px solid var(--hms-gray-100);
+    position: relative; /* for typeahead z-stacking */
+}
+
+.hms-rx-row:last-child {
+    border-bottom: none;
+}
+
+.hms-rx-row__cells {
+    display: grid;
+    grid-template-columns: 28px minmax(180px, 1fr) 80px 96px 54px 60px 88px 36px;
+    align-items: stretch;
+    min-height: 42px;
+}
+
+/* ── Row number ──────────────────────────────────────────────────────────── */
+
+.hms-rx-row__num {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 13px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--hms-gray-400);
+    user-select: none;
+}
+
+/* ── Drug search cell ────────────────────────────────────────────────────── */
+
+.hms-rx-row__drug {
+    border-left: 1px solid var(--hms-gray-100);
+    position: relative;
+    padding: 7px 8px 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    min-height: 42px;
+}
+
+/* inline search row: icon + input + spinner */
+.hms-rx-drug-search {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.hms-rx-drug-icon {
+    color: var(--hms-gray-400);
+    flex-shrink: 0;
+}
+
+.hms-rx-drug-input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--hms-gray-800);
+    padding: 0;
+    height: 22px;
+    font-family: var(--hms-font-family);
+}
+
+.hms-rx-drug-input:focus {
+    outline: none;
+}
+
+.hms-rx-drug-input::placeholder {
+    color: var(--hms-gray-400);
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* Row highlight when drug cell is focused */
+.hms-rx-row__drug:focus-within {
+    background: #f8faff;
+}
+
+/* Linked-to-master badge */
+.hms-rx-drug-linked {
+    font-size: 10.5px;
+    color: var(--hms-gray-500);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Free-text-only warning */
+.hms-rx-drug-warn {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10.5px;
+    color: #b45309;
+    margin: 0;
+}
+
+.hms-rx-drug-allergy-warn {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #b91c1c;
+    margin: 0;
+}
+
+.hms-rx-row.is-allergy-match {
+    background: #fff5f5;
+    border-left: 3px solid #f87171;
+}
+
+.hms-rx-allergy-ack {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.hms-rx-allergy-ack-input {
+    width: 100%;
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #7f1d1d;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 11px;
+    font-family: var(--hms-font-family);
+}
+
+.hms-rx-allergy-ack-input:focus {
+    outline: none;
+    border-color: #b91c1c;
+}
+
+.hms-rx-allergy-ack-input::placeholder {
+    color: #b91c1c;
+    opacity: 0.6;
+}
+
+.hms-rx-drug-duplicate-warn {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #b45309;
+    margin: 0;
+}
+
+.hms-rx-row.is-duplicate-match {
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+}
+
+/* Typeahead results dropdown */
+.hms-rx-drug-results {
+    position: absolute;
+    z-index: 300;
+    top: calc(100% + 2px);
+    left: 0;
+    right: 0;
+    min-width: 240px;
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.hms-rx-drug-result {
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.1s;
+    font-family: var(--hms-font-family);
+    border-bottom: 1px solid var(--hms-gray-50);
+}
+
+.hms-rx-drug-result:last-child {
+    border-bottom: none;
+}
+
+.hms-rx-drug-result:hover {
+    background: #f0f7ff;
+}
+
+.hms-rx-drug-result__name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+    margin: 0 0 2px;
+}
+
+.hms-rx-drug-result__sub {
+    font-size: 11.5px;
+    color: var(--hms-gray-500);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hms-rx-stock {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+
+.hms-rx-stock.is-in  { background: #dcfce7; color: #15803d; }
+.hms-rx-stock.is-out { background: #fee2e2; color: #dc2626; }
+
+/* Schedule badge */
+.hms-rx-sched-badge {
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: #fef3c7;
+    color: #b45309;
+}
+
+/* ── Generic field cells (dose, days, qty) ───────────────────────────────── */
+
+.hms-rx-row__cell {
+    border-left: 1px solid var(--hms-gray-100);
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+/* Borderless, full-cell inputs */
+.hms-rx-cell-input {
+    width: 100%;
+    height: 100%;
+    min-height: 42px;
+    border: none;
+    background: transparent;
+    padding: 0 8px;
+    font-size: 13px;
+    color: var(--hms-gray-800);
+    text-align: center;
+    font-family: var(--hms-font-family);
+    -moz-appearance: textfield; /* hide number spinners Firefox */
+}
+
+.hms-rx-cell-input::-webkit-inner-spin-button,
+.hms-rx-cell-input::-webkit-outer-spin-button {
+    -webkit-appearance: none; /* hide spinners Chrome */
+    margin: 0;
+}
+
+.hms-rx-cell-input:focus {
+    outline: none;
+    background: #f0f7ff;
+}
+
+.hms-rx-cell-input::placeholder {
+    color: var(--hms-gray-400);
+    font-size: 11.5px;
+}
+
+/* Auto-computed quantity gets a subtle green tint */
+.hms-rx-cell-input.is-auto {
+    color: #059669;
+}
+
+/* ── SearchableSelect inside table cells ─────────────────────────────────── */
+
+.hms-rx-row__cell .hms-searchable-select {
+    width: 100%;
+    height: 100%;
+}
+
+.hms-rx-row__cell .hms-select__trigger {
+    height: 100%;
+    min-height: 42px;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--hms-gray-700);
+    padding: 0 8px;
+}
+
+.hms-rx-row__cell .hms-select__trigger:hover {
+    border: none;
+    background: var(--hms-gray-50);
+}
+
+.hms-rx-row__cell .hms-select__trigger:focus {
+    box-shadow: none;
+    border: none;
+    background: #f0f7ff;
+}
+
+.hms-rx-row__cell .hms-select__dropdown {
+    z-index: 300;
+    min-width: 180px;
+    left: auto;
+    right: 0;
+}
+
+/* ── Delete button ───────────────────────────────────────────────────────── */
+
+.hms-rx-del-btn {
+    width: 36px;
+    border: none;
+    border-left: 1px solid var(--hms-gray-100);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--hms-gray-300);
+    transition: color 0.15s, background 0.15s;
+    align-self: stretch;
+    border-radius: 0 0 0 0;
+}
+
+.hms-rx-del-btn:hover:not(:disabled) {
+    color: #ef4444;
+    background: #fff1f2;
+}
+
+.hms-rx-del-btn:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+}
+
+/* ── Instructions sub-row ────────────────────────────────────────────────── */
+
+.hms-rx-row__instr {
+    padding: 2px 8px 7px;
+    padding-left: 36px; /* indent past num column */
+    border-top: 1px solid var(--hms-gray-50);
+}
+
+.hms-rx-instr-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    font-style: italic;
+    color: var(--hms-gray-500);
+    padding: 2px 0;
+    font-family: var(--hms-font-family);
+}
+
+.hms-rx-instr-input:focus {
+    outline: none;
+    font-style: normal;
+    color: var(--hms-gray-700);
+}
+
+.hms-rx-instr-input::placeholder {
+    color: var(--hms-gray-300);
+    font-style: italic;
+}
+
+/* ── "Add drug" row inside table ─────────────────────────────────────────── */
+
+.hms-rx-add-row {
+    padding: 8px 10px;
+    border-top: 1px dashed var(--hms-gray-200);
+    background: var(--hms-gray-50);
+    border-radius: 0 0 10px 10px;
+}
+
+/* ── Responsive: collapse to scrollable table on narrow screens ───────────  */
+
+@media (max-width: 640px) {
+    .hms-rx-table {
+        overflow-x: auto;
+    }
+
+    .hms-rx-table-head,
+    .hms-rx-row__cells {
+        min-width: 580px;
+    }
+}

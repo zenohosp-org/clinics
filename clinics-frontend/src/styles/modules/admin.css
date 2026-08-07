@@ -1,0 +1,4760 @@
+/* ===================================================================
+   HMS — admin module
+   -------------------------------------------------------------------
+   Page-specific compositions for the admin area. Atomic helpers live
+   in utilities.css; reusable patterns (avatar, icon tile, kv row,
+   etc.) live in hms-system.css.
+
+   What lives here
+     * .hms-entity-row              — table-row composition of avatar +
+                                      title + caption + optional code.
+                                      Used by Specializations / Services
+                                      / Departments / DoctorsList /
+                                      StaffsList / PatientServices.
+     * .hms-dept-presets            — dashed quick-add chip strip used
+                                      below the Departments &
+                                      Designations table.
+     * .hms-shift-*                 — ShiftRoster grid pieces (mini nav
+                                      button, shift chip & remove).
+     * .hms-admit-* / .hms-discharge-* — narrow page-area helpers used
+                                      by Admit/Discharge/MoveToOT /
+                                      ViewBilling modals.
+   =================================================================== */
+
+
+/* ─────────────────────────── Entity row (table cell) ─────────────────────────── */
+.hms-entity-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.hms-entity-row__body {
+    min-width: 0;
+}
+
+.hms-entity-row__title {
+    margin: 0;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--hms-gray-900);
+    line-height: 1.3;
+}
+
+.hms-entity-row__sub {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--hms-gray-500);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 280px;
+}
+
+.hms-entity-row__code {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-600);
+    border-radius: 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+}
+
+
+/* ─────────────────────────── Quick-add preset chips (Departments / Designations) ─────────────────────────── */
+.hms-preset-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px dashed var(--hms-gray-300);
+    background: transparent;
+    color: var(--hms-gray-500);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--hms-font-family);
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.hms-preset-chip:hover {
+    border-color: var(--hms-gray-400);
+    color: var(--hms-gray-700);
+}
+
+.hms-preset-strip {
+    padding: var(--hms-space-20);
+    border-top: 1px solid var(--hms-gray-100);
+}
+
+.hms-preset-strip__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.hms-preset-strip__none {
+    font-size: 13px;
+    color: var(--hms-gray-400);
+}
+
+
+/* ─────────────────────────── Group / section card header (taxonomy pages) ─────────────────────────── */
+.hms-group-header {
+    padding: var(--hms-space-md) var(--hms-space-20);
+    border-bottom: 1px solid var(--hms-gray-100);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hms-group-header__title {
+    margin: 0;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+}
+
+.hms-group-header__count {
+    font-size: 13px;
+    color: var(--hms-gray-400);
+}
+
+
+/* ─────────────────────────── Shift roster (ShiftRoster.jsx) ─────────────────────────── */
+.hms-shift-nav-btn {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    border: 1px solid var(--hms-gray-200);
+    background: transparent;
+    color: var(--hms-gray-400);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.hms-shift-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.hms-shift-add-btn {
+    width: 100%;
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px dashed var(--hms-gray-200);
+    background: transparent;
+    color: var(--hms-gray-300);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.hms-shift-add-btn.is-large {
+    flex: 1;
+    min-height: 52px;
+    border: 1px solid var(--hms-gray-200);
+    background: var(--hms-gray-50);
+    padding: 0;
+}
+
+
+/* ─────────────────────────── Shift roster top nav card + legend ─────────────────────────── */
+.hms-shift-nav {
+    flex-direction: row !important;
+    /* override Card flex-col */
+    align-items: center;
+    gap: 12px;
+    padding: 12px var(--hms-space-md) !important;
+}
+
+.hms-shift-nav__controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.hms-shift-nav__week-label {
+    flex: 1;
+    margin: 0;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hms-gray-800);
+}
+
+.hms-shift-legend {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.hms-shift-legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+.hms-shift-legend__dot,
+.hms-shift-menu__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    flex-shrink: 0;
+}
+
+/* Domain-specific shift palette — page-local, not in tone set */
+
+
+/* ─────────────────────────── Shift roster group card ─────────────────────────── */
+.hms-shift-group {
+    padding: 0 !important;
+    overflow: visible !important;
+    /* allow popover positioning */
+}
+
+.hms-shift-group__head {
+    padding: 10px var(--hms-space-md);
+    border-bottom: 1px solid var(--hms-gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hms-shift-group__title {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--hms-gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-shift-group__count {
+    margin-left: 8px;
+    font-weight: 400;
+    color: var(--hms-gray-400);
+    text-transform: none;
+}
+
+.hms-shift-group__paging {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.hms-shift-group__paging-label {
+    font-size: 12px;
+    color: var(--hms-gray-400);
+    padding: 0 4px;
+}
+
+
+/* ─────────────────────────── Shift roster table ─────────────────────────── */
+.hms-shift-table-wrap {
+    overflow-x: auto;
+}
+
+.hms-shift-table {
+    width: 100%;
+    min-width: 700px;
+    border-collapse: collapse;
+}
+
+.hms-shift-table thead tr {
+    border-bottom: 1px solid var(--hms-gray-100);
+}
+
+.hms-shift-table__col-employee {
+    text-align: left;
+    padding: 8px var(--hms-space-md);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--hms-gray-500);
+    width: 192px;
+}
+
+.hms-shift-table__col-day {
+    text-align: center;
+    padding: 8px;
+    width: 96px;
+    background: transparent;
+}
+
+.hms-shift-table__col-day.is-today {
+    background: var(--hms-info-bg);
+}
+
+.hms-shift-table__day-name {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--hms-gray-400);
+}
+
+.hms-shift-table__col-day.is-today .hms-shift-table__day-name {
+    color: var(--hms-info);
+}
+
+.hms-shift-table__day-num {
+    font-size: 14px;
+    font-weight: 700;
+    margin-top: 2px;
+    color: var(--hms-gray-700);
+}
+
+.hms-shift-table__col-day.is-today .hms-shift-table__day-num {
+    color: #0369a1;
+}
+
+.hms-shift-table tbody tr {
+    border-bottom: 1px solid var(--hms-gray-50);
+}
+
+.hms-shift-table__employee {
+    padding: 10px var(--hms-space-md);
+}
+
+.hms-shift-table__employee-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hms-shift-table__employee-body {
+    min-width: 0;
+}
+
+.hms-shift-table__employee-name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hms-shift-table__employee-role {
+    margin: 0;
+    font-size: 11px;
+    color: var(--hms-gray-500);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hms-shift-table__cell {
+    padding: 8px 6px;
+    vertical-align: top;
+    position: relative;
+    background: transparent;
+}
+
+.hms-shift-table__cell.is-today {
+    background: rgba(239, 246, 255, 0.4);
+}
+
+.hms-shift-table__cell-body {
+    min-height: 52px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.hms-shift-table__loading {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid var(--hms-gray-100);
+    background: var(--hms-gray-50);
+}
+
+
+/* ─────────────────────────── Shift chip (per shift type) ─────────────────────────── */
+.hms-shift-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.hms-shift-chip__remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 4px;
+    opacity: 0.7;
+    transition: opacity 0.15s, background 0.15s;
+}
+
+.hms-shift-chip__remove:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.06);
+}
+
+
+/* ─────────────────────────── Shift roster popover (assign menu) ─────────────────────────── */
+.hms-shift-menu {
+    min-width: 220px;
+}
+
+.hms-shift-menu__header {
+    padding: 6px 10px 4px;
+    border-bottom: 1px solid var(--hms-gray-100);
+    margin-bottom: 4px;
+}
+
+.hms-shift-menu__header-label {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--hms-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-shift-menu__time {
+    font-size: 11px;
+    color: var(--hms-gray-500);
+}
+
+
+/* ─────────────────────────── Shift roster: states (loading + empty) ─────────────────────────── */
+.hms-shift-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 96px 0;
+    color: var(--hms-gray-500);
+}
+
+.hms-shift-state.is-empty {
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hms-shift-state__icon-dim {
+    opacity: 0.3;
+}
+
+.hms-shift-state__icon-mid {
+    color: var(--hms-gray-300);
+}
+
+
+/* ─────────────────────────── Shift roster avatar tones (page-local) ─────────────────────────── */
+.hms-shift-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-700);
+}
+
+.hms-shift-avatar.is-doctor {
+    background: var(--hms-info-bg);
+    color: #0369a1;
+}
+
+.hms-shift-avatar.is-admin {
+    background: #fff1f2;
+    color: #be123c;
+}
+
+.hms-shift-avatar.is-technician {
+    background: var(--hms-warning-bg);
+    color: #b45309;
+}
+
+
+/* ─────────────────────────── Doctor schedule day pill (DoctorFormModal) ─────────────────────────── */
+.hms-day-pill {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid var(--hms-gray-200);
+    background: var(--hms-white);
+    color: var(--hms-gray-500);
+    font-family: var(--hms-font-family);
+}
+
+.hms-day-pill.is-on {
+    border-color: var(--hms-brand-primary);
+    background: var(--hms-brand-primary);
+    color: var(--hms-white);
+}
+
+
+/* ─────────────────────────── Section title with number circle (AdmitPatientModal) ─────────────────────────── */
+.hms-section-num {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--hms-gray-100);
+}
+
+.hms-section-num__circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: var(--hms-brand-primary);
+    color: var(--hms-white);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.hms-section-num__title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+}
+
+.hms-section-num__subtitle {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+
+/* ─────────────────────────── Delete-confirm summary card ─────────────────────────── */
+.hms-confirm-summary {
+    margin-top: var(--hms-space-md);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--hms-gray-50);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: var(--hms-radius);
+}
+
+.hms-confirm-summary__title {
+    margin: 0;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    font-size: 15px;
+}
+
+.hms-confirm-summary__sub {
+    margin: 0;
+    font-size: 13px;
+    color: var(--hms-gray-500);
+}
+
+
+/* ─────────────────────────── Stat tile (small KPI for StaffsList top row) ─────────────────────────── */
+.hms-stat-tile__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.hms-stat-tile__label {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--hms-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-stat-tile__value {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+
+/* ─────────────────────────── StaffsList auto-fit grids ─────────────────────────── */
+.hms-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.hms-member-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--hms-space-md);
+}
+
+
+/* ─────────────────────────── Member card (StaffsList grid item) ─────────────────────────── */
+.hms-member-card {
+    gap: 14px !important;
+    /* override Card's default gap-sm */
+}
+
+.hms-member-card .hms-avatar {
+    border-width: 2px;
+}
+
+.hms-member-card__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.hms-member-card__identity {
+    display: flex;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+}
+
+.hms-member-card__name {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hms-member-card__code {
+    margin: 2px 0 0;
+    font-size: 11px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--hms-gray-500);
+}
+
+.hms-member-card__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.hms-member-card__details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--hms-gray-500);
+}
+
+.hms-member-card__designation {
+    margin: 0;
+    font-weight: 600;
+    color: var(--hms-gray-700);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hms-member-card__department {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--hms-gray-700);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hms-member-card__line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hms-member-card__line.is-truncate {
+    overflow: hidden;
+}
+
+.hms-member-card__line.is-truncate>span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hms-member-card__fee {
+    margin: 0;
+    font-weight: 700;
+    color: var(--hms-success);
+}
+
+
+/* ─────────────────────────── Skeleton placeholder strip (loading member card) ─────────────────────────── */
+.hms-skel {
+    background: var(--hms-gray-100);
+    border-radius: 4px;
+}
+
+.hms-skel.is-circle {
+    border-radius: 999px;
+}
+
+
+/* ─────────────────────────── Admissions stat tile (large icon left, value right) ─────────────────────────── */
+
+
+/* Per-stat colors — page-local; not part of the design-system tone set. */
+
+
+
+
+/* ─────────────────────────── Admissions grid view toggle ─────────────────────────── */
+.hms-view-toggle {
+    display: flex;
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.hms-view-toggle__btn {
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    background: var(--hms-white);
+    color: var(--hms-gray-500);
+    transition: background 0.15s;
+    font-family: var(--hms-font-family);
+}
+
+.hms-view-toggle__btn.is-active {
+    background: var(--hms-brand-primary);
+    color: var(--hms-white);
+}
+
+
+/* ─────────────────────────── Admissions card / row (status accent strip + content) ─────────────────────────── */
+.hms-admit-card {
+    position: relative;
+    padding: var(--hms-space-md);
+    gap: 12px !important;
+}
+
+.hms-admit-card.is-overdue {
+    border-left: 4px solid #fb7185;
+}
+
+.hms-admit-card.is-ot {
+    border-left: 4px solid #7c3aed;
+}
+
+.hms-admit-card__head {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.hms-admit-card__patient {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.hms-admit-card__name {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--hms-gray-900);
+}
+
+.hms-admit-card__uhid {
+    margin: 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+.hms-admit-card__pills {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.hms-admit-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--hms-gray-500);
+}
+
+.hms-admit-card__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hms-admit-card__footer {
+    padding-top: 12px;
+    border-top: 1px solid var(--hms-gray-100);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hms-admit-card__ids {
+    text-align: right;
+}
+
+.hms-admit-card__ipd {
+    margin: 0;
+    font-size: 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+}
+
+.hms-admit-card__no {
+    margin: 0;
+    font-size: 11px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--hms-gray-400);
+}
+
+
+/* ─────────────────────────── EMERGENCY admission type pill (Admissions card) ─────────────────────────── */
+.hms-emergency-pill {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--hms-danger);
+    color: var(--hms-white);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+/* ─────────────────────────── Admissions auto-fit grids ─────────────────────────── */
+
+.hms-admit-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--hms-space-md);
+}
+
+
+/* ─────────────────────────── Admissions stat card needs row layout ─────────────────────────── */
+
+
+/* ─────────────────────────── Generic 40x40 patient/icon tile (Admissions card) ─────────────────────────── */
+.hms-admit-card__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-700);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+
+/* ─────────────────────────── Admissions filter row ─────────────────────────── */
+.hms-admit-filter {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.hms-admit-filter__search {
+    flex: 1;
+    min-width: 260px;
+}
+
+
+/* ─────────────────────────── Admissions overdue / OT inline text accents ─────────────────────────── */
+.hms-admit-overdue-text {
+    color: #e11d48;
+    font-weight: 600;
+}
+
+.hms-admit-ot-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7c3aed;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.hms-admit-no-room {
+    color: var(--hms-warning);
+    font-size: 12px;
+}
+
+
+/* ─────────────────────────── Admissions state (empty / loading) ─────────────────────────── */
+.hms-admit-state {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--hms-gray-400);
+    padding: 64px 0;
+}
+
+.hms-admit-state.is-empty {
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hms-admit-state__cta {
+    background: transparent;
+    border: none;
+    color: var(--hms-gray-900);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    font-family: var(--hms-font-family);
+}
+
+
+/* ─────────────────────────── Admissions list-view table ─────────────────────────── */
+.hms-admit-table-card {
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+.hms-admit-table-wrap {
+    overflow-x: auto;
+}
+
+.hms-admit-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.hms-admit-table thead tr {
+    border-bottom: 1px solid var(--hms-gray-100);
+    background: var(--hms-gray-50);
+}
+
+.hms-admit-table th {
+    padding: 10px var(--hms-space-md);
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--hms-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-admit-table tbody tr {
+    border-bottom: 1px solid var(--hms-gray-100);
+    cursor: pointer;
+}
+
+.hms-admit-table tbody tr.is-overdue {
+    border-left: 4px solid #fb7185;
+}
+
+.hms-admit-table tbody tr.is-ot {
+    border-left: 4px solid #7c3aed;
+}
+
+.hms-admit-table td {
+    padding: 10px var(--hms-space-md);
+}
+
+.hms-admit-table__id-primary {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+}
+
+.hms-admit-table__id-secondary {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    color: var(--hms-gray-400);
+}
+
+.hms-admit-table__name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--hms-gray-900);
+}
+
+.hms-admit-table__sub {
+    margin: 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+.hms-admit-table__text {
+    font-size: 14px;
+    color: var(--hms-gray-600);
+}
+
+.hms-admit-table__text-sm {
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+
+/* ─────────────────────────── DoctorFormModal: identity header (Drawer edit mode) ─────────────────────────── */
+.hms-doctor-identity {
+    display: flex;
+    align-items: center;
+    gap: var(--hms-space-md);
+    padding: var(--hms-space-md);
+    background: var(--hms-gray-50);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: var(--hms-radius);
+}
+
+.hms-doctor-identity__body {
+    min-width: 0;
+}
+
+.hms-doctor-identity__name {
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    font-size: 16px;
+}
+
+.hms-doctor-identity__email {
+    font-size: 14px;
+    color: var(--hms-gray-500);
+    margin-top: 2px;
+}
+
+
+/* ─────────────────────────── DoctorFormModal: specialisation chip picker ─────────────────────────── */
+.hms-spec-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: var(--hms-info-bg);
+    color: #0369a1;
+    border: 1px solid var(--hms-info-border);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.hms-spec-chip__remove {
+    background: transparent;
+    border: none;
+    color: #0369a1;
+    cursor: pointer;
+    line-height: 0;
+    padding: 0;
+}
+
+.hms-spec-chip__max {
+    margin: 0;
+    font-size: 12px;
+    color: var(--hms-gray-400);
+}
+
+
+/* ─────────────────────────── DoctorFormModal: weekly schedule preview ─────────────────────────── */
+.hms-schedule-preview {
+    padding: var(--hms-space-md);
+    background: var(--hms-gray-50);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: var(--hms-radius);
+}
+
+.hms-schedule-preview__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.hms-schedule-preview__tile {
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+}
+
+.hms-schedule-preview__label {
+    margin: 0;
+    font-size: 11px;
+    color: var(--hms-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-schedule-preview__value {
+    margin: 4px 0 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+}
+
+.hms-schedule-preview__total {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--hms-gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hms-schedule-preview__total-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--hms-gray-500);
+}
+
+.hms-schedule-preview__total-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+}
+
+
+/* ─────────────────────────── DoctorFormModal: section + day-pill row ─────────────────────────── */
+.hms-day-pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.hms-doctor-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hms-space-lg);
+}
+
+
+/* ─────────────────────────── AdmitPatientModal: patient picker (selected + search) ─────────────────────────── */
+.hms-patient-pick {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--hms-gray-50);
+    border: 1px solid var(--hms-gray-200);
+}
+
+.hms-patient-pick__identity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.hms-patient-pick__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--hms-gray-200);
+    color: var(--hms-gray-600);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hms-patient-pick__name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hms-gray-900);
+}
+
+.hms-patient-pick__sub {
+    margin: 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+.hms-patient-pick__change {
+    background: transparent;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--hms-gray-600);
+    cursor: pointer;
+    text-decoration: underline;
+    font-family: var(--hms-font-family);
+}
+
+
+/* AdmitPatientModal: patient search input + suggest dropdown */
+.hms-patient-search {
+    position: relative;
+}
+
+.hms-patient-search__icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--hms-gray-400);
+    pointer-events: none;
+}
+
+.hms-patient-search__input {
+    padding-left: 36px;
+}
+
+.hms-patient-suggest {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 8px;
+    box-shadow: var(--hms-shadow-lg);
+    z-index: 10;
+    overflow: hidden;
+}
+
+.hms-patient-suggest__item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px var(--hms-space-md);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--hms-font-family);
+    transition: background 0.15s;
+}
+
+.hms-patient-suggest__item:hover {
+    background: var(--hms-gray-50);
+}
+
+.hms-patient-suggest__name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--hms-gray-900);
+}
+
+.hms-patient-suggest__sub {
+    margin: 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+
+/* ─────────────────────────── AdmitPatientModal: bed selector grid ─────────────────────────── */
+.hms-bed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+}
+
+.hms-bed-chip {
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid var(--hms-success-border);
+    background: var(--hms-success-bg);
+    color: #166534;
+    font-family: var(--hms-font-family);
+}
+
+.hms-bed-chip.is-on {
+    border-color: var(--hms-brand-primary);
+    background: var(--hms-brand-primary);
+    color: var(--hms-white);
+}
+
+.hms-bed-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0;
+    color: var(--hms-gray-400);
+    font-size: 14px;
+}
+
+.hms-bed-empty {
+    margin: 0;
+    font-size: 14px;
+    color: var(--hms-danger);
+}
+
+
+/* ─────────────────────────── AdmitPatientModal: payment-category cards ─────────────────────────── */
+.hms-pay-card {
+    text-align: left;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 2px solid var(--hms-gray-200);
+    background: var(--hms-white);
+    font-family: var(--hms-font-family);
+}
+
+.hms-pay-card.is-on {
+    border-color: var(--hms-brand-primary);
+    background: var(--hms-gray-50);
+}
+
+.hms-pay-card__label {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hms-gray-600);
+}
+
+.hms-pay-card.is-on .hms-pay-card__label {
+    color: var(--hms-gray-900);
+}
+
+.hms-pay-card__desc {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-400);
+}
+
+
+/* ─────────────────────────── AdmitPatientModal: advance block + summary ─────────────────────────── */
+.hms-admit-advance-block {
+    padding-top: var(--hms-space-md);
+    border-top: 1px solid var(--hms-gray-100);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hms-advance-account-hint {
+    margin-left: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--hms-gray-400);
+}
+
+.hms-advance-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--hms-gray-500);
+    padding: 8px 0;
+}
+
+.hms-admit-summary {
+    padding: var(--hms-space-md);
+    border-radius: 8px;
+    background: var(--hms-gray-50);
+    border: 1px solid var(--hms-gray-200);
+    font-size: 14px;
+}
+
+.hms-admit-summary__title {
+    margin: 0 0 8px;
+    font-weight: 600;
+    color: var(--hms-gray-700);
+}
+
+.hms-admit-summary__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0 var(--hms-space-md);
+    color: var(--hms-gray-600);
+}
+
+
+/* ─────────────────────────── DischargeModal: fullscreen split-pane shell ─────────────────────────── */
+.hms-discharge-shell {
+    position: fixed;
+    inset: 0;
+    background: var(--hms-white);
+    z-index: var(--hms-z-modal-overlay);
+    display: flex;
+    overflow: hidden;
+}
+
+.hms-discharge-left {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border-right: 1px solid var(--hms-gray-200);
+}
+
+.hms-discharge-right {
+    width: 340px;
+    flex-shrink: 0;
+    background: var(--hms-gray-50);
+    overflow-y: auto;
+    padding: var(--hms-space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--hms-space-20);
+}
+
+.hms-discharge-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--hms-space-md) var(--hms-space-lg);
+    border-bottom: 1px solid var(--hms-gray-100);
+    flex-shrink: 0;
+}
+
+.hms-discharge-header__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hms-discharge-header__sub {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+.hms-discharge-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--hms-space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--hms-space-md);
+}
+
+.hms-discharge-footer {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: var(--hms-space-md) var(--hms-space-lg);
+    border-top: 1px solid var(--hms-gray-100);
+    background: var(--hms-gray-50);
+}
+
+
+/* DischargeModal: follow-up checkbox card */
+.hms-discharge-followup {
+    border-radius: 8px;
+    border: 1px solid var(--hms-gray-200);
+    padding: var(--hms-space-md);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hms-discharge-followup__label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.hms-discharge-followup__checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--hms-brand-primary);
+    cursor: pointer;
+}
+
+.hms-discharge-followup__text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hms-discharge-followup__indent {
+    padding-left: var(--hms-space-28);
+}
+
+
+/* DischargeModal: patient summary block (right pane) */
+
+.hms-discharge-patient__label {
+    margin: 0 0 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--hms-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-discharge-patient__name {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    line-height: 1.2;
+}
+
+.hms-discharge-patient__uhid {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+
+/* DischargeModal: stacked key/value list */
+.hms-discharge-summary {
+    border-radius: 12px;
+    border: 1px solid var(--hms-gray-200);
+    background: var(--hms-white);
+    overflow: hidden;
+}
+
+.hms-discharge-summary__row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px var(--hms-space-md);
+    border-top: 1px solid var(--hms-gray-100);
+}
+
+.hms-discharge-summary__row:first-child {
+    border-top: none;
+}
+
+.hms-discharge-summary__label {
+    font-size: 12px;
+    color: var(--hms-gray-500);
+    flex-shrink: 0;
+    padding-top: 2px;
+}
+
+.hms-discharge-summary__value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+    text-align: right;
+}
+
+
+/* DischargeModal: billing status card (4 tones) */
+.hms-bill-card {
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid var(--hms-gray-200);
+    background: var(--hms-gray-50);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.hms-bill-card.is-clear {
+    background: var(--hms-success-bg);
+    border-color: var(--hms-success-border);
+}
+
+.hms-bill-card.is-partial {
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+
+.hms-bill-card.is-unpaid {
+    background: var(--hms-danger-bg);
+    border-color: var(--hms-danger-border);
+}
+
+.hms-bill-card__icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--hms-gray-400);
+}
+
+.hms-bill-card.is-clear .hms-bill-card__icon {
+    color: var(--hms-success);
+}
+
+.hms-bill-card.is-partial .hms-bill-card__icon {
+    color: #c2410c;
+}
+
+.hms-bill-card.is-unpaid .hms-bill-card__icon {
+    color: var(--hms-danger);
+}
+
+.hms-bill-card__title {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.hms-bill-card__sub {
+    margin: 2px 0 0;
+    font-size: 12px;
+}
+
+.hms-bill-card.is-clear .hms-bill-card__title,
+.hms-bill-card.is-clear .hms-bill-card__sub {
+    color: #166534;
+}
+
+.hms-bill-card.is-partial .hms-bill-card__title,
+.hms-bill-card.is-partial .hms-bill-card__sub {
+    color: #c2410c;
+}
+
+.hms-bill-card.is-unpaid .hms-bill-card__title,
+.hms-bill-card.is-unpaid .hms-bill-card__sub {
+    color: #dc2626;
+}
+
+.hms-bill-card .hms-bill-card__title.is-pending,
+.hms-bill-card .hms-bill-card__sub.is-pending {
+    color: var(--hms-gray-500);
+    font-weight: 600;
+}
+
+
+/* ─────────────────────────── MoveToOTModal / DischargeModal: loading row + room radio rows ─────────────────────────── */
+.hms-modal-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: var(--hms-space-xl);
+    color: var(--hms-gray-400);
+    font-size: 14px;
+}
+
+.hms-room-radio-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hms-room-radio {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px var(--hms-space-md);
+    border-radius: 8px;
+    border: 1px solid var(--hms-gray-200);
+    background: var(--hms-white);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.hms-room-radio.is-on {
+    border-color: var(--hms-brand-primary);
+    background: var(--hms-gray-50);
+}
+
+.hms-room-radio__input {
+    accent-color: var(--hms-brand-primary);
+    cursor: pointer;
+}
+
+.hms-room-radio__name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+}
+
+.hms-room-radio__sub {
+    margin: 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+.hms-room-empty {
+    padding: 12px var(--hms-space-md);
+    border-radius: 8px;
+    border: 1px solid var(--hms-warning-border);
+    background: var(--hms-warning-bg);
+    color: #92400e;
+    font-size: 14px;
+}
+
+
+/* ─────────────────────────── ViewBillingModal: loading + empty + bill table ─────────────────────────── */
+.hms-bill-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 80px 0;
+}
+
+.hms-bill-loading__icon {
+    color: var(--hms-gray-700);
+}
+
+.hms-bill-loading__text {
+    margin: 0;
+    font-size: 14px;
+    color: var(--hms-gray-500);
+}
+
+.hms-bill-empty {
+    padding: 48px var(--hms-space-md);
+    text-align: center;
+    border: 2px dashed var(--hms-gray-200);
+    border-radius: 8px;
+}
+
+.hms-bill-empty__title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--hms-gray-500);
+}
+
+.hms-bill-empty__sub {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-400);
+}
+
+.hms-bill-table {
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.hms-bill-table__head,
+.hms-bill-table__row {
+    display: grid;
+    grid-template-columns: 1.4fr 2.4fr 1fr 1fr 1fr;
+    gap: 8px;
+    padding: 10px var(--hms-space-md);
+}
+
+.hms-bill-table__head {
+    background: var(--hms-gray-50);
+    border-bottom: 1px solid var(--hms-gray-100);
+}
+
+.hms-bill-table__row {
+    align-items: center;
+    border-bottom: 1px solid var(--hms-gray-50);
+}
+
+.hms-bill-table__head-cell {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--hms-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-bill-table__head-cell.is-center {
+    text-align: center;
+}
+
+.hms-bill-table__head-cell.is-right {
+    text-align: right;
+}
+
+.hms-bill-table__cell {
+    font-size: 14px;
+    color: var(--hms-gray-600);
+    font-variant-numeric: tabular-nums;
+}
+
+.hms-bill-table__cell.is-center {
+    text-align: center;
+}
+
+.hms-bill-table__cell.is-right {
+    text-align: right;
+}
+
+.hms-bill-table__desc {
+    font-size: 14px;
+    color: var(--hms-gray-700);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hms-bill-table__total {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hms-gray-800);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* Bill item type pill — TYPE_META modifiers */
+.hms-bill-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.hms-bill-type.is-room {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.hms-bill-type.is-consultation {
+    background: var(--hms-info-bg);
+    color: #0369a1;
+}
+
+.hms-bill-type.is-radiology {
+    background: #f5f3ff;
+    color: #6d28d9;
+}
+
+.hms-bill-type.is-lab {
+    background: #f0fdfa;
+    color: #0f766e;
+}
+
+.hms-bill-type.is-medicine {
+    background: var(--hms-success-bg);
+    color: #166534;
+}
+
+.hms-bill-type.is-ot {
+    background: #f5f3ff;
+    color: #7c3aed;
+}
+
+.hms-bill-type.is-custom {
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-600);
+}
+
+
+/* Bill totals block */
+.hms-bill-totals {
+    padding: var(--hms-space-md);
+    border-top: 1px solid var(--hms-gray-100);
+    display: flex;
+    justify-content: flex-end;
+    background: var(--hms-gray-50);
+}
+
+.hms-bill-totals__inner {
+    width: 240px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.hms-bill-totals__row {
+    display: flex;
+    justify-content: space-between;
+    color: var(--hms-gray-500);
+}
+
+.hms-bill-totals__row span:last-child {
+    font-variant-numeric: tabular-nums;
+}
+
+.hms-bill-totals__row.is-subtotal span:last-child {
+    font-weight: 600;
+}
+
+.hms-bill-totals__row.is-grand {
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    font-size: 16px;
+    border-top: 1px solid var(--hms-gray-100);
+    padding-top: 10px;
+    margin-top: 4px;
+}
+
+.hms-bill-totals__row.is-grand span:last-child {
+    color: var(--hms-info);
+}
+
+.hms-bill-disclaimer {
+    margin: 0;
+    font-size: 12px;
+    color: var(--hms-gray-400);
+    text-align: center;
+}
+
+
+/* ─────────────────────────── DoctorDetails: fullscreen split-pane page ─────────────────────────── */
+
+.hms-detail-page {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    overflow: hidden;
+    height: 100%;
+}
+
+.hms-detail-page__aside {
+    width: 288px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--hms-white);
+    border-right: 1px solid var(--hms-gray-200);
+    overflow-y: auto;
+}
+
+.hms-detail-page__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--hms-gray-50);
+}
+
+
+/* Aside top: back button + edit */
+.hms-detail-aside__topbar {
+    padding: var(--hms-space-20) var(--hms-space-20) 12px;
+    border-bottom: 1px solid var(--hms-gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hms-detail-aside__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--hms-gray-500);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-family: var(--hms-font-family);
+}
+
+
+/* Aside hero: avatar + name + subtitle + status */
+.hms-detail-aside__hero {
+    padding: var(--hms-space-lg) var(--hms-space-20);
+    text-align: center;
+    border-bottom: 1px solid var(--hms-gray-200);
+}
+
+.hms-detail-aside__hero-avatar {
+    margin: 0 auto 12px;
+}
+
+.hms-detail-aside__name {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    line-height: 1.2;
+}
+
+.hms-detail-aside__subtitle {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: var(--hms-gray-500);
+}
+
+.hms-detail-aside__reg {
+    margin: 12px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-400);
+}
+
+
+/* Status dot inside a Badge (the small green dot when Active) */
+.hms-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    margin-right: 4px;
+}
+
+.hms-status-dot.is-success {
+    background: var(--hms-success);
+}
+
+
+/* Aside body — sections of side info rows */
+.hms-detail-aside__sections {
+    padding: var(--hms-space-20);
+    display: flex;
+    flex-direction: column;
+    gap: var(--hms-space-lg);
+    flex: 1;
+}
+
+.hms-side-section__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.hms-side-section__title {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--hms-gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-side-section__list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hms-side-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.hms-side-info__icon {
+    flex-shrink: 0;
+    color: var(--hms-gray-400);
+    margin-top: 2px;
+}
+
+.hms-side-info__label {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--hms-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-side-info__value {
+    margin: 2px 0 0;
+    font-size: 14px;
+    color: var(--hms-gray-700);
+}
+
+
+/* Main pane tab bar */
+.hms-detail-tabs {
+    padding: var(--hms-space-20) var(--hms-space-lg) 0;
+    background: var(--hms-white);
+    border-bottom: 1px solid var(--hms-gray-200);
+    flex-shrink: 0;
+}
+
+.hms-detail-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--hms-space-lg);
+}
+
+
+/* DoctorDetails: section card (Billing & schedule / Medical registration) */
+.hms-detail-section {
+    padding: 0 !important;
+}
+
+.hms-detail-section__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: var(--hms-space-md) var(--hms-space-20);
+    border-bottom: 1px solid var(--hms-gray-100);
+}
+
+.hms-detail-section__icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hms-detail-section__icon.is-success {
+    background: var(--hms-success-bg);
+    color: var(--hms-success);
+}
+
+.hms-detail-section__icon.is-info {
+    background: var(--hms-info-bg);
+    color: var(--hms-info);
+}
+
+.hms-detail-section__title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+}
+
+.hms-detail-section__body {
+    padding: var(--hms-space-20);
+}
+
+.hms-detail-section__body.is-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--hms-space-20);
+}
+
+
+/* DoctorDetails: stat row + stat card content */
+.hms-doctor-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--hms-space-md);
+}
+
+.hms-doctor-stat__head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--hms-gray-500);
+    margin-bottom: 8px;
+}
+
+
+
+
+/* DoctorDetails: fee tile grid + tile */
+.hms-fee-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: var(--hms-space-20);
+}
+
+.hms-fee-tile {
+    padding: 14px;
+    background: var(--hms-gray-50);
+    border-radius: 8px;
+    border: 1px solid var(--hms-gray-200);
+}
+
+.hms-fee-tile.is-accent {
+    background: var(--hms-success-bg);
+    border-color: var(--hms-success-border);
+}
+
+.hms-fee-tile__label {
+    margin: 0 0 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--hms-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-fee-tile.is-accent .hms-fee-tile__label {
+    color: #166534;
+}
+
+.hms-fee-tile__row {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hms-fee-tile__row>svg {
+    color: var(--hms-gray-400);
+}
+
+.hms-fee-tile__value {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--hms-gray-900);
+}
+
+
+/* DoctorDetails: small day chip (compact pill in available-days strip) */
+.hms-day-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--hms-gray-50);
+    color: var(--hms-gray-400);
+    border: 1px solid var(--hms-gray-200);
+}
+
+.hms-day-chip.is-on {
+    background: var(--hms-info-bg);
+    color: #0369a1;
+    border-color: var(--hms-info-border);
+}
+
+
+/* DoctorDetails: appointment card with status accent strip */
+.hms-detail-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--hms-space-md);
+}
+
+.hms-appt-card {
+    padding: var(--hms-space-20) !important;
+    position: relative;
+    overflow: hidden;
+    gap: 12px !important;
+}
+
+.hms-appt-card__stripe {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+}
+
+.hms-appt-card__stripe.is-success {
+    background: var(--hms-success);
+}
+
+.hms-appt-card__stripe.is-danger {
+    background: var(--hms-danger);
+}
+
+.hms-appt-card__stripe.is-warning {
+    background: var(--hms-warning);
+}
+
+.hms-appt-card__stripe.is-info {
+    background: var(--hms-info);
+}
+
+.hms-appt-card__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.hms-appt-card__date {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--hms-gray-800);
+}
+
+.hms-appt-card__time {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: var(--hms-gray-500);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hms-appt-card__patient {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hms-appt-card__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-700);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.hms-appt-card__name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+}
+
+.hms-appt-card__type {
+    margin: 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+
+/* Reason for visit panel */
+.hms-appt-reason {
+    background: var(--hms-gray-50);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--hms-gray-100);
+}
+
+.hms-appt-reason__label {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--hms-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-appt-reason__quote {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--hms-gray-700);
+    line-height: 1.5;
+    font-style: italic;
+}
+
+
+/* Patient card (row layout in PatientsTab) */
+.hms-patient-card {
+    flex-direction: row !important;
+    align-items: center;
+    gap: var(--hms-space-md);
+}
+
+.hms-patient-card__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    background: var(--hms-gray-100);
+    border: 1px solid var(--hms-gray-200);
+    color: var(--hms-gray-700);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.hms-patient-card__name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hms-patient-card__sub {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+
+/* Schedule editor: per-day row */
+.hms-schedule-day {
+    border-radius: 12px;
+    border: 1px solid var(--hms-gray-200);
+    background: var(--hms-white);
+    transition: all 0.15s;
+}
+
+.hms-schedule-day.is-off {
+    background: var(--hms-gray-50);
+    opacity: 0.6;
+}
+
+.hms-schedule-day__row {
+    display: flex;
+    align-items: center;
+    gap: var(--hms-space-md);
+    padding: var(--hms-space-md) var(--hms-space-20);
+}
+
+.hms-schedule-day__name-col {
+    width: 112px;
+    flex-shrink: 0;
+}
+
+.hms-schedule-day__name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hms-schedule-day__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--hms-gray-300);
+}
+
+.hms-schedule-day.is-on .hms-schedule-day__dot {
+    background: var(--hms-success);
+}
+
+.hms-schedule-day__name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hms-gray-700);
+}
+
+.hms-schedule-day__off {
+    margin: 4px 0 0 var(--hms-space-md);
+    font-size: 11px;
+    color: var(--hms-gray-400);
+}
+
+.hms-schedule-day__inputs {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.hms-schedule-day__hint {
+    margin: 0;
+    font-size: 13px;
+    color: var(--hms-gray-400);
+}
+
+
+/* Slot field (label + control) */
+.hms-slot-field__label {
+    margin: 0 0 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--hms-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+
+/* Schedule preview bar (windowed summary at bottom of day row) */
+.hms-schedule-bar {
+    padding: 0 var(--hms-space-20) 12px;
+}
+
+.hms-schedule-bar__inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: var(--hms-gray-50);
+    border-radius: 8px;
+    border: 1px solid var(--hms-gray-100);
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+
+/* Centered empty state (with icon + title + description) */
+.hms-center-empty {
+    padding: 64px 0;
+    text-align: center;
+}
+
+.hms-center-empty__icon {
+    color: var(--hms-gray-300);
+    margin-bottom: 12px;
+}
+
+.hms-center-empty__title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hms-gray-500);
+}
+
+.hms-center-empty__desc {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-400);
+}
+
+
+/* Inline link-style button (used in Schedule "Edit doctor" cta) */
+.hms-link-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--hms-gray-600);
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit;
+}
+
+.hms-link-btn.is-info {
+    color: var(--hms-info);
+    text-decoration: none;
+    font-size: 12px;
+    margin-top: 6px;
+    font-family: var(--hms-font-family);
+}
+
+
+/* DoctorDetails: full-screen loading + 404 wrappers */
+.hms-detail-loading,
+.hms-detail-notfound {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: var(--hms-white);
+}
+
+.hms-detail-notfound {
+    flex-direction: column;
+    gap: var(--hms-space-md);
+}
+
+
+/* DoctorDetails: section heading for the schedule / appointments tab heads */
+.hms-tab-head {
+    margin-bottom: var(--hms-space-20);
+}
+
+.hms-tab-head__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+}
+
+.hms-tab-head__sub {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--hms-gray-500);
+}
+
+
+/* DoctorDetails: available-days strip section label */
+.hms-available-label {
+    margin: 0 0 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--hms-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+
+/* DoctorDetails: schedule tab head (title + Save button) */
+.hms-schedule-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--hms-space-20);
+}
+
+
+/* ─────────────────────────── AdminDashboard: page shell ─────────────────────────── */
+.hms-dash {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hms-space-xl);
+}
+
+.hms-dash__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.hms-dash__greeting {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    letter-spacing: -0.02em;
+}
+
+.hms-dash__subtitle {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: var(--hms-gray-500);
+}
+
+
+/* AdminDashboard: KPI grid + KPI card */
+.hms-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--hms-space-md);
+}
+
+.hms-kpi-card {
+    padding: var(--hms-space-20) !important;
+    gap: var(--hms-space-md) !important;
+}
+
+.hms-kpi-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hms-kpi-card__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-700);
+}
+
+.hms-kpi-card__icon.is-info {
+    background: var(--hms-info-bg);
+    color: var(--hms-info);
+}
+
+.hms-kpi-card__icon.is-success {
+    background: var(--hms-success-bg);
+    color: var(--hms-success);
+}
+
+.hms-kpi-card__icon.is-warning {
+    background: var(--hms-warning-bg);
+    color: #b45309;
+}
+
+.hms-kpi-card__icon.is-neutral {
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-700);
+}
+
+.hms-kpi-card__icon.is-rose {
+    background: #fff1f2;
+    color: #be123c;
+}
+
+.hms-kpi-card__trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 999px;
+}
+
+.hms-kpi-card__trend.is-up {
+    background: var(--hms-success-bg);
+    color: var(--hms-success);
+}
+
+.hms-kpi-card__trend.is-down {
+    background: #fff1f2;
+    color: #be123c;
+}
+
+.hms-kpi-card__value {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--hms-gray-900);
+    letter-spacing: -0.02em;
+}
+
+.hms-kpi-card__label {
+    margin: 2px 0 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--hms-gray-500);
+}
+
+.hms-kpi-card__sub {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+
+/* AdminDashboard: chart card + title row */
+.hms-chart-card {
+    padding: var(--hms-space-lg) !important;
+    gap: var(--hms-space-20) !important;
+}
+
+.hms-chart-card__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.hms-chart-card__title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+}
+
+.hms-chart-card__subtitle {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+.hms-chart-card__action {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--hms-gray-900);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    font-family: var(--hms-font-family);
+}
+
+
+/* AdminDashboard: row layouts */
+.hms-dash-row.is-3-2 {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: var(--hms-space-lg);
+}
+
+.hms-dash-row.is-3col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--hms-space-lg);
+}
+
+
+/* AdminDashboard: recharts custom tooltip surface */
+.hms-tooltip {
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 8px;
+    box-shadow: var(--hms-shadow-lg);
+    padding: 10px 14px;
+    font-size: 12px;
+    font-family: var(--hms-font-family);
+}
+
+.hms-tooltip__title {
+    margin: 0 0 4px;
+    font-weight: 700;
+    color: var(--hms-gray-700);
+}
+
+.hms-tooltip__line {
+    margin: 0;
+}
+
+.hms-tooltip__line.is-paid {
+    color: #10b981;
+}
+
+.hms-tooltip__line.is-outstanding {
+    color: #f43f5e;
+}
+
+
+/* AdminDashboard: donut centre text */
+.hms-donut-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hms-donut-center {
+    position: absolute;
+    text-align: center;
+    pointer-events: none;
+}
+
+.hms-donut-center__value {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--hms-gray-900);
+}
+
+.hms-donut-center__label {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--hms-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+
+/* AdminDashboard: legend dot row */
+.hms-legend-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hms-legend-row__left,
+.hms-legend-row__right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hms-legend-row__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    flex-shrink: 0;
+}
+
+.hms-legend-row__label {
+    font-size: 12px;
+    color: var(--hms-gray-600);
+}
+
+.hms-legend-row__value {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--hms-gray-800);
+}
+
+.hms-legend-row__pct {
+    font-size: 11px;
+    color: var(--hms-gray-500);
+    width: 32px;
+    text-align: right;
+}
+
+.hms-legend-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+
+/* AdminDashboard: revenue bar legend (paid + outstanding squares) */
+.hms-rev-legend {
+    display: flex;
+    align-items: center;
+    gap: var(--hms-space-md);
+    margin-top: 4px;
+}
+
+.hms-rev-legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+.hms-rev-legend__sq {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+}
+
+.hms-rev-legend__sq.is-paid {
+    background: #10b981;
+}
+
+.hms-rev-legend__sq.is-outstanding {
+    background: #f43f5e;
+    opacity: 0.7;
+}
+
+
+/* AdminDashboard: empty-chart placeholder */
+.hms-empty-chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 160px;
+    gap: 8px;
+    color: var(--hms-gray-400);
+}
+
+
+/* AdminDashboard: quick-actions card */
+.hms-quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.hms-quick-action {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+    font-family: var(--hms-font-family);
+}
+
+.hms-quick-action:hover {
+    background: var(--hms-gray-50);
+}
+
+.hms-quick-action__icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.hms-quick-action__icon.is-success {
+    background: var(--hms-success-bg);
+    color: var(--hms-success);
+}
+
+.hms-quick-action__icon.is-neutral {
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-700);
+}
+
+.hms-quick-action__icon.is-info {
+    background: var(--hms-info-bg);
+    color: var(--hms-info);
+}
+
+.hms-quick-action__icon.is-warning {
+    background: var(--hms-warning-bg);
+    color: #b45309;
+}
+
+.hms-quick-action__icon.is-rose {
+    background: #fff1f2;
+    color: #be123c;
+}
+
+.hms-quick-action__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.hms-quick-action__label {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+}
+
+.hms-quick-action__sub {
+    margin: 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* AdminDashboard: card heading block (Quick actions card title) */
+.hms-card-head {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.hms-card-head__title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+}
+
+.hms-card-head__sub {
+    margin: 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+
+/* ===================================================================
+   IPDDetailPane.jsx — right-edge slide-in drawer for an inpatient
+   admission. Pane-local patterns; all keys prefixed .hms-ipd-*.
+   =================================================================== */
+
+/* Drawer shell: fixed full-viewport flex row, scrim + panel right-aligned */
+.hms-ipd-pane {
+    position: fixed;
+    inset: 0;
+    z-index: var(--hms-z-drawer);
+    display: flex;
+    justify-content: flex-end;
+    pointer-events: none;
+}
+
+.hms-ipd-pane__scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.25);
+    pointer-events: auto;
+}
+
+.hms-ipd-pane__panel {
+    position: relative;
+    width: 100%;
+    max-width: 760px;
+    height: 100%;
+    background: var(--hms-white);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    pointer-events: auto;
+    border-left: 1px solid var(--hms-gray-200);
+    font-family: var(--hms-font-family);
+}
+
+
+/* Drawer header */
+.hms-ipd-header {
+    flex-shrink: 0;
+    padding: var(--hms-space-20) var(--hms-space-20) var(--hms-space-md);
+    border-bottom: 1px solid var(--hms-gray-100);
+}
+
+.hms-ipd-header__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.hms-ipd-header__identity {
+    flex: 1;
+    min-width: 0;
+}
+
+.hms-ipd-header__badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.hms-ipd-header__name {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    line-height: 1.2;
+}
+
+.hms-ipd-header__uhid {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-400);
+}
+
+.hms-ipd-header__meta {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.hms-ipd-header__meta-row {
+    display: flex;
+    align-items: center;
+    gap: var(--hms-space-20);
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+.hms-ipd-header__meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hms-ipd-header__meta-item>svg {
+    color: var(--hms-gray-300);
+}
+
+.hms-ipd-header__id-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.hms-ipd-header__id-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.hms-ipd-header__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+
+/* Monospace ID pills (primary brand-coloured + outlined secondary) */
+.hms-ipd-id-pill {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-weight: 700;
+    background: var(--hms-brand-primary);
+    color: var(--hms-white);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.hms-ipd-id-pill.is-outline {
+    background: transparent;
+    color: var(--hms-gray-400);
+    border: 1px solid var(--hms-gray-200);
+    font-weight: 400;
+}
+
+
+/* Header chip button — tone modifiers replace the inline tone={} prop */
+.hms-ipd-chip-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    background: var(--hms-gray-50);
+    color: var(--hms-gray-600);
+    border: 1px solid var(--hms-gray-200);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--hms-font-family);
+}
+
+.hms-ipd-chip-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.hms-ipd-chip-btn.is-danger {
+    background: var(--hms-danger-bg);
+    color: var(--hms-danger);
+    border-color: var(--hms-danger-border);
+}
+
+.hms-ipd-chip-btn.is-violet {
+    background: #f5f3ff;
+    color: #6d28d9;
+    border-color: #ddd6fe;
+}
+
+.hms-ipd-chip-btn.is-success {
+    background: var(--hms-success-bg);
+    color: var(--hms-success);
+    border-color: var(--hms-success-border);
+}
+
+.hms-ipd-chip-btn.is-success-solid {
+    background: var(--hms-success);
+    color: var(--hms-white);
+    border-color: transparent;
+}
+
+.hms-ipd-chip-btn.is-allergy {
+    background: #fff7ed;
+    color: #c2410c;
+    border-color: #fed7aa;
+}
+
+.hms-ipd-chip-btn.is-ghost {
+    background: transparent;
+    color: var(--hms-gray-400);
+    border-color: transparent;
+}
+
+.hms-ipd-chip-btn.is-zema {
+    background: var(--zema-grad-brand);
+    border-color: transparent;
+    color: #ffffff;
+}
+
+.hms-ipd-chip-btn.is-zema:hover {
+    background: var(--zema-grad-brand);
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow: var(--zema-shadow-glow-sm);
+    transform: translateY(-1px);
+}
+
+/* Interaction states — the chips previously had no hover/active/focus at all,
+   so the whole action row read as static/unclickable. Subtle lift on hover,
+   tone-aware fills per variant, a press scale, and a keyboard focus ring.
+   Every tone sets its own :hover background so the neutral base hover below
+   never leaks onto a coloured chip. */
+.hms-ipd-chip-btn:hover {
+    background: var(--hms-gray-100);
+    border-color: var(--hms-gray-300);
+    color: var(--hms-gray-800);
+    transform: translateY(-1px);
+}
+
+.hms-ipd-chip-btn:active {
+    transform: scale(0.97);
+}
+
+.hms-ipd-chip-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12);
+}
+
+.hms-ipd-chip-btn.is-danger:hover {
+    background: #fee2e2;
+    border-color: var(--hms-danger);
+    color: var(--hms-danger);
+}
+
+.hms-ipd-chip-btn.is-violet:hover {
+    background: #ede9fe;
+    border-color: #c4b5fd;
+    color: #6d28d9;
+}
+
+.hms-ipd-chip-btn.is-success:hover {
+    background: #dcfce7;
+    border-color: var(--hms-success);
+    color: #166534;
+}
+
+.hms-ipd-chip-btn.is-success-solid:hover {
+    background: #15803d;
+    color: #fff;
+}
+
+.hms-ipd-chip-btn.is-allergy:hover {
+    background: #ffedd5;
+    border-color: #fdba74;
+    color: #c2410c;
+}
+
+.hms-ipd-chip-btn.is-ghost:hover {
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-700);
+}
+
+
+/* Discharge guard banner */
+.hms-ipd-discharge-block {
+    margin-top: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--hms-danger-border);
+    background: var(--hms-danger-bg);
+}
+
+.hms-ipd-discharge-block__icon {
+    color: var(--hms-danger);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.hms-ipd-discharge-block__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.hms-ipd-discharge-block__title {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #dc2626;
+}
+
+.hms-ipd-discharge-block__sub {
+    margin: 2px 0 0;
+    font-size: 11px;
+    color: #dc2626;
+}
+
+.hms-ipd-discharge-block__dismiss {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--hms-danger);
+    flex-shrink: 0;
+}
+
+
+/* Wristband — printed via the header "Wristband" button; full-page only in print */
+.hms-ipd-wristband-print {
+    display: none;
+}
+
+@media print {
+    .hms-ipd-wristband-print {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: var(--hms-white);
+        color: #000;
+        padding: 48px;
+        text-align: center;
+    }
+}
+
+.hms-ipd-wristband-print__hosp {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.hms-ipd-wristband-print__name {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.hms-ipd-wristband-print__row {
+    display: flex;
+    gap: var(--hms-space-md);
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
+
+.hms-ipd-wristband-print__room {
+    font-size: 13px;
+    color: #555;
+    margin: 0;
+}
+
+.hms-ipd-wristband-print__barcode {
+    margin-top: 12px;
+}
+
+/* Tab bar + body shell */
+.hms-ipd-tabs-bar {
+    flex-shrink: 0;
+    padding: 0 var(--hms-space-20);
+    border-bottom: 1px solid var(--hms-gray-100);
+    overflow-x: auto;
+}
+
+.hms-ipd-tabs-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.hms-ipd-tab-body {
+    padding: var(--hms-space-20);
+}
+
+.hms-ipd-tab-body.is-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hms-space-md);
+}
+
+
+/* Log tab head + add-record toolbar */
+.hms-ipd-log-head {
+    margin-bottom: var(--hms-space-md);
+}
+
+.hms-ipd-log-head__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.hms-ipd-log-head__label {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--hms-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-ipd-log-head__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+/* Timeline list — entry = dot column + card body */
+.hms-ipd-timeline {
+    display: flex;
+    flex-direction: column;
+}
+
+.hms-ipd-timeline__entry {
+    display: flex;
+    gap: 12px;
+}
+
+.hms-ipd-timeline__rail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    padding-top: 4px;
+}
+
+.hms-ipd-timeline__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--hms-brand-primary);
+}
+
+.hms-ipd-timeline__line {
+    width: 1px;
+    flex: 1;
+    background: var(--hms-gray-100);
+    margin-top: 4px;
+}
+
+.hms-ipd-timeline__card {
+    flex: 1;
+    min-width: 0;
+    padding: 0 0 var(--hms-space-lg) 12px;
+}
+
+.hms-ipd-timeline__entry:last-child .hms-ipd-timeline__card {
+    padding-bottom: 0;
+}
+
+.hms-ipd-timeline__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.hms-ipd-timeline__stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--hms-gray-400);
+    flex-shrink: 0;
+}
+
+.hms-ipd-timeline__title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+    line-height: 1.4;
+}
+
+.hms-ipd-timeline__sub {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+    line-height: 1.4;
+}
+
+.hms-ipd-timeline__desc {
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-600);
+    line-height: 1.4;
+}
+
+.hms-ipd-timeline__badge {
+    margin: 4px 0 0;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--hms-gray-500);
+}
+
+/* ── SOAP note sections (inline in timeline) ─────────────────────────────── */
+
+.hms-soap-note {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.hms-soap-note__section {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.hms-soap-note__label {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.hms-soap-note__text {
+    margin: 0;
+    padding-top: 2px;
+    font-size: 12px;
+    color: var(--hms-gray-600);
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+/* ── Prescription drug chips (inline in timeline) ────────────────────────── */
+
+.hms-rec-drugs {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.hms-rec-drug-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    background: #f0f7ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    width: fit-content;
+    max-width: 100%;
+}
+
+.hms-rec-drug-chip__icon {
+    color: #3b82f6;
+    flex-shrink: 0;
+}
+
+.hms-rec-drug-chip__name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hms-rec-drug-chip__signa {
+    font-size: 11px;
+    color: #3b82f6;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.hms-rec-drugs__more {
+    font-size: 11px;
+    color: var(--hms-gray-500);
+    padding-left: 2px;
+}
+
+/* Stopped/discontinued order chip — strike-through name + "Stopped" badge */
+.hms-rec-drug-chip.is-stopped {
+    background: var(--hms-gray-50);
+    border-color: var(--hms-gray-200);
+    opacity: 0.85;
+}
+
+.hms-rec-drug-chip.is-stopped .hms-rec-drug-chip__icon {
+    color: var(--hms-gray-400);
+}
+
+.hms-rec-drug-chip.is-stopped .hms-rec-drug-chip__name,
+.hms-rec-drug-chip.is-stopped .hms-rec-drug-chip__signa {
+    color: var(--hms-gray-500);
+    text-decoration: line-through;
+}
+
+.hms-rec-drug-chip__stopped-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 4px;
+    padding: 1px 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.hms-rec-drug-chip__allergy-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #b45309;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 4px;
+    padding: 1px 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Pharmacy dispense status — mirrored from PrescriptionItem.dispenseStatus,
+   kept in sync by the pharmacy /dispense callback. */
+.hms-rec-drug-chip__dispense-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 1px 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.hms-rec-drug-chip__dispense-badge.is-dispensed {
+    color: #047857;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+}
+
+.hms-rec-drug-chip__dispense-badge.is-partial {
+    color: #1d4ed8;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+}
+
+/* ── "View in detail" button on RECORD timeline cards ────────────────────── */
+
+.hms-ipd-view-btn {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--hms-primary, #2563eb);
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: color 0.15s;
+}
+
+.hms-ipd-view-btn::after {
+    content: "→";
+    font-size: 12px;
+}
+
+.hms-ipd-view-btn:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+
+/* Event tone tag (EVENT_TONE migration — pill above the timeline card) */
+.hms-ipd-event-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--hms-gray-50);
+    color: var(--hms-gray-600);
+    border: 1px solid var(--hms-gray-200);
+}
+
+.hms-ipd-event-tag.is-admitted {
+    background: var(--hms-success-bg);
+    color: #166534;
+    border-color: var(--hms-success-border);
+}
+
+.hms-ipd-event-tag.is-allocated {
+    background: var(--hms-info-bg);
+    color: #0369a1;
+    border-color: var(--hms-info-border);
+}
+
+.hms-ipd-event-tag.is-deallocated {
+    background: var(--hms-warning-bg);
+    color: #b45309;
+    border-color: var(--hms-warning-border);
+}
+
+.hms-ipd-event-tag.is-radiology {
+    background: #f5f3ff;
+    color: #6d28d9;
+    border-color: #ddd6fe;
+}
+
+.hms-ipd-event-tag.is-ambulance {
+    background: #fff1f2;
+    color: #be123c;
+    border-color: #fecdd3;
+}
+
+.hms-ipd-event-tag.is-ot {
+    background: #f5f3ff;
+    color: #7c3aed;
+    border-color: #ddd6fe;
+}
+
+.hms-ipd-event-tag.is-discharged {
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-600);
+    border-color: var(--hms-gray-200);
+}
+
+.hms-ipd-event-tag.is-record {
+    background: #eef2ff;
+    color: #4338ca;
+    border-color: #c7d2fe;
+}
+
+
+/* Bordered list (Attender card + Assets list) */
+.hms-ipd-list {
+    border-radius: 8px;
+    border: 1px solid var(--hms-gray-100);
+    overflow: hidden;
+}
+
+.hms-ipd-list__head {
+    padding: 10px var(--hms-space-md);
+    background: var(--hms-gray-50);
+    border-bottom: 1px solid var(--hms-gray-100);
+}
+
+.hms-ipd-list__head-label {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--hms-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-ipd-list-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px var(--hms-space-md);
+    border-top: 1px solid var(--hms-gray-50);
+    background: var(--hms-white);
+}
+
+.hms-ipd-list-row:first-child {
+    border-top: none;
+}
+
+.hms-ipd-list-row__icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--hms-gray-50);
+    border: 1px solid var(--hms-gray-100);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--hms-gray-400);
+    flex-shrink: 0;
+}
+
+.hms-ipd-list-row__label {
+    margin: 0;
+    font-size: 11px;
+    color: var(--hms-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-ipd-list-row__value {
+    margin: 2px 0 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+}
+
+.hms-ipd-list-row__value a {
+    color: var(--hms-gray-800);
+    text-decoration: none;
+}
+
+.hms-ipd-list-row__value.is-capitalize {
+    text-transform: capitalize;
+}
+
+/* Asset row variant — icon left, label/sub centre, status badge right */
+.hms-ipd-list-row.is-asset {
+    padding: 12px var(--hms-space-md);
+}
+
+.hms-ipd-list-row__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.hms-ipd-list-row__title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hms-ipd-list-row__sub {
+    margin: 0;
+    font-size: 12px;
+    color: var(--hms-gray-400);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* Billing tab — small refresh row + section blocks */
+.hms-ipd-bill-refresh {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.hms-ipd-bill-section {
+    border-radius: 8px;
+    border: 1px solid var(--hms-gray-100);
+    overflow: hidden;
+}
+
+.hms-ipd-bill-head {
+    display: grid;
+    grid-template-columns: 3fr 5fr 1fr 3fr;
+    gap: 8px;
+    padding: 8px var(--hms-space-md);
+    background: var(--hms-gray-50);
+    border-bottom: 1px solid var(--hms-gray-100);
+}
+
+.hms-ipd-bill-head__cell {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--hms-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-ipd-bill-head__cell.is-center {
+    text-align: center;
+}
+
+.hms-ipd-bill-head__cell.is-right {
+    text-align: right;
+}
+
+.hms-ipd-bill-row {
+    display: grid;
+    grid-template-columns: 3fr 5fr 1fr 3fr;
+    gap: 8px;
+    align-items: center;
+    padding: 10px var(--hms-space-md);
+    background: var(--hms-white);
+    border-top: 1px solid var(--hms-gray-50);
+}
+
+.hms-ipd-bill-row__type {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.hms-ipd-bill-row__type.is-room {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.hms-ipd-bill-row__type.is-consultation {
+    background: var(--hms-info-bg);
+    color: #0369a1;
+}
+
+.hms-ipd-bill-row__type.is-radiology {
+    background: #f5f3ff;
+    color: #6d28d9;
+}
+
+.hms-ipd-bill-row__type.is-lab {
+    background: #f0fdfa;
+    color: #0f766e;
+}
+
+.hms-ipd-bill-row__type.is-medicine {
+    background: var(--hms-success-bg);
+    color: #166534;
+}
+
+.hms-ipd-bill-row__type.is-ot {
+    background: #f5f3ff;
+    color: #7c3aed;
+}
+
+.hms-ipd-bill-row__type.is-custom {
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-600);
+}
+
+.hms-ipd-bill-row__desc {
+    font-size: 12px;
+    color: var(--hms-gray-600);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hms-ipd-bill-row__qty {
+    font-size: 12px;
+    color: var(--hms-gray-400);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.hms-ipd-bill-row__total {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--hms-gray-800);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* Bill totals — compact stacked block */
+.hms-ipd-bill-totals {
+    padding: 12px var(--hms-space-md);
+    border-top: 1px solid var(--hms-gray-100);
+    background: var(--hms-gray-50);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.hms-ipd-bill-totals__row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+.hms-ipd-bill-totals__row.is-success {
+    color: var(--hms-success);
+}
+
+.hms-ipd-bill-totals__row>span:last-child {
+    font-variant-numeric: tabular-nums;
+}
+
+.hms-ipd-bill-totals__grand {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    border-top: 1px solid var(--hms-gray-100);
+    padding-top: 8px;
+    margin-top: 4px;
+}
+
+.hms-ipd-bill-totals__grand>span:last-child {
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* Final invoice header strip (label + invoice number + settled badge) */
+.hms-ipd-bill-fi-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.hms-ipd-bill-fi-head__label {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--hms-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-ipd-bill-fi-head__sub {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-400);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+
+/* Estimated bill heading */
+.hms-ipd-bill-est-head__title {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--hms-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.hms-ipd-bill-est-head__sub {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-400);
+}
+
+.hms-ipd-bill-est-foot {
+    margin: 0;
+    font-size: 12px;
+    color: var(--hms-gray-400);
+    text-align: center;
+}
+
+
+/* Retry row (OT/pharmacy failure rescue UI) */
+.hms-ipd-retry-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--hms-gray-100);
+    background: var(--hms-white);
+}
+
+.hms-ipd-retry-row__body {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hms-ipd-retry-row__icon {
+    color: var(--hms-warning);
+}
+
+.hms-ipd-retry-row__text {
+    margin: 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+.hms-ipd-retry-row__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--hms-font-family);
+}
+
+.hms-ipd-retry-row__btn.is-violet {
+    color: #7c3aed;
+}
+
+.hms-ipd-retry-row__btn.is-success {
+    color: var(--hms-success);
+}
+
+
+/* Centered loader + empty state (pane-local — sized to 64px padding) */
+.hms-ipd-center-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 0;
+    gap: 8px;
+    color: var(--hms-gray-400);
+}
+
+.hms-ipd-center-loader__text {
+    font-size: 14px;
+}
+
+.hms-ipd-center-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 0;
+    color: var(--hms-gray-400);
+    gap: 8px;
+}
+
+.hms-ipd-center-empty__icon {
+    opacity: 0.5;
+}
+
+.hms-ipd-center-empty__text {
+    margin: 0;
+    font-size: 14px;
+}
+
+.hms-ipd-center-empty__sub {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* ─── IPD Vitals tab ─────────────────────────────────────────────────────── */
+
+.hms-ipd-vitals-tab {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hms-space-lg);
+}
+
+/* Form section */
+.hms-ipd-vitals-form-section {
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 10px;
+    padding: var(--hms-space-md) var(--hms-space-20);
+}
+
+/* Discharged notice replaces the form */
+.hms-ipd-vitals-discharged-notice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #92400e;
+}
+
+/* Notes textarea inside the vitals form */
+.hms-vitals-notes-input {
+    width: 100%;
+    resize: vertical;
+    min-height: 56px;
+    padding: 8px 10px;
+    border: 1px solid var(--hms-gray-300);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--hms-gray-900);
+    background: var(--hms-white);
+    font-family: inherit;
+    line-height: 1.5;
+    transition: border-color 0.15s;
+}
+
+.hms-vitals-notes-input:focus {
+    outline: none;
+    border-color: var(--hms-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* History section */
+.hms-ipd-vitals-history {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Zema AI vitals trend panel */
+.hms-vitals-trend-panel {
+    margin-bottom: 18px;
+}
+
+.hms-vitals-trend-chips {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.hms-vitals-trend-legend {
+    display: flex;
+    gap: var(--hms-space-md);
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(139, 92, 246, 0.15);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--hms-gray-600);
+    position: relative;
+    z-index: 1;
+}
+
+.hms-vitals-trend-legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.hms-vitals-trend-legend__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.hms-vitals-reading-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Individual reading card */
+.hms-vitals-reading-card {
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 10px;
+    padding: 12px var(--hms-space-md);
+    transition: border-color 0.15s;
+}
+
+.hms-vitals-reading-card:hover {
+    border-color: var(--hms-gray-300);
+}
+
+.hms-vitals-reading-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.hms-vitals-reading-card__time {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+}
+
+.hms-vitals-reading-card__by {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--hms-gray-500);
+}
+
+/* Grid of vital fields inside a card */
+.hms-vitals-reading-card__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+    margin-bottom: 2px;
+}
+
+.hms-vitals-reading-card__field {
+    background: var(--hms-gray-50);
+    border-radius: 6px;
+    padding: 7px 10px;
+}
+
+.hms-vitals-reading-card__field-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--hms-gray-500);
+    margin-bottom: 3px;
+}
+
+.hms-vitals-reading-card__field-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    line-height: 1.2;
+}
+
+.hms-vitals-reading-card__field-unit {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--hms-gray-500);
+    margin-left: 2px;
+}
+
+.hms-vitals-reading-card__notes {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--hms-gray-100);
+    font-size: 12px;
+    color: var(--hms-gray-600);
+    line-height: 1.5;
+}
+
+/* ── Allergy banner (read-only strip shown in modals and MAR tab) ─────── */
+
+.hms-allergy-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    flex-wrap: wrap;
+}
+
+.hms-allergy-banner__icon {
+    color: #c2410c;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.hms-allergy-banner__label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #c2410c;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* ── Active medications panel (WritePrescriptionModal) ───────────────── */
+
+.hms-active-meds {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #f0f7ff;
+    border: 1px solid #bfdbfe;
+}
+
+.hms-active-meds__label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1d4ed8;
+}
+
+.hms-active-meds__list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.hms-active-med-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 6px 8px;
+    background: var(--hms-white);
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+}
+
+.hms-active-med-row__info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.hms-active-med-row__name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+}
+
+.hms-active-med-row__signa {
+    font-size: 11px;
+    font-weight: 500;
+    color: #3b82f6;
+    white-space: nowrap;
+}
+
+.hms-active-med-row__meta {
+    font-size: 10.5px;
+    color: var(--hms-gray-500);
+    white-space: nowrap;
+}
+
+.hms-active-med-row__stop-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.hms-active-med-row__stop-btn:hover {
+    background: #fee2e2;
+}
+
+.hms-active-med-row__stop-form {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.hms-active-med-row__stop-input {
+    font-size: 11px;
+    padding: 4px 6px;
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 5px;
+    min-width: 160px;
+}
+
+.hms-active-med-row__stop-confirm,
+.hms-active-med-row__stop-cancel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.hms-active-med-row__stop-confirm {
+    color: var(--hms-white);
+    background: #dc2626;
+}
+
+.hms-active-med-row__stop-confirm:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.hms-active-med-row__stop-cancel {
+    color: var(--hms-gray-600);
+    background: var(--hms-gray-100);
+}
+
+/* ── Allergy panel (collapsible in IPD header) ───────────────────────── */
+
+.hms-allergy-panel {
+    margin: 0 var(--hms-space-md) 0;
+    padding: 10px 14px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 8px;
+}
+
+.hms-allergy-panel__head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.hms-allergy-panel__icon {
+    color: #c2410c;
+    flex-shrink: 0;
+}
+
+.hms-allergy-panel__title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #c2410c;
+    flex: 1;
+}
+
+.hms-allergy-panel__add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #fff;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.hms-allergy-panel__add-btn:hover {
+    background: #ffedd5;
+}
+
+.hms-allergy-panel__empty {
+    font-size: 12px;
+    color: var(--hms-gray-500);
+    margin: 0;
+}
+
+/* ── Allergy chip (used in banner, panel, and chip-row) ──────────────── */
+
+.hms-allergy-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.hms-allergy-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid;
+    cursor: default;
+}
+
+.hms-allergy-chip.is-severe {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+.hms-allergy-chip.is-moderate {
+    background: #fff7ed;
+    color: #c2410c;
+    border-color: #fed7aa;
+}
+
+.hms-allergy-chip.is-mild {
+    background: #fffbeb;
+    color: #b45309;
+    border-color: #fde68a;
+}
+
+.hms-allergy-chip.is-unknown {
+    background: var(--hms-gray-50);
+    color: var(--hms-gray-600);
+    border-color: var(--hms-gray-200);
+}
+
+.hms-allergy-chip__name {
+    font-weight: 700;
+}
+
+.hms-allergy-chip__reaction {
+    font-weight: 400;
+    opacity: 0.8;
+}
+
+.hms-allergy-chip__sev {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+.hms-allergy-chip__del {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.6;
+    padding: 0;
+    transition: opacity 0.12s;
+}
+
+.hms-allergy-chip__del:hover {
+    opacity: 1;
+}
+
+/* ── Allergy add-form ────────────────────────────────────────────────── */
+
+.hms-allergy-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #fed7aa;
+}
+
+.hms-allergy-form__input,
+.hms-allergy-form__select {
+    flex: 1 1 140px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    border: 1px solid var(--hms-gray-200);
+    background: #fff;
+    color: var(--hms-gray-900);
+    font-family: var(--hms-font-family);
+    outline: none;
+    transition: border-color 0.12s;
+}
+
+.hms-allergy-form__input:focus,
+.hms-allergy-form__select:focus {
+    border-color: #f97316;
+}
+
+.hms-allergy-form__actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.hms-allergy-form__save-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #f97316;
+    color: #fff;
+    border: 1px solid #f97316;
+    box-shadow: 0 1px 3px rgba(234, 88, 12, 0.25);
+    cursor: pointer;
+    transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+}
+
+.hms-allergy-form__save-btn:hover:not(:disabled) {
+    background: #ea580c;
+    box-shadow: 0 4px 10px rgba(234, 88, 12, 0.3);
+    transform: translateY(-1px);
+}
+
+.hms-allergy-form__save-btn:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.hms-allergy-form__save-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.hms-allergy-form__cancel-btn {
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    background: transparent;
+    color: var(--hms-gray-600);
+    border: 1px solid var(--hms-gray-200);
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.hms-allergy-form__cancel-btn:hover {
+    background: var(--hms-gray-50);
+}

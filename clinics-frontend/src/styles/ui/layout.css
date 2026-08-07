@@ -1,0 +1,558 @@
+/* ===================================================================
+   ZENO SHARED UI — Layout (layout.css)
+   -------------------------------------------------------------------
+   App shell, sidebar, top navbar, page header.
+   =================================================================== */
+
+/* ─────────────────────────── App shell ─────────────────────────── */
+.zu-app-shell {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--zu-gray-50);
+}
+
+.zu-app-shell.is-focus {
+    flex-direction: column;
+}
+
+.zu-app-shell-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+.zu-app-shell-content {
+    flex: 1;
+    overflow-y: auto;
+
+    /* NO width cap, deliberately: the content column always fills the space
+       the screen provides, so auto-fill/auto-fit grids gain a column as the
+       viewport grows (e.g. .hms-admit-card-grid goes 3 -> 4 cards per row
+       between a 14" and a 1920px screen). A fixed cap was trialled to make
+       every machine render an identical column; it was dropped because it
+       cost a card per row on grid pages and left ~200px of dead gutter on
+       larger laptops. Consistency now comes from the fluid spacing scale
+       (tokens.css) and the container queries below, not from a fixed width.
+
+       If this ever runs on an ultrawide (34"+), revisit: unbounded line
+       length hurts readability well past ~1800px. */
+
+    /* Container query root. This — not the viewport — is what descendants
+       size against, so they react to the real content footprint, including
+       the sidebar collapsing 260px -> 64px with no viewport change. */
+    container-type: inline-size;
+    container-name: zu-content;
+}
+
+.zu-app-shell.is-focus .zu-app-shell-content,
+.zu-app-shell-content.is-focus {
+    padding: 0;
+    overflow: hidden;
+}
+
+@media print {
+    .zu-app-shell-content {
+        padding: 0;
+        overflow: visible;
+    }
+}
+
+.zu-app-shell-content.zu-dashboard {
+    padding: var(--zu-space-xl); /* was 28px; now fluid 24->32px */
+}
+
+/* No cap here — the column is already capped at .zu-app-shell-content, so
+   this just fills it. Adding a second cap would be redundant and would risk
+   the two drifting apart. */
+.zu-page-content {
+    padding-inline: var(--zu-space-xl); /* logical; was `padding: 0 28px` */
+}
+
+/* ─────────────────────────── Sidebar ─────────────────────────── */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: width var(--zu-transition-layout);
+    flex-shrink: 0;
+    background: var(--zu-white);
+    border-right: 1px solid var(--zu-gray-200);
+    width: 260px;
+}
+
+.sidebar.is-collapsed {
+    width: 64px;
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--zu-gray-200);
+    height: auto;
+    min-height: 56px;
+    gap: var(--zu-space-sm);
+    /* Static: the sidebar is a fixed 260px rail, so its internal spacing has
+       no free space to reclaim. Fluid spacing applies to the content area. */
+    padding: 0px 20px;
+}
+
+.sidebar.is-collapsed .sidebar-logo {
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+}
+
+.sidebar-logo-icon {
+    /* Literal 32px, NOT --zu-space-xl: that token is now fluid, and this is
+       an icon's geometry, not spacing — scaling it would distort the tile. */
+    width: 32px;
+    height: 32px;
+    border-radius: var(--zu-radius);
+    background: var(--zu-gray-900);
+    color: var(--zu-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sidebar-brand {
+    overflow: hidden;
+}
+
+.sidebar-brand-name {
+    margin: 0;
+    font-weight: 800;
+    font-size: 18px;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    color: var(--zu-gray-950);
+}
+
+.sidebar-brand-sub {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--zu-gray-600);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-nav-container {
+    flex: 1;
+    padding: 1rem 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sidebar-section-label {
+    padding: 1rem 1.25rem 0.5rem;
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--zu-slate-500);
+}
+
+.sidebar-section-label.is-spaced {
+    margin-top: 0;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sidebar-nav-group {
+    display: flex;
+    flex-direction: column;
+    /* driver.js (product tour) forces `overflow:hidden` on the highlighted
+       item's parent. In flexbox, non-visible overflow drops the automatic
+       min-height from content-based to 0, so the tour's active nav row could
+       collapse and the next row would ride up over it. flex-shrink:0 keeps
+       nav rows at their content height regardless of overflow. */
+    flex-shrink: 0;
+}
+
+.sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--zu-space-9) 16px; /* static — fixed-width sidebar rail */
+    margin: 0 0 0 var(--zu-space-12);
+    width: calc(100% - 1.5rem);
+    border-radius: 0.5rem;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--zu-gray-950);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--zu-font-family);
+    transition: background var(--zu-transition-fast), color var(--zu-transition-fast);
+    text-align: left;
+}
+
+.sidebar-nav-item:hover {
+    background: var(--zu-gray-100);
+    color: var(--zu-brand-primary);
+}
+
+.sidebar-nav-item.active {
+    background: #e6eaf1;
+    color: var(--zu-gray-950);
+    font-weight: 500;
+}
+
+.sidebar-nav-item.is-icon-only {
+    justify-content: center;
+    padding: var(--zu-space-12) 0;
+    width: 44px;
+    margin: 0 auto;
+}
+
+.sidebar-nav-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--zu-gray-950);
+    flex-shrink: 0;
+}
+
+.sidebar-nav-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    overflow: hidden;
+}
+
+.sidebar-nav-label span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-nav-chevron {
+    width: 14px;
+    height: 14px;
+    transition: transform var(--zu-transition-normal);
+    opacity: 0.5;
+    color: var(--zu-gray-400);
+}
+
+.sidebar-nav-chevron.is-open {
+    transform: rotate(180deg);
+}
+
+.sidebar-submenu {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 0 0 0 0.75rem;
+    margin: 2px 0.75rem 2px 18px;
+    border-left: 1px solid var(--zu-gray-200);
+}
+
+.sidebar-submenu li {
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-submenu button {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 1rem;
+    border-radius: 0.5rem;
+    width: 100%;
+    text-align: left;
+    text-decoration: none;
+    color: var(--zu-gray-600);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--zu-font-family);
+    transition: background var(--zu-transition-fast), color var(--zu-transition-fast);
+}
+
+.sidebar-submenu button:hover {
+    background: var(--zu-gray-100);
+    color: var(--zu-slate-900);
+}
+
+.sidebar-submenu button.active {
+    background: var(--zu-gray-100);
+    color: var(--zu-slate-900);
+    font-weight: 600;
+}
+
+.sidebar-footer {
+    border-top: 1px solid #edf8df;
+    background: #f8fff1;
+    padding: 0px 10px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.sidebar-footer .sidebar-section-label {
+    color: #98d50c;
+}
+
+.sidebar-ext {
+    display: flex;
+    align-items: center;
+    gap: var(--zu-space-12);
+    padding: 8px 1rem;
+    border-radius: var(--zu-radius);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--zu-gray-950);
+    transition: background var(--zu-transition-fast), color var(--zu-transition-fast);
+}
+
+.sidebar-ext.is-icon-only {
+    justify-content: center;
+    padding: var(--zu-space-12) 0;
+    width: 100%;
+}
+
+.sidebar-ext:hover {
+    background: #d1f1ba;
+    color: var(--zu-gray-900);
+}
+
+/* ─────────────────────────── Header ─────────────────────────── */
+.zu-topnav {
+    height: 56px;
+    background: var(--zu-white);
+    border-bottom: 1px solid var(--zu-gray-200);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--zu-space-md);
+    gap: var(--zu-space-12);
+    flex-shrink: 0;
+}
+
+.zu-topnav-burger,
+.zu-topnav-bell {
+    background: transparent;
+    border: 0;
+    color: var(--zu-gray-500);
+    padding: 6px;
+    border-radius: var(--zu-radius);
+    cursor: pointer;
+    transition: background var(--zu-transition-fast), color var(--zu-transition-fast);
+    position: relative;
+}
+
+.zu-topnav-burger:hover,
+.zu-topnav-bell:hover {
+    background: var(--zu-gray-100);
+    color: var(--zu-gray-800);
+}
+
+.zu-topnav-bell {
+    padding: var(--zu-space-sm);
+}
+
+.zu-topnav-bell-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 6px;
+    height: 6px;
+    border-radius: var(--zu-radius-full);
+    background: var(--zu-gray-900);
+}
+
+.zu-topnav-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--zu-gray-700);
+    flex: 1;
+}
+
+.zu-topnav-right {
+    display: flex;
+    align-items: center;
+    gap: var(--zu-space-xs);
+}
+
+.zu-topnav-divider {
+    height: 32px;
+    width: 1px;
+    background: var(--zu-gray-200);
+    margin: 0 var(--zu-space-sm);
+}
+
+.zu-topnav-user {
+    display: flex;
+    align-items: center;
+    gap: var(--zu-space-12);
+    margin-left: var(--zu-space-xs);
+}
+
+.zu-topnav-user-avatar {
+    /* Literal 32px, NOT --zu-space-xl: fluid sizing would deform the circle. */
+    width: 32px;
+    height: 32px;
+    border-radius: var(--zu-radius-full);
+    background: var(--zu-gray-100);
+    border: 1px solid var(--zu-gray-300);
+    color: var(--zu-gray-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.zu-topnav-user-text {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+@media (min-width: 640px) {
+    .zu-topnav-user-text {
+        display: flex;
+    }
+}
+
+.zu-topnav-user-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--zu-gray-900);
+    line-height: 1.2;
+}
+
+.zu-topnav-user-role {
+    font-size: 13px;
+    color: var(--zu-gray-500);
+}
+
+.zu-topnav-logout {
+    background: transparent;
+    border: 0;
+    color: var(--zu-gray-600);
+    padding: 6px;
+    border-radius: var(--zu-radius);
+    cursor: pointer;
+    transition: background var(--zu-transition-fast), color var(--zu-transition-fast);
+    flex-shrink: 0;
+}
+
+.zu-topnav-logout:hover {
+    background: var(--zu-danger-bg);
+    color: var(--zu-rose-500);
+}
+
+/* ─────────────────────────── Page Header ─────────────────────────── */
+.zu-page-header {
+    padding: var(--zu-space-20) var(--zu-space-28);
+    background: var(--zu-white);
+    border-bottom: 1px solid var(--zu-gray-200);
+    position: sticky;
+    top: 0;
+    z-index: var(--zu-z-sticky);
+}
+
+.zu-page-header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1600px;
+    margin: 0 auto;
+    gap: var(--zu-space-md);
+}
+
+.zu-page-header-titles {
+    flex: 1;
+    min-width: 0;
+}
+
+.zu-page-title {
+    font-size: var(--zu-font-display-lg); /* was 24px; now fluid 21->24px */
+    font-weight: 800;
+    color: var(--zu-slate-900);
+    letter-spacing: -0.5px;
+    margin: 0 0 6px 0;
+    font-family: var(--zu-font-family);
+}
+
+.zu-page-subtitle {
+    font-size: 14px;
+    color: var(--zu-slate-500);
+    font-weight: 400;
+    margin: 0;
+}
+
+.zu-page-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--zu-radius-md);
+    background: var(--zu-gray-100);
+    color: var(--zu-gray-500);
+    border: none;
+    cursor: pointer;
+    transition: all var(--zu-transition-fast);
+    flex-shrink: 0;
+}
+
+.zu-page-back-btn:hover {
+    background: var(--zu-gray-200);
+    color: var(--zu-slate-900);
+    transform: translateX(-2px);
+}
+
+.zu-page-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--zu-space-12);
+}
+
+.zu-page-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--zu-space-12);
+}
+
+.zu-page-actions-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--zu-space-12);
+}
+
+.zu-page-refresh-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--zu-gray-200);
+    background: var(--zu-gray-50);
+    color: var(--zu-gray-600);
+    cursor: pointer;
+    transition: background var(--zu-transition-fast), color var(--zu-transition-fast);
+}
+
+.zu-page-refresh-btn:hover {
+    background: var(--zu-gray-100);
+    color: var(--zu-gray-900);
+}

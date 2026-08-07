@@ -1,0 +1,61 @@
+# ── Secrets ───────────────────────────────────────────────────────────────
+# Never commit these. application-local.properties holds real DB credentials
+# and the shared JWT signing secret; .env* hold the frontend's dev identity.
+**/application-local.properties
+**/application-*.local.properties
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# ── Java / Maven ──────────────────────────────────────────────────────────
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+.mvn/wrapper/maven-wrapper.jar
+HELP.md
+
+# ── Node ──────────────────────────────────────────────────────────────────
+node_modules/
+dist/
+build/
+.vite/
+*.tsbuildinfo
+.eslintcache
+.npm
+
+# ── Logs & runtime ────────────────────────────────────────────────────────
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pids
+*.pid
+*.seed
+
+# ── Test / coverage ───────────────────────────────────────────────────────
+coverage/
+.nyc_output
+
+# ── Editors & OS ──────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.factorypath
+.apt_generated
+.DS_Store
+Thumbs.db
+
+# ── Build scratch ─────────────────────────────────────────────────────────
+vite.config.js.timestamp-*.mjs
+vite.config.ts.timestamp-*.mjs
+*.rej
+*.orig

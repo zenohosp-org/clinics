@@ -1,0 +1,306 @@
+/* -------------------------------------------------------------------
+   HMS design system — Layered import chain
+   -------------------------------------------------------------------
+   Cascade order (later wins on equal specificity):
+     1. base.css           — :root design tokens, font import
+     2. hms-system.css     — component primitives + reusable patterns
+     3. utilities.css      — atomic helpers (.flex, .gap-3, …)
+     4. modules/*.css      — page-area-specific compositions
+     5. legacy block below — original .btn-primary / .card / .input etc.
+   ------------------------------------------------------------------- */
+@import './styles/ui/index.css'; /* NEW SHARED UI LAYER */
+@import './styles/base.css';
+@import './styles/hms-system.css';
+
+@import './styles/modules/shell.css';
+@import './styles/modules/settings.css';
+@import './styles/modules/admin.css';
+@import './styles/modules/clinical.css';
+@import './styles/modules/rooms.css';
+@import './styles/modules/finance.css';
+@import './styles/modules/dashboard.css';
+@import './styles/modules/infrastructure-tree.css';
+@import './styles/modules/zema-ai.css';
+@import './styles/modules/blood-bank.css';
+@import './styles/modules/biomedical-waste.css';
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--hms-font-family);
+  background-color: #f8fafc;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Card component */
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e2e8f0;
+}
+
+/* Button components */
+.btn-primary {
+  background-color: #020617; /* slate-950 */
+  color: white;
+  font-weight: 700;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.875rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary:hover {
+  background-color: #0f172a; /* slate-900 */
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.btn-primary:active {
+  transform: translateY(0px);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background-color: white;
+  color: #475569; /* slate-600 */
+  font-weight: 700;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0; /* slate-200 */
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.875rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-secondary:hover {
+  background-color: #f8fafc; /* slate-50 */
+  border-color: #cbd5e1; /* slate-300 */
+  color: #1e293b; /* slate-800 */
+}
+
+.btn-secondary:active {
+  background-color: #f1f5f9; /* slate-100 */
+}
+/* Input component */
+.input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 2px solid #dfdfdf;
+  background: white;
+  color: #0f172a;
+  font-size: 0.875rem;
+  font-family: inherit;
+  outline: none;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.input:focus {
+  border-color: #0f172a;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+}
+
+.input::placeholder {
+  color: #94a3b8;
+}
+
+/* Label */
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+/* Consultation modal form fields — shared by chief-complaint, notes,
+   instructions, next-visit so the form has one visual style end-to-end. */
+
+/* Consultation View page form fields — bigger sibling of .consult-input
+   for the doctor's full-page queue-walked workspace. Larger type, more
+   breathing room, slightly stronger focus ring so the active field
+   stands out on a wide canvas. */
+.focus-input,
+.focus-textarea {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 1rem;
+  line-height: 1.55;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+}
+
+.focus-textarea {
+  resize: vertical;
+  min-height: 7rem;
+}
+
+.focus-input:hover,
+.focus-textarea:hover {
+  border-color: #cbd5e1;
+}
+
+.focus-input:focus,
+.focus-textarea:focus {
+  border-color: #0f172a;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.08);
+}
+
+.focus-input::placeholder,
+.focus-textarea::placeholder {
+  color: #94a3b8;
+}
+
+/* Vitals modal numeric input — wider, bigger digits, monospace for
+   nurse-station scannability. Shared across BP / SpO2 / HR / weight. */
+
+/* External-results modal — front-desk capture form for outside-clinic
+   lab / radiology / pathology reports. Violet focus tone matches the
+   modal's accent (distinct from blue=consult, emerald=rx, amber=vitals). */
+
+/* Scrollbar — stay invisible until the user hovers/scrolls the container,
+   so it doesn't sit on screen as a permanent rail. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+*:hover,
+*:focus-within {
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 8px;
+}
+
+*:hover::-webkit-scrollbar-thumb,
+*:focus-within::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Print */
+@media print {
+
+  /* Hide all chrome UI */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Full-page reset */
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Let the main area fill the page */
+  main {
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* Invoice card: no shadow, no border radius, full width */
+  .card {
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 1.5cm;
+  }
+
+  /* Page-break utilities used by the print-consultation route.
+     .print-page wraps each of the three sheets (consultation, Rx,
+     lab) so they always start on a fresh page. break-* keeps lab
+     order rows / Rx rows together. */
+  .print-page {
+    break-before: page;
+    page-break-before: always;
+  }
+  .print-page:first-child {
+    break-before: auto;
+    page-break-before: auto;
+  }
+  .print-page-break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+/* Off-screen iframe used for per-invoice printing — must not be display:none
+   or the browser won't render the content before print() is called. */
+.print-frame {
+  position: fixed;
+  right: -9999px;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  border: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Remove native number-input spinner controls (the up/down "roller") */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

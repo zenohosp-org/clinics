@@ -1,0 +1,1026 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   IPD Medication Administration Record — dedicated stylesheet
+   Used exclusively by IpdMarTab.jsx
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Tab wrapper ──────────────────────────────────────────────────────────── */
+
+.mar-tab {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: var(--hms-space-xl);
+}
+
+.mar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* ── Discharge notice (reuse vitals pattern) ──────────────────────────────── */
+
+.mar-discharge-notice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--hms-gray-50, #f9fafb);
+    border: 1px solid var(--hms-gray-200, #e5e7eb);
+    border-left: 3px solid #b45309;
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: var(--hms-gray-700, #374151);
+}
+
+/* ── Order card ───────────────────────────────────────────────────────────── */
+
+.mar-card {
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* Drug info section */
+.mar-card__info {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px var(--hms-space-md) 12px;
+}
+
+.mar-card__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--hms-gray-100, #f3f4f6);
+    color: var(--hms-gray-700, #374151);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.mar-card__text {
+    flex: 1;
+    min-width: 0;
+}
+
+.mar-card__drug-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    line-height: 1.3;
+    margin: 0 0 5px;
+}
+
+/* Signa row: frequency + route pills + dose */
+.mar-card__signa {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+}
+
+.mar-signa-pill {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+/* Tag pills — frequency code (BD/TDS/…) and route (ORAL/IV/…). These are
+   informational labels, not status, so they read as quiet typographic
+   chips rather than coloured stickers. The card stays scannable instead
+   of looking like a rainbow when half the orders are routine. */
+.mar-signa-pill.is-freq,
+.mar-signa-pill.is-route {
+    background: var(--hms-gray-100, #f3f4f6);
+    color: var(--hms-gray-700, #374151);
+    border: 1px solid var(--hms-gray-200, #e5e7eb);
+}
+
+.mar-signa-pill.is-due,
+.mar-signa-pill.is-overdue {
+    gap: 3px;
+}
+
+.mar-signa-pill.is-due {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.mar-signa-pill.is-overdue {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.mar-signa-dose {
+    font-size: 11.5px;
+    color: var(--hms-gray-600);
+    padding: 0 2px;
+}
+
+.mar-card__instr {
+    font-size: 12px;
+    color: var(--hms-gray-500);
+    font-style: italic;
+    margin: 0 0 6px;
+}
+
+/* Prescriber meta row */
+.mar-card__prescriber {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    font-size: 11.5px;
+    color: var(--hms-gray-400);
+    margin: 0;
+}
+
+.mar-card__prescriber-sep {
+    color: var(--hms-gray-300);
+}
+
+/* ── Administration log toggle ───────────────────────────────────────────── */
+
+.mar-log-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 9px var(--hms-space-md);
+    background: var(--hms-gray-50);
+    border: none;
+    border-top: 1px solid var(--hms-gray-100);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--hms-gray-600);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.12s, color 0.12s;
+    gap: 8px;
+}
+
+.mar-log-toggle:hover {
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-800);
+}
+
+.mar-log-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-left: 4px;
+}
+
+.mar-log-count.has-entries {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.mar-log-count.no-entries {
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-500);
+}
+
+/* ── Administration log list ─────────────────────────────────────────────── */
+
+.mar-log-list {
+    padding: 10px var(--hms-space-md) 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px solid var(--hms-gray-100);
+    background: var(--hms-gray-50);
+}
+
+.mar-log-empty {
+    font-size: 12px;
+    color: var(--hms-gray-400);
+    text-align: center;
+    padding: 6px 0;
+    font-style: italic;
+}
+
+/* ── Administration event row ────────────────────────────────────────────── */
+
+.mar-event {
+    border-radius: 8px;
+    padding: 9px 12px;
+    border: 1px solid transparent;
+}
+
+.mar-event.is-given   { background: #f0fdf4; border-color: #bbf7d0; }
+.mar-event.is-held    { background: #fffbeb; border-color: #fde68a; }
+.mar-event.is-refused { background: #fff7ed; border-color: #fed7aa; }
+
+.mar-event__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.mar-event__status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.is-given   .mar-event__status { color: #15803d; }
+.is-held    .mar-event__status { color: #b45309; }
+.is-refused .mar-event__status { color: #c2410c; }
+
+.mar-event__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--hms-gray-500);
+}
+
+.mar-event__meta-item {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.mar-event__dose-badge {
+    font-size: 10.5px;
+    font-weight: 600;
+    background: var(--hms-gray-200);
+    color: var(--hms-gray-700);
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+.mar-event__reason {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--hms-gray-600);
+    font-style: italic;
+    line-height: 1.4;
+}
+
+.mar-event__notes {
+    margin-top: 3px;
+    font-size: 11.5px;
+    color: var(--hms-gray-500);
+    line-height: 1.4;
+}
+
+/* ── Entry form ──────────────────────────────────────────────────────────── */
+
+.mar-form {
+    padding: 14px var(--hms-space-md) var(--hms-space-md);
+    border-top: 1px solid var(--hms-gray-150, #eaecf0);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mar-form__heading {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--hms-gray-500);
+    margin: 0 0 2px;
+}
+
+/* 2-column row for Time + Status */
+.mar-form__row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+@media (max-width: 480px) {
+    .mar-form__row-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+.mar-form__field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.mar-form__label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--hms-gray-700);
+}
+
+.mar-form__label .req {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+.mar-form__label .hint {
+    font-weight: 400;
+    color: var(--hms-gray-400);
+    font-size: 11px;
+    margin-left: 4px;
+}
+
+/* Shared input style for MAR form */
+.mar-input {
+    width: 100%;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid var(--hms-gray-300);
+    border-radius: 7px;
+    font-size: 13px;
+    color: var(--hms-gray-800);
+    background: var(--hms-white);
+    box-sizing: border-box;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.mar-input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.mar-input::placeholder {
+    color: var(--hms-gray-400);
+    font-size: 12.5px;
+}
+
+/* Select keeps the same height/padding as input */
+select.mar-input {
+    appearance: auto;
+    padding-right: var(--hms-space-28);
+    cursor: pointer;
+}
+
+/* Textarea variant */
+.mar-input.is-textarea {
+    height: auto;
+    padding: 8px 10px;
+    resize: vertical;
+    min-height: 60px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+/* ── Form action row ──────────────────────────────────────────────────────── */
+
+.mar-form__actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 2px;
+}
+
+.mar-record-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 36px;
+    padding: 0 18px;
+    background: var(--hms-gray-900);
+    color: var(--hms-white);
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+}
+
+.mar-record-btn:hover:not(:disabled) {
+    background: var(--hms-gray-700);
+}
+
+.mar-record-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* ── Stop order button (in form action row) ───────────────────────────────── */
+
+.mar-form__actions {
+    gap: 8px;
+}
+
+.mar-stop-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 14px;
+    background: transparent;
+    border: 1px solid #fca5a5;
+    color: #dc2626;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.mar-stop-btn:hover,
+.mar-stop-btn.is-open {
+    background: #fff1f2;
+    border-color: #ef4444;
+}
+
+/* ── Inline stop confirmation form ───────────────────────────────────────── */
+
+.mar-stop-form {
+    margin: 0 var(--hms-space-md) 14px;
+    padding: 14px;
+    background: #fff1f2;
+    border: 1px solid #fca5a5;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mar-stop-form__heading {
+    font-size: 12px;
+    font-weight: 700;
+    color: #b91c1c;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.mar-stop-form__actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.mar-stop-confirm-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 14px;
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+}
+
+.mar-stop-confirm-btn:hover:not(:disabled) {
+    background: #b91c1c;
+}
+
+.mar-stop-confirm-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.mar-stop-cancel-btn {
+    display: inline-flex;
+    align-items: center;
+    height: 34px;
+    padding: 0 14px;
+    background: transparent;
+    border: 1px solid var(--hms-gray-300);
+    color: var(--hms-gray-600);
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.mar-stop-cancel-btn:hover {
+    background: var(--hms-gray-100);
+}
+
+/* ── Stopped card state ───────────────────────────────────────────────────── */
+
+/* Stopped card — quieter than red-on-red. The red signal lives on the
+   badge + the stopped banner's left rule; the rest of the card stays
+   neutral so the eye still groups it as "an order I can read", just
+   slightly faded. */
+.mar-card.is-stopped {
+    border-color: var(--hms-gray-200, #e5e7eb);
+    background: var(--hms-white, #fff);
+    opacity: 0.78;
+}
+
+.mar-card.is-stopped .mar-card__icon {
+    background: var(--hms-gray-100, #f3f4f6);
+    color: var(--hms-gray-500, #6b7280);
+}
+
+/* Drug name row with stopped badge */
+.mar-card__name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.mar-card__stopped-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+    background: #fee2e2;
+    color: #b91c1c;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+
+.mar-card__allergy-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+    background: #fef3c7;
+    color: #b45309;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+
+/* ── Stopped banner ───────────────────────────────────────────────────────── */
+
+.mar-stopped-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0 var(--hms-space-md) 10px;
+    padding: 10px 12px;
+    background: var(--hms-gray-50, #f9fafb);
+    border: 1px solid var(--hms-gray-200, #e5e7eb);
+    border-left: 3px solid #dc2626;
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--hms-gray-700, #374151);
+    line-height: 1.4;
+}
+
+.mar-stopped-banner svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: #dc2626;
+}
+
+/* ── Dispense tally pill (drug header) ──────────────────────────────────────
+   Bumped to the same visual weight as the frequency / route pills so it's
+   read as a status, not a footnote. The three states have distinct colours
+   so a glance is enough:
+     PENDING   = amber — pharmacy hasn't issued anything, nurse should chase
+     PARTIAL   = blue  — some on the trolley, some still owed
+     DISPENSED = green — all units issued */
+
+.mar-signa-pill.is-dispense {
+    gap: 4px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 700;
+    font-size: 11.5px;
+    padding: 3px 10px;
+    border: 1px solid transparent;
+}
+
+/* Dispense state palette is the only place we keep three tones because
+   the state IS clinically distinct: pending (pharmacy hasn't acted),
+   partial (in flight), dispensed (complete). All sit at low saturation so
+   the eye lands on a single colour at a time, not a billboard.        */
+.mar-signa-pill.is-dispense.is-pending {
+    background: #fff7ed;
+    color: #9a3412;
+    border-color: #fed7aa;
+}
+
+.mar-signa-pill.is-dispense.is-partial {
+    background: #fefce8;
+    color: #854d0e;
+    border-color: #fde68a;
+}
+
+.mar-signa-pill.is-dispense.is-dispensed {
+    background: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+/* ── Dispense status notice (full-width, above the entry form) ──────────────
+   PENDING is amber so a glance from the doctor's standing position is enough
+   to spot "pharmacy hasn't done their part yet". PARTIAL is a quieter blue
+   nudge. DISPENSED is suppressed in the JSX so it never renders. */
+
+.mar-dispense-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0 var(--hms-space-md) 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    line-height: 1.45;
+    border: 1px solid transparent;
+}
+
+.mar-dispense-notice strong {
+    font-weight: 700;
+}
+
+.mar-dispense-notice svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.mar-dispense-notice.is-pending {
+    background: #fff7ed;
+    color: #9a3412;
+    border-color: #fed7aa;
+}
+
+.mar-dispense-notice.is-partial {
+    background: #fefce8;
+    color: #854d0e;
+    border-color: #fde68a;
+}
+
+/* ── Consumption pill (MAR GIVEN count) ─────────────────────────────────── */
+
+.mar-signa-pill.is-given-count {
+    gap: 3px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 600;
+    font-size: 11px;
+    /* Neutral default — quiet while no doses have been given so the dispense
+       pill stays the louder signal for the pre-administration state. */
+    background: var(--hms-gray-100, #f3f4f6);
+    color: var(--hms-gray-700, #374151);
+}
+
+.mar-signa-pill.is-given-count.has-doses {
+    /* Lights up once the patient starts receiving doses — matches the
+       Given event row's success palette so the eye groups it correctly. */
+    background: #dcfce7;
+    color: #166534;
+}
+
+/* ── Pharmacy hand-off chips ──────────────────────────────────────────────
+   Two distinct states so the nurse can read the audit chain at a glance:
+     pending verify → amber (action pending at pharmacy counter)
+     returned       → green (closed-out, stock + credit note posted) */
+
+.mar-signa-pill.is-return-pending {
+    gap: 3px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 600;
+    font-size: 11px;
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+}
+
+.mar-signa-pill.is-return-confirmed {
+    gap: 3px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 600;
+    font-size: 11px;
+    background: #dcfce7;
+    color: #166534;
+}
+
+/* ── Ward actions strip (return button + inline form) ─────────────────────── */
+
+.mar-ward-actions {
+    margin: 0 var(--hms-space-md) 14px;
+}
+
+.mar-return-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 14px;
+    background: var(--hms-white, #fff);
+    border: 1px solid var(--hms-gray-300, #d1d5db);
+    color: var(--hms-gray-800, #1f2937);
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.mar-return-btn:hover {
+    background: var(--hms-gray-50, #f9fafb);
+    border-color: var(--hms-gray-400, #9ca3af);
+}
+
+.mar-return-btn__hint {
+    margin-left: 6px;
+    font-weight: 500;
+    color: var(--hms-gray-600, #4b5563);
+    font-size: 11.5px;
+}
+
+.mar-return-form {
+    padding: 14px;
+    background: var(--hms-gray-50, #f9fafb);
+    border: 1px solid var(--hms-gray-200, #e5e7eb);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mar-return-form__heading {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--hms-gray-900, #111827);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.mar-return-form__sub {
+    margin: -4px 0 4px;
+    font-size: 11.5px;
+    color: var(--hms-gray-600, #4b5563);
+    line-height: 1.45;
+}
+
+.mar-return-form__stop {
+    padding: 10px;
+    background: var(--hms-white, #fff);
+    border: 1px solid var(--hms-gray-200, #e5e7eb);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mar-return-form__stop-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--hms-gray-800, #1f2937);
+    cursor: pointer;
+}
+
+.mar-return-form__stop-toggle input[type="checkbox"] {
+    margin: 0;
+}
+
+.mar-return-form__actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.mar-return-confirm-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 14px;
+    background: var(--hms-gray-900, #111827);
+    color: var(--hms-white, #fff);
+    border: none;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+}
+
+.mar-return-confirm-btn:hover:not(:disabled) {
+    background: var(--hms-gray-700, #374151);
+}
+
+.mar-return-confirm-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.mar-return-cancel-btn {
+    display: inline-flex;
+    align-items: center;
+    height: 34px;
+    padding: 0 14px;
+    background: transparent;
+    border: 1px solid var(--hms-gray-300, #d1d5db);
+    color: var(--hms-gray-600, #4b5563);
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.mar-return-cancel-btn:hover:not(:disabled) {
+    background: var(--hms-gray-100, #f3f4f6);
+}
+
+.mar-return-cancel-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* ── Drug-switch chain badges (drug header row) ───────────────────────────── */
+
+.mar-card__switch-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+/* Switch chain — these are informational links between an old order and
+   its replacement, not a status the nurse needs to act on. Neutral chip
+   with a thin border keeps the eye on the actual status badges. */
+.mar-card__switch-badge.is-out,
+.mar-card__switch-badge.is-in {
+    background: var(--hms-gray-100, #f3f4f6);
+    color: var(--hms-gray-700, #374151);
+    border: 1px solid var(--hms-gray-200, #e5e7eb);
+}
+
+/* ── Switch-to-different-drug section (inside the return form) ────────────── */
+
+.mar-return-form__switch {
+    padding: 10px;
+    background: var(--hms-white, #fff);
+    border: 1px solid var(--hms-gray-200, #e5e7eb);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mar-return-form__switch-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--hms-gray-800, #1f2937);
+    cursor: pointer;
+}
+
+.mar-return-form__switch-toggle input[type="checkbox"] {
+    margin: 0;
+}
+
+.mar-return-form__switch-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 6px;
+    border-top: 1px dashed var(--hms-gray-200, #e5e7eb);
+}
+
+/* ── Inline drug-master search ────────────────────────────────────────────── */
+
+.mar-drug-search {
+    position: relative;
+}
+
+.mar-drug-search__input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.mar-drug-search__icon {
+    position: absolute;
+    left: 10px;
+    color: var(--hms-gray-500, #6b7280);
+    pointer-events: none;
+}
+
+.mar-drug-search__input {
+    padding-left: 30px !important;
+}
+
+.mar-drug-search__spinner {
+    position: absolute;
+    right: 10px;
+    width: 14px !important;
+    height: 14px !important;
+}
+
+.mar-drug-search__menu {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    max-height: 240px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid var(--hms-gray-200, #e5e7eb);
+    border-radius: 8px;
+    box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.12);
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+}
+
+.mar-drug-search__option {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.mar-drug-search__option:hover {
+    background: var(--hms-gray-100, #f3f4f6);
+}
+
+.mar-drug-search__option.is-empty {
+    color: var(--hms-gray-500, #6b7280);
+    font-style: italic;
+    cursor: default;
+}
+
+.mar-drug-search__option.is-empty:hover {
+    background: transparent;
+}
+
+.mar-drug-search__brand {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--hms-gray-900, #111827);
+}
+
+.mar-drug-search__meta {
+    font-size: 11.5px;
+    color: var(--hms-gray-600, #4b5563);
+}
+
+.mar-drug-search__generic {
+    font-size: 11px;
+    color: var(--hms-gray-500, #6b7280);
+    font-style: italic;
+}
+
+.mar-drug-context {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    background: var(--hms-gray-100, #f3f4f6);
+    border: 1px solid var(--hms-gray-200, #e5e7eb);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--hms-gray-700, #374151);
+    align-self: flex-start;
+}

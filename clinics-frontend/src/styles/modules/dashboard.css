@@ -1,0 +1,71 @@
+/* ===================================================================
+   Clinics — dashboard module
+   -------------------------------------------------------------------
+   Page-specific compositions for the dashboard area. Atomic helpers live in
+   utilities.css; reusable patterns (avatar, icon tile, kv row, etc.)
+   live in hms-system.css. This file contains only what's unique to dashboard.
+
+   The clinics dashboard reuses the shared .hms-dash-* vocabulary wholesale so
+   it inherits the design system unchanged. Only the pieces below are new, and
+   they exist because the waiting-room queue table has no equivalent in HMS.
+   =================================================================== */
+
+/* Header action cluster — "Book Appointment" + "Register Patient" sit side by
+   side, and stack under the greeting on narrow screens rather than squashing. */
+.clinic-dash-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--zu-space-sm);
+    flex-wrap: wrap;
+}
+
+/* Queue token number. Tabular figures so the column stays optically aligned
+   as tokens run 1 → 99, which a proportional font would ragged out. */
+.clinic-dash-token {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    padding: 3px 8px;
+    border-radius: var(--zu-radius-full);
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-900);
+    font-size: 12px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Chief complaint is free text of unbounded length — clamp it to one line so a
+   long entry can't blow the table's column widths apart. Full text stays
+   available on hover via the browser's own title tooltip on the row. */
+.clinic-dash-complaint {
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--hms-gray-600);
+}
+
+/* Status pill inside the queue table. Reuses the .hms-dash-status-row__icon
+   colour modifiers (.is-info / .is-amber / .is-emerald / …) for its palette,
+   overriding only the geometry: the sibling class is a square icon tile, this
+   needs to be a text chip. */
+.clinic-dash-status-chip {
+    width: auto;
+    height: auto;
+    padding: 3px 10px;
+    border-radius: var(--zu-radius-full);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+    .clinic-dash-header-actions {
+        width: 100%;
+    }
+
+    .clinic-dash-complaint {
+        max-width: 140px;
+    }
+}

@@ -1,0 +1,54 @@
+/* ── Suite-wide "Remote Work" check-in toggle (top bar) ── */
+.checkin-widget {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid #d1f1ba;
+}
+
+.checkin-widget.is-topbar {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #f8fff1;
+}
+
+.checkin-icon { color: #6b7280; flex-shrink: 0; }
+.checkin-icon.is-in { color: #65a30d; }
+
+.checkin-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums; /* HH:MM:SS ticks without jitter */
+}
+
+.checkin-toggle {
+    position: relative;
+    width: 32px;
+    height: 18px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 999px;
+    background: #d1d5db;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.15s;
+}
+.checkin-toggle.is-on { background: #65a30d; }
+.checkin-toggle:disabled { opacity: 0.6; cursor: default; }
+
+.checkin-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: #fff;
+    transition: transform 0.15s;
+}
+.checkin-toggle.is-on .checkin-knob { transform: translateX(14px); }

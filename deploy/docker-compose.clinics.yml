@@ -1,0 +1,76 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Clinics backend — service definition to merge into the VPS-side
+#  /opt/zenohosp/docker-compose.yml (the file that already runs hms-backend,
+#  labs, pharmacy, directory, …).
+#
+#  This file is NOT deployed as-is. Copy the `clinics-backend` block into the
+#  existing compose file's `services:` map, because the deploy workflow runs
+#      docker compose up -d --build clinics-backend
+#  from /opt/zenohosp and therefore resolves the service from that one file.
+#
+#  Every value below comes from /opt/zenohosp/.env — see DEPLOYMENT.md for the
+#  variables that must be added there before the first boot.
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  clinics-backend:
+    build:
+      context: ./clinics/clinics-backend
+      dockerfile: Dockerfile
+    container_name: clinics-backend
+    restart: unless-stopped
+    # Bound to loopback on purpose: nginx is the only thing that should reach
+    # it. Publishing on 0.0.0.0 would expose the API to the internet directly,
+    # bypassing the TLS vhost.
+    ports:
+      - "127.0.0.1:9003:9003"
+    environment:
+      PORT: 9003
+
+      # ── Shared database (same Supabase instance and tables as HMS) ──────
+      # Clinics runs ddl-auto=none, so it only ever reads/writes rows. HMS
+      # owns the schema. Do not point this at a different database without
+      # first creating the schema there.
+      DB_URL: ${DB_URL}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+
+      # ── JWT — MUST be byte-identical to the secret Directory signs with, ──
+      # and to what HMS/pharmacy/labs use. A mismatch makes every sso_token
+      # fail signature validation and the app 401s on /auth/me forever.
+      JWT_SECRET: ${JWT_SECRET}
+
+      # ── SSO cookie — shared across *.zenohosp.com ───────────────────────
+      SSO_COOKIE_NAME: sso_token
+      SSO_COOKIE_DOMAIN: zenohosp.com
+      SSO_COOKIE_SECURE: "true"
+      SSO_COOKIE_MAX_AGE: "86400"
+
+      # ── Directory OAuth2 client ─────────────────────────────────────────
+      # OAUTH_REDIRECT_URI must match the clinics-client registration in
+      # Directory byte-for-byte.
+      DIRECTORY_CLIENT_ID: ${CLINICS_CLIENT_ID:-clinics-client}
+      DIRECTORY_CLIENT_SECRET: ${CLINICS_CLIENT_SECRET}
+      OAUTH_REDIRECT_URI: https://api-clinics.zenohosp.com/login/oauth2/code/directory
+      FRONTEND_URL: https://clinics.zenohosp.com
+
+      # ── Sibling services ────────────────────────────────────────────────
+      LABS_API_URL: https://api-labs.zenohosp.com
+      ASSETS_API_URL: https://api-asset.zenohosp.com
+
+      # ── Google OAuth2 (legacy direct login path, inherited from HMS) ─────
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:9003/actuator/health | grep -q UP || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

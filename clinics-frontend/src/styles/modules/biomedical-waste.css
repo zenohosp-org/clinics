@@ -1,0 +1,197 @@
+/* ===================================================================
+   Biomedical Waste — page-area styles
+   -------------------------------------------------------------------
+   Composes on top of the shared zu-page / hms-* primitives (and the
+   generic .hms-bb-modal-grid form grid). Adds the BMW-specific bits:
+   stat tiles, the category chip strip (colour driven by lookup
+   metadata via --chip-color), status pills, and small breakdown chips
+   for the Handovers table.
+   =================================================================== */
+
+
+/* ── Top stat strip ─────────────────────────────────────────────── */
+.hms-bmw-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--hms-space-md);
+    margin-bottom: var(--hms-space-lg);
+}
+
+.hms-bmw-stat {
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 16px;
+    padding: var(--hms-space-20) var(--hms-space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hms-bmw-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.hms-bmw-stat__label {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--hms-gray-500);
+}
+
+.hms-bmw-stat__value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--hms-gray-900);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+
+.hms-bmw-stat__hint {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--hms-gray-500);
+}
+
+.hms-bmw-stat.is-warn { background: #fffbeb; border-color: #fcd34d; box-shadow: 0 1px 3px rgba(251, 191, 36, 0.1); }
+.hms-bmw-stat.is-warn:hover { box-shadow: 0 4px 6px -1px rgba(251, 191, 36, 0.15); }
+.hms-bmw-stat.is-warn .hms-bmw-stat__value { color: #b45309; }
+.hms-bmw-stat.is-warn .hms-bmw-stat__label { color: #92400e; }
+
+
+/* ── Category chip strip ─────────────────────────────────────────────
+   Horizontal chip row, one per WASTE_CATEGORY. Colour comes from the
+   lookup's metadata.color, passed in as the --chip-color CSS var.
+   Click a chip to filter the log table to that category. */
+.hms-bmw-category-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--hms-space-md);
+    margin-bottom: var(--hms-space-lg);
+}
+
+.hms-bmw-category-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    border-left: 6px solid var(--chip-color, var(--hms-gray-300));
+    border-radius: 14px;
+    padding: var(--hms-space-md) var(--hms-space-20);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    font-family: inherit;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.hms-bmw-category-chip:hover {
+    background: color-mix(in srgb, var(--chip-color, var(--hms-gray-300)) 4%, white);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.04);
+}
+
+.hms-bmw-category-chip.is-active {
+    border-color: var(--chip-color, var(--hms-gray-400));
+    background: color-mix(in srgb, var(--chip-color, var(--hms-gray-300)) 8%, white);
+    box-shadow: 0 0 0 1px var(--chip-color, var(--hms-gray-400)), 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.hms-bmw-category-chip__label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+    line-height: 1.3;
+}
+
+.hms-bmw-category-chip__value {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--hms-gray-900);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    letter-spacing: -0.01em;
+}
+
+.hms-bmw-category-chip__hint {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--hms-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 4px;
+}
+
+
+/* ── Category badge (table cell) ─────────────────────────────────── */
+.hms-bmw-category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--chip-color, var(--hms-gray-300)) 10%, white);
+    border: 1px solid color-mix(in srgb, var(--chip-color, var(--hms-gray-300)) 20%, white);
+    color: var(--hms-gray-800);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.hms-bmw-category-badge__dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--chip-color, var(--hms-gray-400));
+}
+
+
+/* ── Status pills ─────────────────────────────────────────────────── */
+.hms-bmw-status {
+    display: inline-flex;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.hms-bmw-status.is-pending     { color: #92400e; background: #fef3c7; border: 1px solid #fde68a; }
+.hms-bmw-status.is-handed-over { color: #065f46; background: #d1fae5; border: 1px solid #a7f3d0; }
+
+
+/* ── Handover category-breakdown chips ──────────────────────────── */
+.hms-bmw-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.hms-bmw-breakdown-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--chip-color, var(--hms-gray-300)) 10%, white);
+    border: 1px solid color-mix(in srgb, var(--chip-color, var(--hms-gray-300)) 20%, white);
+    color: var(--hms-gray-800);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.hms-bmw-breakdown-chip__dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--chip-color, var(--hms-gray-400));
+}

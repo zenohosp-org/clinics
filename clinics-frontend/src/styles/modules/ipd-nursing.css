@@ -1,0 +1,440 @@
+/* ===================================================================
+   HMS — IPD Nursing Tasks
+   =================================================================== */
+
+/* ── Summary + filter row ─────────────────────────────────────────── */
+
+.nursing-summary-row {
+    padding: 14px var(--hms-space-md) 0;
+}
+
+.nursing-summary {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.nursing-filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all 0.12s;
+    font-family: var(--hms-font-family);
+}
+
+.nursing-filter-pill.is-pending {
+    background: #fefce8;
+    color: #854d0e;
+    border-color: #fde68a;
+}
+
+.nursing-filter-pill.is-pending.is-active {
+    background: #fde68a;
+    border-color: #ca8a04;
+}
+
+.nursing-filter-pill.is-done {
+    background: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+.nursing-filter-pill.is-done.is-active {
+    background: #bbf7d0;
+    border-color: #16a34a;
+}
+
+.nursing-filter-pill.is-skipped {
+    background: var(--hms-gray-50);
+    color: var(--hms-gray-500);
+    border-color: var(--hms-gray-200);
+}
+
+.nursing-filter-pill.is-skipped.is-active {
+    background: var(--hms-gray-200);
+    border-color: var(--hms-gray-400);
+}
+
+/* ── Quick-add presets ────────────────────────────────────────────── */
+
+.nursing-presets {
+    padding: 12px var(--hms-space-md) 0;
+}
+
+.nursing-presets__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--hms-gray-400);
+    margin: 0 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.nursing-presets__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.nursing-preset-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 11px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    background: var(--hms-gray-50);
+    color: var(--hms-gray-600);
+    border: 1px solid var(--hms-gray-200);
+    cursor: pointer;
+    transition: all 0.12s;
+    font-family: var(--hms-font-family);
+}
+
+.nursing-preset-chip:hover {
+    background: var(--hms-gray-100);
+    border-color: var(--hms-gray-300);
+}
+
+.nursing-preset-chip.is-custom {
+    background: #eff6ff;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+
+.nursing-preset-chip.is-custom:hover {
+    background: #dbeafe;
+}
+
+/* ── Custom task form ─────────────────────────────────────────────── */
+
+.nursing-form {
+    margin: 10px var(--hms-space-md) 0;
+    padding: 14px;
+    background: var(--hms-gray-50);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 10px;
+}
+
+.nursing-form__fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.nursing-form__field {
+    display: flex;
+    flex-direction: column;
+    min-width: 120px;
+}
+
+.nursing-form__field--grow {
+    flex: 1;
+}
+
+.nursing-form__field--full {
+    flex: 0 0 100%;
+}
+
+.nursing-form__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--hms-gray-500);
+    margin-bottom: 4px;
+}
+
+.nursing-form__input,
+.nursing-form__select {
+    padding: 7px 10px;
+    border-radius: 7px;
+    font-size: 12px;
+    border: 1px solid var(--hms-gray-200);
+    background: #fff;
+    color: var(--hms-gray-900);
+    font-family: var(--hms-font-family);
+    outline: none;
+    transition: border-color 0.12s;
+}
+
+.nursing-form__input:focus,
+.nursing-form__select:focus {
+    border-color: var(--hms-primary);
+}
+
+.nursing-form__actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.nursing-form__save-btn {
+    padding: 8px 18px;
+    border-radius: 7px;
+    font-size: 12.6px;
+    font-weight: 600;
+    background: var(--hms-primary);
+    color: #fff;
+    border: 1px solid var(--hms-primary);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.18);
+    cursor: pointer;
+    transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+    font-family: var(--hms-font-family);
+}
+
+.nursing-form__save-btn:hover:not(:disabled) {
+    background: var(--hms-primary-hover);
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.22);
+    transform: translateY(-1px);
+}
+
+.nursing-form__save-btn:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.nursing-form__save-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.nursing-form__cancel-btn {
+    padding: 6px 12px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 500;
+    background: transparent;
+    color: var(--hms-gray-600);
+    border: 1px solid var(--hms-gray-200);
+    cursor: pointer;
+    transition: background 0.12s;
+    font-family: var(--hms-font-family);
+}
+
+.nursing-form__cancel-btn:hover {
+    background: var(--hms-gray-100);
+}
+
+/* ── Task list ────────────────────────────────────────────────────── */
+
+.nursing-list {
+    padding: 12px var(--hms-space-md);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* ── Task row ─────────────────────────────────────────────────────── */
+
+.nursing-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid var(--hms-gray-100);
+    transition: background 0.1s;
+}
+
+.nursing-row:hover {
+    background: var(--hms-gray-50);
+}
+
+.nursing-row.is-done {
+    background: #f9fefb;
+    border-color: #d1fae5;
+}
+
+.nursing-row.is-skipped {
+    opacity: 0.55;
+}
+
+/* Status dot */
+.nursing-row__status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+}
+
+.nursing-row__status-dot.is-pending {
+    background: #f59e0b;
+    box-shadow: 0 0 0 2px #fde68a;
+}
+
+.nursing-row__status-dot.is-done {
+    background: #22c55e;
+    box-shadow: 0 0 0 2px #bbf7d0;
+}
+
+.nursing-row__status-dot.is-skipped {
+    background: var(--hms-gray-300);
+}
+
+.nursing-row__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.nursing-row__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.nursing-row__name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--hms-gray-900);
+}
+
+.nursing-row__name.is-muted {
+    color: var(--hms-gray-400);
+    text-decoration: line-through;
+}
+
+.nursing-row__badges {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+/* ── Category badge ───────────────────────────────────────────────── */
+
+.nursing-cat-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 7px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    border: 1px solid;
+}
+
+.nursing-cat-badge.is-violet  { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+.nursing-cat-badge.is-rose    { background: #fff1f2; color: #be123c; border-color: #fecdd3; }
+.nursing-cat-badge.is-blue    { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
+.nursing-cat-badge.is-teal    { background: #f0fdfa; color: #0f766e; border-color: #99f6e4; }
+.nursing-cat-badge.is-amber   { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+.nursing-cat-badge.is-indigo  { background: #eef2ff; color: #3730a3; border-color: #c7d2fe; }
+.nursing-cat-badge.is-gray    { background: var(--hms-gray-50); color: var(--hms-gray-500); border-color: var(--hms-gray-200); }
+
+/* ── Shift badge ──────────────────────────────────────────────────── */
+
+.nursing-shift-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 7px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    border: 1px solid;
+}
+
+.nursing-shift-badge.is-morning   { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+.nursing-shift-badge.is-afternoon { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+.nursing-shift-badge.is-night     { background: #eef2ff; color: #3730a3; border-color: #c7d2fe; }
+.nursing-shift-badge.is-any       { background: var(--hms-gray-50); color: var(--hms-gray-500); border-color: var(--hms-gray-200); }
+
+/* ── Row meta / notes ─────────────────────────────────────────────── */
+
+.nursing-row__notes {
+    font-size: 12px;
+    color: var(--hms-gray-500);
+    margin: 3px 0 0;
+}
+
+.nursing-row__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--hms-gray-400);
+    margin: 4px 0 0;
+}
+
+.nursing-row__meta span + span::before {
+    content: "·";
+    margin-right: 6px;
+}
+
+.nursing-row__completed {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: #16a34a;
+    font-weight: 500;
+}
+
+.nursing-row__skipped-label {
+    color: var(--hms-gray-400);
+    font-style: italic;
+}
+
+/* ── Row action buttons ───────────────────────────────────────────── */
+
+.nursing-row__actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.nursing-row__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all 0.12s;
+    padding: 0;
+}
+
+.nursing-row__btn.is-done {
+    background: #f0fdf4;
+    color: #16a34a;
+    border-color: #bbf7d0;
+}
+
+.nursing-row__btn.is-done:hover {
+    background: #dcfce7;
+    border-color: #86efac;
+}
+
+.nursing-row__btn.is-skip {
+    background: var(--hms-gray-50);
+    color: var(--hms-gray-400);
+    border-color: var(--hms-gray-200);
+}
+
+.nursing-row__btn.is-skip:hover {
+    background: #fef9c3;
+    color: #854d0e;
+    border-color: #fde68a;
+}
+
+.nursing-row__btn.is-delete {
+    background: transparent;
+    color: var(--hms-gray-300);
+    border-color: transparent;
+}
+
+.nursing-row__btn.is-delete:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #fecaca;
+}

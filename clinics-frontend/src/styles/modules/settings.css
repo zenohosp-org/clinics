@@ -1,0 +1,73 @@
+/* ===================================================================
+   HMS — settings module
+   -------------------------------------------------------------------
+   Page-specific compositions for the settings area. Atomic helpers
+   live in utilities.css; reusable patterns (avatar, icon tile, kv row,
+   settings list, toggle, etc.) live in hms-system.css.
+
+   What lives here
+     * .hms-svc-info-card     — informational tile inside a settings
+                                form, used by PatientServiceFormModal
+                                to render the "Charge only once on
+                                registration" decision card.
+     * .hms-svc-active-row    — the active / inactive toggle row at
+                                the bottom of the PatientService form.
+   =================================================================== */
+
+
+.hms-svc-info-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.hms-svc-info-card__checkbox {
+    margin-top: 2px;
+    width: 16px;
+    height: 16px;
+    accent-color: #4338ca;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.hms-svc-info-card__title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hms-gray-700);
+}
+
+.hms-svc-info-card__description {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}
+
+
+.hms-svc-active-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px;
+    background: var(--hms-gray-50);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 8px;
+}
+
+.hms-svc-active-row__title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hms-gray-700);
+}
+
+.hms-svc-active-row__description {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+}

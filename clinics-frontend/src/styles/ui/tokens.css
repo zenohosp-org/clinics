@@ -1,0 +1,208 @@
+/* ===================================================================
+   ZENO SHARED UI — Design Tokens (tokens.css)
+   -------------------------------------------------------------------
+   App-neutral design variables for the shared component layer.
+   Prefix: --zu-* 
+   =================================================================== */
+
+:root {
+    /* Brand — pure neutral */
+    --zu-brand-primary: #000000;
+    --zu-brand-primary-hover: #171717;
+    --zu-brand-primary-active: #262626;
+    --zu-brand-primary-dark: #1c1c1c;
+    --zu-brand-primary-light: #dcdcdc;
+    --zu-brand-primary-lighter: #e5e5e5;
+    --zu-brand-primary-lightest: #f5f5f5;
+    --zu-brand-glow: rgba(0, 0, 0, 0.05);
+    --zu-brand-primary-glow: rgba(0, 0, 0, 0.10);
+
+    /* Neutral palette */
+    --zu-white: #ffffff;
+    --zu-gray-50: #f9fafb;
+    --zu-gray-100: #f3f4f6;
+    --zu-gray-200: #e5e7eb;
+    --zu-gray-300: #d1d5db;
+    --zu-gray-400: #9ca3af;
+    --zu-gray-500: #6b7280;
+    --zu-gray-600: #4b5563;
+    --zu-gray-700: #374151;
+    --zu-gray-800: #1f2937;
+    --zu-gray-900: #111827;
+    --zu-gray-950: #020617; /* Added for shell */
+    --zu-gray-250: #e4e4e4; /* Added for shell active bg */
+    --zu-slate-500: #64748b; /* Added for shell section label */
+    --zu-slate-900: #0f172a; /* Added for shell title */
+    --zu-rose-500: #f43f5e; /* Added for shell hover */
+
+    /* Semantic colour pairs */
+    --zu-success: #10b981;
+    --zu-success-bg: #dcfce7;
+    --zu-success-border: #bbf7d0;
+    --zu-warning: #f59e0b;
+    --zu-warning-bg: #fef3c7;
+    --zu-warning-border: #fde68a;
+    --zu-danger: #ef4444;
+    --zu-danger-bg: #fef2f2;
+    --zu-danger-border: #fecaca;
+    --zu-info: #3b82f6;
+    --zu-info-bg: #eff6ff;
+    --zu-info-border: #dbeafe;
+
+    /* Component specific raw values */
+    --zu-overlay-bg: rgba(15, 23, 42, 0.45);
+    --zu-shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.18);
+
+    --zu-btn-shadow: 0 1px 3px rgba(15, 23, 42, 0.18);
+    --zu-btn-shadow-hover: 0 4px 10px rgba(15, 23, 42, 0.22);
+    --zu-btn-primary-hover: #1e293b;
+    --zu-btn-danger-shadow: 0 1px 3px rgba(239, 68, 68, 0.25);
+    --zu-btn-danger-shadow-hover: 0 4px 12px rgba(220, 38, 38, 0.3);
+    --zu-danger-outline-border: #fca5a5;
+    --zu-danger-hover: #dc2626;
+
+    --zu-btn-blue-bg: #2563eb;
+    --zu-btn-blue-hover: #1d4ed8;
+    --zu-btn-orange-bg: #ea580c;
+    --zu-btn-orange-hover: #c2410c;
+    --zu-btn-green-bg: #16a34a;
+    --zu-btn-green-hover: #15803d;
+
+    /* Extended Semantic Colors for Badges/Avatars */
+    --zu-info-text: #0369a1;
+    --zu-success-text: #166534;
+    --zu-warning-text: #92400e;
+    --zu-danger-text: #dc2626;
+    
+    --zu-rose-bg: #fff1f2;
+    --zu-rose-border: #fecdd3;
+    --zu-rose-text: #be123c;
+    
+    --zu-amber-text: #b45309;
+    
+    --zu-violet-bg: #f5f3ff;
+    --zu-violet-border: #ddd6fe;
+    --zu-violet-text: #6d28d9;
+
+    /* Clinical accents */
+    --zu-accent-consult: #0f172a;
+    --zu-accent-consult-glow: rgba(15, 23, 42, 0.08);
+    --zu-accent-vitals: #0f172a;
+    --zu-accent-rx: #047857;
+    --zu-accent-external: #7c3aed;
+    --zu-accent-external-glow: rgba(124, 58, 237, 0.12);
+
+    /* ── Spacing scale ──────────────────────────────────────────────
+       Interpolates between a 1200px viewport (75% of each value) and a
+       1500px viewport (100%), via `clamp(min, calc(<b> + <m>vw), max)`.
+
+       The ramp completes at 1500px — just UNDER a 14"'s 1512px width — so
+       every laptop at 14" and above sits on clamp()'s ceiling and resolves
+       to the exact max. Chrome spacing is therefore consistent from a 14"
+       upward, while the layout itself still gains columns on wider screens.
+       Landing the ramp exactly ON 1512 leaves the result at the mercy of
+       float rounding (measured 23.9994px vs 24px), hence the 12px margin.
+
+       Spacing intentionally stops growing past 1500px: extra width should
+       become more content, not fatter padding.
+
+       Coefficients are exact: vw = max/12, offset = -max/4.
+
+       NOTE: a unitless 0→1 progress ratio is NOT expressible in CSS —
+       calc() cannot divide a length by a length to yield <number>. The
+       vw-based linear term below is the valid equivalent.
+
+       xs/sm stay FIXED: 4-8px is grid rhythm, not "airiness" — scaling
+       them is imperceptible and only adds calc cost. */
+    --zu-space-xs: 4px;
+    --zu-space-sm: 8px;
+    --zu-space-9: 9px; /* Added for shell */
+    --zu-space-12: 12px; /* Added for shell */
+    /* Every step compresses uniformly to 75% at 1200px and reaches 100%
+       (its previous static value) at 1500px. The -20 and -28 steps exist
+       because those two values are pervasive in the module CSS and must
+       map to a token that maxes at their own value — mapping them onto
+       md/lg/xl would silently resize them. */
+    --zu-space-md: clamp(12px, calc(1.3333vw - 4px), 16px);
+    --zu-space-20: clamp(15px, calc(1.6667vw - 5px), 20px);
+    --zu-space-lg: clamp(18px, calc(2vw - 6px), 24px);
+    --zu-space-28: clamp(21px, calc(2.3333vw - 7px), 28px);
+    --zu-space-xl: clamp(24px, calc(2.6667vw - 8px), 32px);
+    --zu-space-2xl: 48px;
+    --zu-space-3xl: 64px;
+    --zu-space-4xl: 96px;
+
+    /* Radius */
+    --zu-radius-sm: 4px;
+    --zu-radius-md: 6px; /* Added for shell */
+    --zu-radius: 8px;
+    --zu-radius-lg: 12px;
+    --zu-radius-xl: 16px;
+    --zu-radius-full: 9999px;
+
+    /* Transitions */
+    --zu-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --zu-transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --zu-transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    --zu-transition-layout: 300ms cubic-bezier(0.4, 0, 0.2, 1); /* Added for shell layout */
+
+    /* Elevation */
+    --zu-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --zu-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.10), 0 1px 2px -1px rgba(0, 0, 0, 0.10);
+    --zu-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.10), 0 2px 4px -2px rgba(0, 0, 0, 0.10);
+    --zu-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.10), 0 4px 6px -4px rgba(0, 0, 0, 0.10);
+    --zu-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.10), 0 8px 10px -6px rgba(0, 0, 0, 0.10);
+    --zu-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+    --zu-shadow-card-hover: 0 1px 3px rgba(0, 0, 0, 0.05), 0 20px 25px -5px rgba(0, 0, 0, 0.10), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+    /* Typography */
+    --zu-font-family: "Lexend", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
+    /* Fluid DISPLAY type only — same 1200→1600px interpolation, maxes
+       anchored to current static values (page title 24px, stat value 20px).
+
+       Body copy, table cells and form labels are deliberately NOT fluid:
+       in a dense clinical UI, row-height predictability and legibility
+       outrank 1-2px of breathing room, and scaling them reintroduces the
+       sub-pixel reflow this system exists to eliminate. */
+    --zu-font-display-lg: clamp(21px, calc(1vw + 9px), 24px);      /* page titles */
+    --zu-font-stat-value: clamp(18px, calc(0.6667vw + 10px), 20px); /* stat numbers */
+
+    /* Stacking layers */
+    --zu-z-dropdown: 1000;
+    --zu-z-sticky: 1020;
+    --zu-z-drawer: 1040;
+    --zu-z-modal-overlay: 1050;
+    --zu-z-modal: 1060;
+    --zu-z-popover: 1070;
+    --zu-z-toast: 1080;
+    --zu-z-print: 1090;
+}
+
+/* 
+===================================================================
+   UNTOKENIZED VALUES FLAG
+   The following raw colors were found hardcoded in CSS files 
+   (shell.css, hms-system.css, utilities.css) and are not covered 
+   by the --zu-* tokens above:
+-------------------------------------------------------------------
+- Navigation specific (shell.css):
+  * #020617 (Sidebar nav text / link icon)
+  * #e4e4e4 (Sidebar nav active background)
+  * #f3f4f6 (Sidebar nav hover background)
+  * #64748b (Section label text)
+
+- Extended Semantics (Rose/Amber/Emerald/Teal variants):
+  * #be123c, #fecdd3, #fff1f2 (Rose badge/stat elements)
+  * #b45309, #d97706, #92400e (Amber elements)
+  * #059669, #15803d, #166534, #16a34a (Emerald / dark green variants)
+  * #0369a1, #1d4ed8, #2563eb (Deep blue variants)
+  * #0d9488 (Teal accent)
+  * #6d28d9, #ddd6fe, #f5f3ff (Violet/Purple variants)
+  * #ea580c, #c2410c (Orange variants)
+  
+- Non-standard Layout Spacing/Sizes:
+  * 9px, 12px (Hardcoded paddings in shell.css)
+  * 300ms cubic-bezier(...) (Sidebar transition uses 300ms, not matched to tokens)
+===================================================================
+*/

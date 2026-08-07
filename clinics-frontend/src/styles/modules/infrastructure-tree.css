@@ -1,0 +1,479 @@
+/* ===================================================================
+   HMS DESIGN SYSTEM — Infrastructure Tree Structure (infrastructure-tree.css)
+   =================================================================== */
+
+.infra-tree-workspace {
+    display: flex;
+    gap: 48px; /* Room for connector lines */
+    padding: 10px 34px;
+    align-items: stretch;
+    overflow-x: auto;
+}
+
+/* Utility to hide scrollbar but keep functionality */
+.infra-tree-hide-scrollbar,
+.infra-tree-hide-scrollbar * {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+.infra-tree-hide-scrollbar::-webkit-scrollbar,
+.infra-tree-hide-scrollbar *::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+}
+
+/* ── Tree Column ─────────────────────────────────────────────────── */
+.infra-tree-col {
+    flex: 1;
+    min-width: 300px;
+    max-width: 360px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    height: 100%;
+}
+
+.infra-tree-col-header {
+    padding: 12px var(--hms-space-md);
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 12px;
+    margin-bottom: var(--hms-space-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01);
+}
+
+.infra-tree-col-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hms-gray-700);
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.infra-tree-col-title svg {
+    color: #0ea5e9;
+    opacity: 0.8;
+}
+
+.infra-tree-col-count {
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: none;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.infra-tree-col-content {
+    padding: 4px 52px var(--hms-space-20) 52px;
+    margin: 0 -48px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--hms-space-md);
+    position: relative;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+}
+
+.infra-tree-col-content::-webkit-scrollbar {
+    width: 4px;
+}
+.infra-tree-col-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+.infra-tree-col-content::-webkit-scrollbar-thumb {
+    background: var(--hms-gray-300);
+    border-radius: 4px;
+}
+
+/* ── Tree Cards ──────────────────────────────────────────────────── */
+.infra-tree-card {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 12px;
+    height: 72px;
+    padding: 0 var(--hms-space-md);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.01);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+.infra-tree-card:hover {
+    border-color: rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+/* Active card styling with soft blue glow */
+.infra-tree-card.is-active {
+    background: #f4faff; /* very soft blue */
+    border-color: rgba(14, 165, 233, 0.2);
+    box-shadow: 0 4px 16px rgba(14, 165, 233, 0.08), 0 0 0 1px rgba(14, 165, 233, 0.1) inset;
+}
+
+.infra-tree-card__icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.infra-tree-card.is-active .infra-tree-card__icon-wrap {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+.infra-tree-card__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.infra-tree-card__name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #334155;
+    margin: 0;
+    transition: color 0.2s;
+}
+
+.infra-tree-card.is-active .infra-tree-card__name {
+    color: #0369a1;
+}
+
+.infra-tree-card__meta {
+    font-size: 11px;
+    color: var(--hms-gray-500);
+    margin-top: 2px;
+}
+
+.infra-tree-card__actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.infra-tree-card:hover .infra-tree-card__actions {
+    opacity: 1;
+}
+
+.infra-tree-card__btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    border: 1px solid var(--hms-gray-200);
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--hms-gray-500);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.infra-tree-card__btn:hover {
+    background: var(--hms-gray-50);
+    color: var(--hms-gray-900);
+    border-color: var(--hms-gray-300);
+}
+
+.infra-tree-card__btn.is-danger:hover {
+    background: var(--hms-danger-bg);
+    color: var(--hms-danger);
+    border-color: var(--hms-danger-border);
+}
+
+/* ── Tree Connection Lines ───────────────────────────────────────── */
+
+/* Left horizontal line connecting to vertical backbone */
+.infra-tree-card::before {
+    content: '';
+    position: absolute;
+    left: -8px; /* Connecting to shifted vertical backbone */
+    top: 50%;
+    width: 8px;
+    height: 2px;
+    background: #e2e8f0;
+    pointer-events: none;
+    z-index: 1;
+    transition: background 0.25s, height 0.25s;
+}
+
+/* Highlight connecting line if column is connected */
+.infra-tree-col-content.is-connected .infra-tree-card::before {
+    background: #0ea5e9;
+}
+
+/* Bold the active path specifically */
+.infra-tree-col-content.is-connected .infra-tree-card.is-active::before {
+    height: 2px;
+    background: #0ea5e9;
+}
+
+/* Vertical backbone line in child column content */
+.infra-tree-col-content::before {
+    content: '';
+    position: absolute;
+    left: 44px;
+    top: 40px;
+    bottom: 40px;
+    width: 2px;
+    background: #e2e8f0;
+    pointer-events: none;
+    z-index: 1;
+    transition: background 0.25s;
+}
+
+.infra-tree-col-content.is-connected::before {
+    background: #0ea5e9;
+}
+
+.infra-tree-col-content.is-empty::before {
+    top: 34px; /* Perfectly touches the center stub of Add buttons */
+}
+
+/* Ensure standalone Add buttons match the group's margin so their stubs align perfectly with the backbone */
+.infra-tree-col-content.is-empty > .infra-tree-add-card-btn {
+    margin-top: 8px;
+}
+
+/* First Column has no left connections */
+.infra-tree-col:first-child .infra-tree-col-content::before,
+.infra-tree-col:first-child .infra-tree-card::before,
+.infra-tree-col:first-child .infra-tree-add-card-btn::before {
+    display: none;
+}
+
+/* Right horizontal line from parent card (inactive state stops at badge) */
+.infra-tree-card.has-children::after,
+.infra-tree-card.is-active::after {
+    content: '';
+    position: absolute;
+    right: -26px;
+    top: 50%;
+    width: 26px;
+    height: 2px;
+    background: #e2e8f0;
+    pointer-events: none;
+    z-index: 2;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Bold and extend active path right connector to backbone */
+.infra-tree-card.has-children.is-active::after,
+.infra-tree-card.is-active::after {
+    right: -52px;
+    width: 52px;
+    height: 2px;
+    background: #0ea5e9;
+}
+
+/* Add Building/Floor/Ward buttons styled elegantly */
+.infra-tree-add-card-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px dashed #cbd5e1;
+    background: transparent;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.infra-tree-add-card-btn:hover:not(:disabled) {
+    border-color: #94a3b8;
+    color: #475569;
+    background: #f8fafc;
+}
+
+/* Give connected columns a subtle blue hint on their add buttons */
+.infra-tree-col-content.is-connected .infra-tree-add-card-btn:hover:not(:disabled) {
+    border-color: #38bdf8;
+    color: #0284c7;
+    background: #f0f9ff;
+}
+
+.infra-tree-add-card-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Connect Add button to vertical backbone */
+.infra-tree-add-card-btn::before,
+.infra-tree-add-btn-group::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    width: 8px;
+    height: 2px;
+    background: #e2e8f0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.infra-tree-col-content.is-connected .infra-tree-add-card-btn::before,
+.infra-tree-col-content.is-connected .infra-tree-add-btn-group::before {
+    height: 2px;
+    background: #0ea5e9;
+}
+
+.infra-tree-add-btn-group {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    position: relative;
+    margin-top: 8px;
+}
+
+.infra-tree-add-btn-group .infra-tree-add-card-btn {
+    flex: 1;
+    margin: 0;
+}
+
+.infra-tree-add-btn-group .infra-tree-add-card-btn::before {
+    display: none; /* Hide individual connectors when grouped */
+}
+
+/* Connection Badge positioned on the parent horizontal line */
+.infra-tree-connection-badge {
+    position: absolute;
+    right: -38px;
+    top: 50%;
+    transform: translateY(-50%);
+    min-width: 24px;
+    height: 22px;
+    padding: 0 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #64748b;
+    pointer-events: none;
+    z-index: 10;
+    transition: all 0.2s;
+}
+
+.infra-tree-connection-badge.is-active {
+    background: #0ea5e9;
+    color: #ffffff;
+    border-color: #0ea5e9;
+    box-shadow: 0 2px 6px rgba(14, 165, 233, 0.25);
+}
+
+.infra-tree-connection-badge.is-inactive {
+    background: #ffffff;
+    color: var(--hms-gray-500);
+}
+
+/* Wards & Special Badge category tags */
+.infra-tree-badge-tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    margin-right: 6px;
+}
+
+.infra-tree-badge-tag.is-general { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.infra-tree-badge-tag.is-icu { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.infra-tree-badge-tag.is-private { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.infra-tree-badge-tag.is-ot { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+.infra-tree-badge-tag.is-store { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+
+/* ── Inline Edit Modal Form Custom Styling ────────────────────────── */
+.infra-modal-form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--hms-space-md);
+}
+
+.infra-rooms-stepper-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: var(--hms-gray-50);
+    border-radius: 8px;
+    border: 1px solid var(--hms-gray-200);
+}
+
+.infra-rooms-names-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    max-height: 240px;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.infra-room-config-card {
+    display: flex;
+    flex-direction: column;
+    border: 1.5px solid var(--hms-gray-200);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #ffffff;
+    transition: all 0.15s;
+}
+
+.infra-room-config-card:focus-within {
+    border-color: var(--hms-info);
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.1);
+}
+
+.infra-room-input-box {
+    width: 100%;
+    padding: 8px 10px;
+    border: none;
+    border-bottom: 1px solid var(--hms-gray-100);
+    font-size: 13px;
+    font-weight: 600;
+    outline: none;
+    background: transparent;
+}
+
+.infra-room-bed-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: var(--hms-gray-50);
+}

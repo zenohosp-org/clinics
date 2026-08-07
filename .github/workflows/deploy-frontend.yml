@@ -1,0 +1,28 @@
+name: Deploy frontend to VPS
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'clinics-frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and deploy over SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 20m
+          script: |
+            set -e
+            cd /opt/zenohosp/clinics
+            git pull origin main
+            cd clinics-frontend
+            npm ci
+            npm run build
+            mkdir -p /var/www/clinics
+            rm -rf /var/www/clinics/*
+            cp -r dist/* /var/www/clinics/

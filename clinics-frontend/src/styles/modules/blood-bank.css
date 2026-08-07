@@ -1,0 +1,254 @@
+/* ===================================================================
+   Blood Bank — page-area styles
+   -------------------------------------------------------------------
+   Composes on top of the shared zu-page / hms-* primitives. Adds the
+   small set of blood-bank-specific patterns: group stat tiles, stock
+   matrix grid, status pills mapped to lookup tones, expiry warning
+   row. Everything else (Table, Card, Modal, FormGroup) is reused.
+   =================================================================== */
+
+
+/* ── Top stat strip ─────────────────────────────────────────────── */
+.hms-bb-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: var(--hms-space-md);
+}
+
+.hms-bb-stat {
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 12px;
+    padding: var(--hms-space-md) 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.hms-bb-stat__label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--hms-gray-500);
+}
+
+.hms-bb-stat__value {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.hms-bb-stat__hint {
+    font-size: 12px;
+    color: var(--hms-gray-600);
+}
+
+.hms-bb-stat.is-warn { background: #fffbeb; border-color: #fde68a; }
+.hms-bb-stat.is-warn .hms-bb-stat__value { color: #b45309; }
+.hms-bb-stat.is-warn .hms-bb-stat__label { color: #92400e; }
+
+
+/* ── Group availability strip (replaces the matrix) ─────────────────
+   Horizontal chip row, one chip per blood group, showing AVAILABLE
+   bag count. Click a chip to filter the bag table to that group. */
+.hms-bb-groupstrip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+    gap: 10px;
+    margin-bottom: var(--hms-space-md);
+}
+
+.hms-bb-groupstrip__chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    text-align: left;
+    font-family: inherit;
+}
+
+.hms-bb-groupstrip__chip:hover {
+    border-color: #fca5a5;
+    background: #fff7f7;
+}
+
+.hms-bb-groupstrip__chip.is-active {
+    border-color: #ef4444;
+    background: #fef2f2;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.10);
+}
+
+/* Stock-level signal — flags groups that need attention at a glance.
+   "Critical" (0 units) and "Low" (below threshold) override the base
+   chip colours; the is-active selection ring still layers on top. */
+.hms-bb-groupstrip__chip.is-critical {
+    border-color: #fca5a5;
+    background: #fef2f2;
+}
+
+.hms-bb-groupstrip__chip.is-critical .hms-bb-groupstrip__count,
+.hms-bb-groupstrip__chip.is-critical .hms-bb-groupstrip__hint {
+    color: #dc2626;
+}
+
+.hms-bb-groupstrip__chip.is-low {
+    border-color: #fde68a;
+    background: #fffbeb;
+}
+
+.hms-bb-groupstrip__chip.is-low .hms-bb-groupstrip__count,
+.hms-bb-groupstrip__chip.is-low .hms-bb-groupstrip__hint {
+    color: #b45309;
+}
+
+.hms-bb-groupstrip__meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.hms-bb-groupstrip__count {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.hms-bb-groupstrip__hint {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--hms-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+
+/* ── Group pill (compact A+/B−/etc. badge) ──────────────────────── */
+.hms-bb-group {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+
+/* ── Expiry warning row ─────────────────────────────────────────── */
+.hms-bb-row.is-expiring td {
+    background: #fffbeb;
+}
+
+.hms-bb-row.is-expiring .hms-bb-expiry {
+    color: #b45309;
+    font-weight: 600;
+}
+
+
+/* ── Issue / register modal grids ───────────────────────────────── */
+.hms-bb-modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.hms-bb-modal-grid.is-3col {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.hms-bb-modal-grid__full {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+    .hms-bb-modal-grid,
+    .hms-bb-modal-grid.is-3col { grid-template-columns: 1fr; }
+}
+
+
+/* ── Status tone helpers — driven by lookup.metadata.tone ───────── */
+.hms-bb-status.is-success { color: #047857; background: #d1fae5; }
+.hms-bb-status.is-warning { color: #b45309; background: #fef3c7; }
+.hms-bb-status.is-info    { color: #1d4ed8; background: #dbeafe; }
+.hms-bb-status.is-violet  { color: #6d28d9; background: #ede9fe; }
+.hms-bb-status.is-neutral { color: #475569; background: var(--hms-gray-100); }
+.hms-bb-status.is-danger  { color: #b91c1c; background: #fee2e2; }
+.hms-bb-status {
+    display: inline-flex;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+
+/* ── Blood-group incompatibility warning (Issue Blood modal) ────── */
+.hms-bb-incompatible-warn {
+    border: 1px solid #fca5a5;
+    background: #fef2f2;
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hms-bb-incompatible-warn__msg {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #b91c1c;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.hms-bb-incompatible-warn__msg svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+
+/* ── Replacement-donation "+1" button (Issue Blood tab) ─────────── */
+.hms-bb-replacement-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    border: 1px solid var(--hms-gray-200);
+    background: var(--hms-white);
+    color: var(--hms-gray-500);
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.hms-bb-replacement-btn:hover {
+    border-color: #6ee7b7;
+    background: #ecfdf5;
+    color: #047857;
+}

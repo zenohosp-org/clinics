@@ -1,0 +1,1077 @@
+/* ===================================================================
+   ZENO SHARED UI — Components (components.css)
+   -------------------------------------------------------------------
+   Buttons, tables, badges, avatars, search, cards, modals, menus,
+   stat cards, and page wrappers.
+   =================================================================== */
+
+/* ─────────────────────────── Cards ─────────────────────────── */
+.zu-card {
+    background: var(--zu-white);
+    border-radius: var(--zu-radius);
+    border: 1px solid var(--zu-gray-200);
+    box-shadow: var(--zu-shadow-card);
+    padding: var(--zu-space-lg);
+    transition: var(--zu-transition-normal);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: var(--zu-space-sm);
+}
+
+.zu-card.is-interactive {
+    cursor: pointer;
+}
+
+.zu-card.is-interactive:hover {
+    box-shadow: var(--zu-shadow-card-hover);
+    transform: translateY(-4px);
+    border-color: var(--zu-gray-300);
+}
+
+.zu-card.is-glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ─────────────────────────── Canonical Page Wrapper ─────────────────────────── */
+.zu-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--zu-space-lg);
+}
+
+/* ─────────────────────────── Canonical Stat Card ─────────────────────────── */
+.zu-stat-card-grid {
+    display: grid;
+    /* min() guards against overflow when the container is narrower than
+       the 240px track (narrow viewport + expanded sidebar). */
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    gap: var(--zu-space-lg); /* fluid 18->24px, no reflow step */
+    margin-block-end: var(--zu-space-lg);
+}
+
+.zu-card.is-stat {
+    flex-direction: row;
+    align-items: center;
+    padding: var(--zu-space-20);
+    gap: var(--zu-space-md);
+}
+
+/* Responds to the CONTENT area's real width, not the window's — so it also
+   fires when the sidebar is expanded on a smaller laptop, which a viewport
+   media query cannot distinguish. Threshold is below a 14"'s 1252px content
+   width so normal laptops keep the roomier 240px track. */
+@container zu-content (max-width: 1100px) {
+    .zu-stat-card-grid {
+        grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+    }
+}
+
+.zu-stat-card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--zu-radius);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid transparent;
+}
+
+.zu-stat-card-icon.is-blue {
+    background: var(--zu-info-bg);
+    border-color: var(--zu-info-border);
+    color: var(--zu-info);
+}
+
+.zu-stat-card-icon.is-emerald {
+    background: var(--zu-success-bg);
+    border-color: var(--zu-success-border);
+    color: var(--zu-success);
+}
+
+.zu-stat-card-icon.is-amber {
+    background: var(--zu-warning-bg);
+    border-color: var(--zu-warning-border);
+    color: var(--zu-amber-text);
+}
+
+.zu-stat-card-icon.is-rose {
+    background: var(--zu-rose-bg);
+    border-color: var(--zu-rose-border);
+    color: var(--zu-rose-text);
+}
+
+.zu-stat-card-body {
+    min-width: 0;
+}
+
+.zu-stat-card-label {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--zu-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.zu-stat-card-value {
+    margin: 2px 0 0;
+    font-size: var(--zu-font-stat-value); /* was 20px; now fluid 18->20px */
+    font-weight: 700;
+    color: var(--zu-gray-900);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.zu-stat-card-sub {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--zu-gray-400);
+}
+
+/* ─────────────────────────── Table ─────────────────────────── */
+.zu-table-wrapper {
+    background: var(--zu-white);
+    border: 1px solid var(--zu-gray-200);
+    border-radius: var(--zu-radius);
+    box-shadow: var(--zu-shadow-xs);
+    overflow: hidden;
+}
+
+.zu-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+    text-align: left;
+    font-family: var(--zu-font-family);
+}
+
+.zu-table thead th {
+    background: var(--zu-gray-50);
+    color: var(--zu-gray-600);
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 8px var(--zu-space-md);
+    border-bottom: 1px solid var(--zu-gray-200);
+    white-space: nowrap;
+}
+
+.zu-table tbody td {
+    padding: 8px var(--zu-space-md);
+    color: var(--zu-gray-700);
+    border-bottom: 1px solid var(--zu-gray-100);
+    vertical-align: middle;
+    transition: var(--zu-transition-fast);
+}
+
+.zu-table tbody tr:hover td {
+    background: var(--zu-gray-50);
+    color: var(--zu-gray-900);
+}
+
+.zu-table-loading {
+    padding: 48px;
+    text-align: center;
+    color: var(--zu-gray-400);
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.zu-table-loading-cell {
+    padding: 0 !important;
+}
+
+/* ─────────────────────────── Table Skeleton ─────────────────────────── */
+.zu-table-skeleton {
+    display: flex;
+    flex-direction: column;
+    animation: zu-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.zu-table-skeleton-row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--zu-space-md);
+    padding: var(--zu-space-md) var(--zu-space-lg);
+    border-bottom: 1px solid var(--zu-gray-100);
+}
+
+.zu-table-skeleton-row:last-child {
+    border-bottom: none;
+}
+
+.zu-table-skeleton-cell {
+    height: 14px;
+    background-color: var(--zu-gray-200);
+    border-radius: var(--zu-radius-sm);
+    flex: 1;
+}
+
+.zu-table-skeleton-cell.is-wide {
+    flex: 2;
+}
+
+.zu-table-skeleton-cell.is-narrow {
+    flex: 0.5;
+}
+
+/* ─────────────────────────── Badges ─────────────────────────── */
+.zu-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: var(--zu-radius-full);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.zu-badge.is-soft {
+    padding: 3px 8px;
+    border-radius: var(--zu-radius-md);
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.zu-badge-success {
+    background: var(--zu-success-bg);
+    color: var(--zu-success-text);
+    border: 1px solid var(--zu-success-border);
+}
+
+.zu-badge-warning {
+    background: var(--zu-warning-bg);
+    color: var(--zu-warning-text);
+    border: 1px solid var(--zu-warning-border);
+}
+
+.zu-badge-danger {
+    background: var(--zu-danger-bg);
+    color: var(--zu-danger-text);
+    border: 1px solid var(--zu-danger-border);
+}
+
+.zu-badge-info {
+    background: var(--zu-info-bg);
+    color: var(--zu-info-text);
+    border: 1px solid var(--zu-info-border);
+}
+
+.zu-badge-neutral {
+    background: var(--zu-gray-100);
+    color: var(--zu-gray-600);
+    border: 1px solid var(--zu-gray-200);
+}
+
+/* ─────────────────────────── Buttons ─────────────────────────── */
+.zu-btn,
+.zu-btn-primary,
+.zu-btn-secondary,
+.zu-btn-cancel,
+.zu-btn-danger,
+.zu-btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: 7px;
+    font-size: 12.6px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    outline: none;
+    border: 1.5px solid transparent;
+    transition: background 0.18s ease, border-color 0.18s ease,
+        box-shadow 0.18s ease, transform 0.12s ease, color 0.18s ease;
+    text-decoration: none;
+    position: relative;
+    font-family: var(--zu-font-family);
+}
+
+.zu-btn-primary:active,
+.zu-btn-secondary:active,
+.zu-btn-cancel:active,
+.zu-btn-danger:active {
+    transform: scale(0.97);
+}
+
+.zu-btn-primary:disabled,
+.zu-btn-secondary:disabled,
+.zu-btn-cancel:disabled,
+.zu-btn-danger:disabled,
+.zu-btn-icon:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.zu-btn-primary {
+    background: var(--zu-slate-900);
+    color: var(--zu-white);
+    border-color: var(--zu-slate-900);
+    box-shadow: var(--zu-btn-shadow);
+}
+
+.zu-btn-primary:hover {
+    background: var(--zu-btn-primary-hover);
+    border-color: var(--zu-btn-primary-hover);
+    box-shadow: var(--zu-btn-shadow-hover);
+    transform: translateY(-1px);
+}
+
+.zu-btn-secondary {
+    background: var(--zu-white);
+    color: var(--zu-gray-600);
+    border-color: var(--zu-gray-200);
+}
+
+.zu-btn-secondary:hover {
+    background: var(--zu-gray-50);
+    border-color: var(--zu-slate-900);
+    color: var(--zu-slate-900);
+}
+
+.zu-btn-secondary.active,
+.zu-btn-secondary[aria-pressed="true"] {
+    background: var(--zu-gray-100);
+    border-color: var(--zu-gray-400);
+    color: var(--zu-slate-900);
+}
+
+.zu-btn-cancel {
+    background: var(--zu-white);
+    color: var(--zu-gray-500);
+    border-color: var(--zu-gray-200);
+}
+
+.zu-btn-cancel:hover {
+    background: var(--zu-gray-50);
+    color: var(--zu-gray-700);
+    border-color: var(--zu-gray-300);
+}
+
+.zu-btn-danger {
+    background: var(--zu-danger);
+    color: var(--zu-white);
+    border-color: var(--zu-danger);
+    box-shadow: var(--zu-btn-danger-shadow);
+}
+
+.zu-btn-danger:hover {
+    background: var(--zu-danger-hover);
+    border-color: var(--zu-danger-hover);
+    box-shadow: var(--zu-btn-danger-shadow-hover);
+    transform: translateY(-1px);
+}
+
+.zu-btn-outline {
+    background: transparent;
+    color: var(--zu-danger);
+    border-color: var(--zu-danger-outline-border);
+}
+
+.zu-btn-outline:hover {
+    background: var(--zu-danger-bg);
+    border-color: var(--zu-danger);
+}
+
+.zu-btn-icon {
+    background: transparent;
+    color: var(--zu-gray-500);
+    border-color: transparent;
+    padding: 7px;
+    border-radius: 7px;
+    width: 34px;
+    height: 34px;
+}
+
+.zu-btn-icon:hover {
+    background: var(--zu-gray-100);
+    color: var(--zu-slate-900);
+}
+
+.zu-btn-icon.is-active {
+    background: var(--zu-gray-200);
+    color: var(--zu-slate-900);
+}
+
+.zu-btn-primary.is-blue,
+.zu-btn-secondary.is-blue {
+    background: var(--zu-btn-blue-bg);
+    color: var(--zu-white);
+    border-color: var(--zu-btn-blue-bg);
+}
+
+.zu-btn-primary.is-blue:hover,
+.zu-btn-secondary.is-blue:hover {
+    background: var(--zu-btn-blue-hover);
+    border-color: var(--zu-btn-blue-hover);
+}
+
+.zu-btn-primary.is-orange,
+.zu-btn-secondary.is-orange {
+    background: var(--zu-btn-orange-bg);
+    color: var(--zu-white);
+    border-color: var(--zu-btn-orange-bg);
+}
+
+.zu-btn-primary.is-orange:hover,
+.zu-btn-secondary.is-orange:hover {
+    background: var(--zu-btn-orange-hover);
+    border-color: var(--zu-btn-orange-hover);
+}
+
+.zu-btn-primary.is-green,
+.zu-btn-secondary.is-green {
+    background: var(--zu-btn-green-bg);
+    color: var(--zu-white);
+    border-color: var(--zu-btn-green-bg);
+}
+
+.zu-btn-primary.is-green:hover,
+.zu-btn-secondary.is-green:hover {
+    background: var(--zu-btn-green-hover);
+    border-color: var(--zu-btn-green-hover);
+}
+
+.zu-btn-primary.is-sm,
+.zu-btn-secondary.is-sm,
+.zu-btn-cancel.is-sm,
+.zu-btn-danger.is-sm,
+.zu-btn-outline.is-sm {
+    padding: 5px 12px;
+    font-size: 11.5px;
+    border-radius: 5px;
+}
+
+.zu-btn-primary.is-full,
+.zu-btn-secondary.is-full,
+.zu-btn-cancel.is-full,
+.zu-btn-danger.is-full,
+.zu-btn-outline.is-full {
+    width: 100%;
+    justify-content: center;
+}
+
+.zu-btn-primary.is-loading,
+.zu-btn-secondary.is-loading,
+.zu-btn-cancel.is-loading,
+.zu-btn-danger.is-loading,
+.zu-btn-outline.is-loading {
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.zu-btn-primary.is-loading::after,
+.zu-btn-secondary.is-loading::after,
+.zu-btn-cancel.is-loading::after,
+.zu-btn-danger.is-loading::after,
+.zu-btn-outline.is-loading::after {
+    content: "";
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    top: 50%;
+    left: 50%;
+    margin: -7.5px 0 0 -7.5px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: zu-btn-spin 0.7s linear infinite;
+}
+
+.zu-btn-secondary.is-loading::after,
+.zu-btn-cancel.is-loading::after,
+.zu-btn-outline.is-loading::after {
+    border: 2px solid var(--zu-gray-200);
+    border-top-color: var(--zu-gray-500);
+}
+
+@keyframes zu-btn-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ─────────────────────────── Loaders ─────────────────────────── */
+.zu-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    gap: var(--zu-space-md);
+    padding: var(--zu-space-xl);
+    color: var(--zu-gray-500);
+}
+
+.zu-spinner {
+    animation: zu-btn-spin 1s linear infinite;
+    color: var(--zu-slate-400);
+    transform-origin: center center;
+}
+
+.zu-loader.is-global {
+    height: 100vh;
+    background: var(--zu-slate-50);
+}
+
+.zu-loader-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--zu-gray-600);
+    animation: zu-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes zu-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .5;
+    }
+}
+
+/* ─────────────────────────── Modal ─────────────────────────── */
+.zu-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--zu-overlay-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--zu-z-modal-overlay);
+    padding: var(--zu-space-20);
+    animation: zu-fade-in 0.18s ease-out;
+    /* `pointer-events` is inherited — when this overlay is mounted inside a
+       host that turns it off (e.g. the IPD drawer's `.hms-ipd-pane`, which
+       sets `pointer-events: none` and only re-enables it on its own scrim
+       and panel), clicks would otherwise fall through the modal onto
+       whatever sits behind it. Force it back on so the modal is always
+       interactive regardless of where it's mounted. */
+    pointer-events: auto;
+}
+
+.zu-modal {
+    background: var(--zu-white);
+    border-radius: var(--zu-radius);
+    box-shadow: var(--zu-shadow-modal);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    overflow: hidden;
+    width: 100%;
+    z-index: var(--zu-z-modal);
+    font-family: var(--zu-font-family);
+}
+
+.zu-modal-sm {
+    max-width: 400px;
+}
+
+.zu-modal-md {
+    max-width: 560px;
+}
+
+.zu-modal-lg {
+    max-width: 800px;
+}
+
+.zu-modal-xl {
+    max-width: 1000px;
+}
+
+.zu-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--zu-space-20) var(--zu-space-lg) var(--zu-space-md);
+    border-bottom: 1px solid var(--zu-gray-100);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    background: var(--zu-white);
+}
+
+.zu-modal-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.zu-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--zu-slate-900);
+}
+
+.zu-modal-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--zu-gray-400);
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.zu-modal-close:hover {
+    color: var(--zu-slate-900);
+    background: var(--zu-gray-100);
+}
+
+.zu-modal-body {
+    padding: var(--zu-space-md) var(--zu-space-lg);
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.zu-modal-footer {
+    padding: 14px var(--zu-space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    border-top: 1px solid var(--zu-gray-100);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    background: var(--zu-white);
+}
+
+.zu-modal-footer--between {
+    justify-content: space-between;
+}
+
+@keyframes zu-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ─────────────────────────── Menu (Dropdown/Kebab) ─────────────────────────── */
+.zu-menu {
+    position: fixed;
+    min-width: 200px;
+    background: var(--zu-white);
+    border: 1px solid var(--zu-gray-200);
+    border-radius: var(--zu-radius);
+    box-shadow: var(--zu-shadow-lg);
+    z-index: var(--zu-z-popover);
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    animation: zu-slide-down-fade 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: var(--zu-font-family);
+}
+
+.zu-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: var(--zu-gray-700);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, color 0.15s;
+    font-family: inherit;
+    width: 100%;
+}
+
+.zu-menu-item:hover,
+.zu-menu-item:focus-visible {
+    background: var(--zu-gray-50);
+    color: var(--zu-gray-900);
+    outline: none;
+}
+
+.zu-menu-item.is-danger {
+    color: var(--zu-danger);
+}
+
+.zu-menu-item.is-danger:hover,
+.zu-menu-item.is-danger:focus-visible {
+    background: var(--zu-danger-bg);
+    color: var(--zu-danger);
+}
+
+.zu-menu-item.is-warning {
+    color: #b45309;
+}
+
+.zu-menu-item.is-warning:hover,
+.zu-menu-item.is-warning:focus-visible {
+    background: #fffbeb;
+    color: #b45309;
+}
+
+.zu-menu-item:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.zu-menu-divider {
+    height: 1px;
+    background: var(--zu-gray-100);
+    margin: 4px 0;
+}
+
+.zu-menu-item-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+@keyframes zu-slide-down-fade {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─────────────────────────── Search Input ─────────────────────────── */
+.zu-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: var(--zu-space-20);
+}
+
+.zu-search input {
+    padding-left: 44px !important;
+}
+
+.zu-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    stroke: var(--zu-gray-400);
+    pointer-events: none;
+    transition: stroke 0.2s;
+    z-index: 1;
+}
+
+.zu-search:focus-within .zu-search-icon {
+    stroke: var(--zu-brand-primary);
+}
+
+.zu-search-clear {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--zu-gray-400);
+    cursor: pointer;
+    outline: none;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    line-height: 1;
+}
+
+.zu-search-clear:hover {
+    background: var(--zu-gray-100);
+    color: var(--zu-gray-600);
+}
+
+/* ─────────────────────────── Avatar ─────────────────────────── */
+.zu-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    background: var(--zu-gray-100);
+    color: var(--zu-gray-700);
+    border: 1px solid var(--zu-gray-200);
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.zu-avatar.is-sm {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+}
+
+.zu-avatar.is-md {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+}
+
+.zu-avatar.is-lg {
+    width: 48px;
+    height: 48px;
+    font-size: 15px;
+}
+
+.zu-avatar.is-xl {
+    width: 56px;
+    height: 56px;
+    font-size: 17px;
+}
+
+.zu-avatar.is-2xl {
+    width: 64px;
+    height: 64px;
+    font-size: 22px;
+}
+
+.zu-avatar.is-info {
+    background: var(--zu-info-bg);
+    color: var(--zu-info-text);
+    border-color: var(--zu-info-border);
+}
+
+.zu-avatar.is-rose {
+    background: var(--zu-rose-bg);
+    color: var(--zu-rose-text);
+    border-color: var(--zu-rose-border);
+}
+
+.zu-avatar.is-success {
+    background: var(--zu-success-bg);
+    color: var(--zu-success-text);
+    border-color: var(--zu-success-border);
+}
+
+.zu-avatar.is-amber {
+    background: var(--zu-warning-bg);
+    color: var(--zu-amber-text);
+    border-color: var(--zu-warning-border);
+}
+
+.zu-avatar.is-violet {
+    background: var(--zu-violet-bg);
+    color: var(--zu-violet-text);
+    border-color: var(--zu-violet-border);
+}
+
+/* ─────────────────────────── Filter Bar ─────────────────────────── */
+/*
+ * A horizontal toolbar that sits between the page header and the main
+ * content. Composes: search input, filter pills, date inputs, and
+ * select dropdowns. Use alongside zu-page-content.
+ *
+ * Markup example:
+ *   <div class="zu-filter-bar">
+ *     <div class="zu-filter-bar__search">
+ *       <SearchIcon class="zu-filter-bar__search-icon" />
+ *       <input class="zu-filter-bar__search-input" />
+ *     </div>
+ *     <div class="zu-filter-bar__controls">
+ *       <button class="zu-filter-pill [is-active]">Label</button>
+ *       <select class="zu-filter-select">…</select>
+ *       <input type="date" class="zu-filter-date" />
+ *     </div>
+ *   </div>
+ */
+.zu-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 0;
+    flex-wrap: wrap;
+}
+
+/* Left side: grows to fill space */
+.zu-filter-bar__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.zu-filter-bar__search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--zu-gray-400);
+    pointer-events: none;
+    width: 16px;
+    height: 16px;
+}
+
+.zu-filter-bar__search-input {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    font-size: 14px;
+    border: 1px solid var(--zu-gray-200);
+    border-radius: var(--zu-radius-sm);
+    background: var(--zu-white);
+    color: var(--zu-gray-900);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: var(--zu-font-family);
+}
+
+.zu-filter-bar__search-input::placeholder {
+    color: var(--zu-gray-400);
+}
+
+.zu-filter-bar__search-input:focus {
+    border-color: var(--zu-gray-400);
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.06);
+}
+
+/* Right side: shrinks group of pills/selects */
+.zu-filter-bar__controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+
+
+
+/*
+ * zu-pill-group — a contained segmented control (pills inside a box).
+ * Use when you want a compact segment bar that sits inside a controls row.
+ * Example:
+ *   <div class="zu-pill-group">
+ *     <button class="zu-pill-group__btn [is-active]">All</button>
+ *     <button class="zu-pill-group__btn">Paid</button>
+ *   </div>
+ */
+.zu-pill-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    background: var(--zu-gray-100);
+    border: 1px solid var(--zu-gray-200);
+    border-radius: var(--zu-radius-sm);
+}
+
+.zu-pill-group__btn {
+    padding: 6px 12px;
+    border-radius: calc(var(--zu-radius-sm) - 2px);
+    border: none;
+    background: transparent;
+    color: var(--zu-gray-500);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+    font-family: var(--zu-font-family);
+    white-space: nowrap;
+    text-transform: capitalize;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.zu-pill-group__btn-count {
+    background: var(--zu-gray-200);
+    color: var(--zu-gray-600);
+    padding: 2px 6px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.zu-pill-group__btn.is-active .zu-pill-group__btn-count {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--zu-white);
+}
+
+.zu-pill-group__btn:hover {
+    color: var(--zu-gray-700);
+}
+
+.zu-pill-group__btn.is-active {
+    background: var(--zu-white);
+    color: var(--zu-gray-900);
+    box-shadow: var(--zu-shadow-card);
+}
+
+/* Native date input that matches the filter bar look */
+.zu-filter-date {
+    padding: 8px 12px;
+    font-size: 13px;
+    border: 1px solid var(--zu-gray-200);
+    border-radius: var(--zu-radius-sm);
+    background: var(--zu-white);
+    color: var(--zu-gray-700);
+    outline: none;
+    cursor: pointer;
+    font-family: var(--zu-font-family);
+    transition: border-color 0.15s;
+}
+
+.zu-filter-date:focus {
+    border-color: var(--zu-gray-400);
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.06);
+}
+
+/* Native select that matches the filter bar look */
+.zu-filter-select {
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--zu-gray-200);
+    border-radius: var(--zu-radius-sm);
+    background: var(--zu-white);
+    color: var(--zu-gray-700);
+    outline: none;
+    cursor: pointer;
+    font-family: var(--zu-font-family);
+    transition: border-color 0.15s;
+}
+
+.zu-filter-select:focus {
+    border-color: var(--zu-gray-400);
+}
