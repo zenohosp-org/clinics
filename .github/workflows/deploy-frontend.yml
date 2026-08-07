@@ -7,6 +7,14 @@ on:
       - '.github/workflows/deploy-frontend.yml'
   # Manual trigger from the Actions tab — for redeploying without a code change.
   workflow_dispatch:
+
+# Shares one concurrency group with the backend workflow — see the comment in
+# deploy.yml. Both drive the same checkout at /opt/zenohosp/clinics, so they
+# must never run at the same time.
+concurrency:
+  group: clinics-vps-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -21,10 +29,20 @@ jobs:
           script: |
             set -e
             cd /opt/zenohosp/clinics
-            git pull origin main
+            # See deploy.yml — deploy checkout must mirror origin exactly.
+            git fetch origin main
+            git reset --hard origin/main
             cd clinics-frontend
             npm ci
             npm run build
+            # Build into a staging dir and swap, so a failed build can't leave
+            # /var/www/clinics empty and the site 404ing. `set -e` means we
+            # never reach the swap unless the build succeeded.
             mkdir -p /var/www/clinics
-            rm -rf /var/www/clinics/*
-            cp -r dist/* /var/www/clinics/
+            rm -rf /var/www/clinics.new
+            cp -r dist /var/www/clinics.new
+            rm -rf /var/www/clinics.old
+            mv /var/www/clinics /var/www/clinics.old
+            mv /var/www/clinics.new /var/www/clinics
+            rm -rf /var/www/clinics.old
+            ls -la /var/www/clinics | head -5

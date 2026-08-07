@@ -8,6 +8,18 @@ on:
   # Manual trigger from the Actions tab — for redeploying without a code
   # change (config edit on the VPS, rolling back, re-running a failed deploy).
   workflow_dispatch:
+
+# Both deploy workflows operate on the SAME git checkout at
+# /opt/zenohosp/clinics. A push touching clinics-backend/** and
+# clinics-frontend/** starts both at once, and two concurrent `git` runs in one
+# working tree race — one wins, the other aborts with "Your local changes would
+# be overwritten by merge". Sharing one concurrency group across both workflows
+# serialises them. Do NOT cancel in progress: a half-finished deploy is worse
+# than a queued one.
+concurrency:
+  group: clinics-vps-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -22,16 +34,22 @@ jobs:
           script: |
             set -e
             cd /opt/zenohosp/clinics
-            git pull origin main
+            # fetch + reset rather than `git pull`. This is a deploy checkout,
+            # not a workspace: it must mirror origin/main exactly. `git pull`
+            # aborts if anything on the box drifted (a hotfix edited in place,
+            # a tool writing into the tree), leaving deploys wedged until
+            # someone SSHes in. reset --hard always converges.
+            git fetch origin main
+            git reset --hard origin/main
             cd /opt/zenohosp
             # No pre-deploy DB snapshot here, unlike the HMS workflow.
             #
             # Clinics shares HMS's database but runs spring.jpa.hibernate.ddl-auto=none
-            # (see clinics-backend/src/main/resources/application.properties), so a
-            # clinics deploy can never alter the schema — there is nothing for a
-            # restore point to protect against. HMS owns the schema and its own
-            # deploy takes the snapshot before any DDL runs.
+            # AND clinics.data-seeder.enabled=false, so a clinics deploy cannot
+            # alter the schema — there is nothing for a restore point to protect.
+            # HMS owns the schema and its own deploy takes the snapshot.
             #
-            # If clinics is ever switched to ddl-auto=update, copy the snapshot
-            # gate from the HMS workflow back in FIRST.
+            # If either guard is ever removed, copy the snapshot gate from the
+            # HMS workflow back in FIRST.
             docker compose up -d --build clinics-backend
+            docker compose ps clinics-backend
