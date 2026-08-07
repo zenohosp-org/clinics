@@ -9,11 +9,38 @@ import com.zenlocare.clinics.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+/**
+ * Inherited from HMS, and <strong>disabled by default in Clinics</strong>.
+ *
+ * <p>This runner issues raw DDL against the database on every boot — it drops
+ * NOT NULL constraints, renames columns ({@code hospital_services
+ * .specialization_id → department_id}), drops and re-adds foreign keys, and
+ * creates tables and indexes. That is safe in HMS, which owns its schema.
+ *
+ * <p>Clinics shares HMS's database. Running this here means two services
+ * racing to reshape the same tables on startup, and a Clinics deploy could
+ * apply a rename or constraint change that the running HMS does not expect —
+ * against live patient data. {@code spring.jpa.hibernate.ddl-auto=none} does
+ * not prevent any of it, because these statements bypass Hibernate entirely.
+ *
+ * <p>Disabling loses nothing: every statement is idempotent bootstrap work
+ * that HMS has already performed on the shared database, and the reference
+ * rows it seeds (roles, demo hospital) are already present for the same
+ * reason. Clinics reads exactly the rows HMS seeded.
+ *
+ * <p>Set {@code clinics.data-seeder.enabled=true} only when pointing Clinics
+ * at a fresh, unshared database that nothing else owns.
+ */
 @Slf4j
 @Component
+@ConditionalOnProperty(
+        name = "clinics.data-seeder.enabled",
+        havingValue = "true",
+        matchIfMissing = false)
 @RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
 
