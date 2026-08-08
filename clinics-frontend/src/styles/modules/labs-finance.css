@@ -1,0 +1,357 @@
+/* ===================================================================
+   Clinics — Labs & Finance modules
+   -------------------------------------------------------------------
+   Compositions unique to the Labs and Finance sections. Everything that
+   already exists in the shared system is reused rather than restyled:
+   .hms-dash-pat-cell for the patient cell, .zu-* for buttons/cards,
+   .hms-alert for the service-unreachable notices.
+
+   Prefix is clinic-* (not hms-*) because these screens have no HMS
+   counterpart — they are the part of this app HMS does not have.
+   =================================================================== */
+
+/* ── Shared page frame ────────────────────────────────────────────── */
+.clinic-lab-page,
+.clinic-fin-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--zu-space-md);
+}
+
+/* ── Toolbar: filters on the left, search on the right ───────────── */
+.clinic-lab-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--zu-space-md);
+    flex-wrap: wrap;
+}
+
+.clinic-lab-filters {
+    display: flex;
+    align-items: center;
+    gap: var(--zu-space-xs);
+    flex-wrap: wrap;
+}
+
+/* Status filter pills. The count sits inside the pill so the eye reads
+   "label + how many" as one unit rather than scanning a second column. */
+.clinic-lab-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid var(--hms-gray-200);
+    border-radius: var(--zu-radius-full);
+    background: var(--hms-white);
+    color: var(--hms-gray-600);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.clinic-lab-filter:hover {
+    border-color: var(--hms-gray-300);
+    color: var(--hms-gray-900);
+}
+
+.clinic-lab-filter.is-active {
+    background: var(--hms-gray-900);
+    border-color: var(--hms-gray-900);
+    color: var(--hms-white);
+}
+
+.clinic-lab-filter__count {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    opacity: 0.7;
+}
+
+.clinic-lab-search {
+    position: relative;
+    min-width: 240px;
+    flex: 0 1 320px;
+}
+
+.clinic-lab-search__icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--hms-gray-400);
+    pointer-events: none;
+}
+
+/* The shared Input has no icon slot, so pad the text clear of the glyph. */
+.clinic-lab-search input {
+    padding-left: 32px;
+}
+
+/* ── Queue table cells ───────────────────────────────────────────── */
+.clinic-lab-test {
+    margin: 0;
+    font-weight: 600;
+    color: var(--hms-gray-900);
+}
+
+.clinic-lab-accession,
+.clinic-fin-subtle {
+    margin: 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+    font-variant-numeric: tabular-nums;
+}
+
+.clinic-lab-report-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #3b82f6;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.clinic-lab-report-link:hover {
+    text-decoration: underline;
+}
+
+/* ── Collection queue: one card per patient ──────────────────────── */
+.clinic-collect-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--zu-space-md);
+}
+
+.clinic-collect-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--zu-space-sm);
+    padding: var(--zu-space-md);
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: var(--zu-radius);
+}
+
+.clinic-collect-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--zu-space-sm);
+}
+
+.clinic-collect-tests {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.clinic-collect-tests li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--zu-space-sm);
+    padding: 6px 8px;
+    background: var(--hms-gray-50, #f8fafc);
+    border-radius: var(--zu-radius-sm);
+    font-size: 13px;
+    color: var(--hms-gray-700);
+}
+
+.clinic-collect-tests__age {
+    font-size: 11px;
+    color: var(--hms-gray-500);
+    white-space: nowrap;
+}
+
+/* ── Result entry grid ───────────────────────────────────────────── */
+.clinic-lab-analytes {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: var(--zu-space-md);
+}
+
+.clinic-lab-analyte {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 0.6fr 1fr 0.8fr;
+    align-items: center;
+    gap: var(--zu-space-sm);
+}
+
+.clinic-lab-analyte.is-head {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--hms-gray-500);
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--hms-gray-200);
+}
+
+.clinic-lab-analyte__name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--hms-gray-900);
+}
+
+.clinic-lab-analyte__unit,
+.clinic-lab-analyte__range {
+    font-size: 12px;
+    color: var(--hms-gray-500);
+    font-variant-numeric: tabular-nums;
+}
+
+.clinic-lab-abnormal-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-bottom: var(--zu-space-md);
+    border-radius: var(--zu-radius-sm);
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.clinic-lab-empty-note {
+    margin: 0;
+    color: var(--hms-gray-600);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.clinic-lab-observation {
+    margin-top: var(--zu-space-sm);
+}
+
+/* ── Finance: stat buckets ───────────────────────────────────────── */
+.clinic-fin-buckets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--zu-space-sm);
+}
+
+.clinic-fin-bucket {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--zu-space-md);
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    /* Tone is carried by a left rule rather than a fill, so a row of four
+       buckets doesn't turn into a block of competing colour. */
+    border-left: 3px solid var(--hms-gray-300);
+    border-radius: var(--zu-radius);
+    text-align: left;
+    font-family: inherit;
+    cursor: default;
+}
+
+button.clinic-fin-bucket {
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+button.clinic-fin-bucket:hover {
+    box-shadow: var(--zu-shadow-sm);
+}
+
+button.clinic-fin-bucket.is-active {
+    border-color: var(--hms-gray-900);
+    box-shadow: var(--zu-shadow-sm);
+}
+
+.clinic-fin-bucket.is-success { border-left-color: #10b981; }
+.clinic-fin-bucket.is-info    { border-left-color: #3b82f6; }
+.clinic-fin-bucket.is-warning { border-left-color: #f59e0b; }
+.clinic-fin-bucket.is-danger  { border-left-color: #ef4444; }
+
+.clinic-fin-bucket__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--hms-gray-500);
+}
+
+.clinic-fin-bucket__value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+    font-variant-numeric: tabular-nums;
+}
+
+.clinic-fin-bucket__meta {
+    font-size: 11px;
+    color: var(--hms-gray-500);
+}
+
+/* ── Finance: money cells ────────────────────────────────────────── */
+/* Tabular figures throughout: currency columns must align on the decimal
+   or they cannot be scanned or checked by eye. */
+.clinic-fin-num {
+    font-variant-numeric: tabular-nums;
+    color: var(--hms-gray-800);
+}
+
+.clinic-fin-num.is-strong {
+    font-weight: 700;
+    color: var(--hms-gray-900);
+}
+
+.clinic-fin-num.is-credit { color: #059669; font-weight: 600; }
+.clinic-fin-num.is-debit  { color: #dc2626; font-weight: 600; }
+
+.clinic-fin-particular {
+    margin: 0;
+    font-weight: 500;
+    color: var(--hms-gray-900);
+}
+
+.clinic-fin-range {
+    display: flex;
+    align-items: center;
+    gap: var(--zu-space-xs);
+}
+
+.clinic-fin-range__sep {
+    font-size: 13px;
+    color: var(--hms-gray-500);
+}
+
+/* ── Narrow screens ──────────────────────────────────────────────── */
+@media (max-width: 720px) {
+    .clinic-lab-toolbar {
+        align-items: stretch;
+    }
+
+    .clinic-lab-search {
+        flex: 1 1 100%;
+    }
+
+    /* Stack the result grid: five columns in ~340px is unusable, and the
+       analyte name plus its input are the only two that must stay paired. */
+    .clinic-lab-analyte {
+        grid-template-columns: 1fr 1fr;
+        row-gap: 4px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--hms-gray-100);
+    }
+
+    .clinic-lab-analyte.is-head {
+        display: none;
+    }
+
+    .clinic-fin-range {
+        flex-wrap: wrap;
+    }
+}

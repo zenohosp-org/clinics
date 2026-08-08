@@ -14,6 +14,14 @@ import {
     Calendar,
     Stethoscope,
     BookOpen,
+    FlaskConical,
+    Syringe,
+    FileText,
+    ScanLine,
+    NotebookPen,
+    Wallet,
+    Coins,
+    BarChart2,
     ChevronDown,
     UserSquare2,
     CalendarDays,
@@ -73,6 +81,20 @@ const BILLING_LINKS = [
     { label: "IPD Billing", to: "/billing/ipd", icon: ReceiptText },
     { label: "Ambulance Billing", to: "/billing/ambulance", icon: Ambulance },
 ];
+// Labs and Finance run inside this app rather than as separate products —
+// see the note where EXTERNAL_APPS used to be.
+const LAB_LINKS = [
+    { label: "Lab Queue", to: "/labs/queue", icon: FlaskConical },
+    { label: "Sample Collection", to: "/labs/collection", icon: Syringe },
+    { label: "Lab Reports", to: "/labs/reports", icon: FileText },
+    { label: "Radiology", to: "/labs/radiology", icon: ScanLine },
+];
+const FINANCE_LINKS = [
+    { label: "Day Book", to: "/finance/day-book", icon: NotebookPen, adminOnly: true },
+    { label: "Expenses", to: "/finance/expenses", icon: Wallet, adminOnly: true },
+    { label: "Receivables", to: "/finance/receivables", icon: Coins },
+    { label: "GST Reports", to: "/finance/gst", icon: Percent, adminOnly: true },
+];
 // No EXTERNAL_APPS list here, unlike HMS.
 //
 // Clinics is a standalone product, not a console inside the multi-app ZenoHosp
@@ -102,6 +124,8 @@ function Sidebar({ isOpen }) {
             location.pathname.startsWith("/settings/patient-services")
     );
     const [billingOpen, setBillingOpen] = useState(() => location.pathname.startsWith("/billing"));
+    const [labsOpen, setLabsOpen] = useState(() => location.pathname.startsWith("/labs"));
+    const [financeOpen, setFinanceOpen] = useState(() => location.pathname.startsWith("/finance"));
 
     const filteredClinicalLinks = CLINICAL_LINKS.filter((link) => {
         if (user?.role === "hospital_admin" || user?.role === "super_admin") return true;
@@ -114,6 +138,7 @@ function Sidebar({ isOpen }) {
         return allowedLinks.includes(link.label);
     });
     const isHrAdmin = user?.role === "hospital_admin" || user?.role === "super_admin";
+    const isFinanceAdmin = isHrAdmin;
     const hrActive = location.pathname.startsWith("/staffs");
     const roomsActive =
         location.pathname.startsWith("/rooms") || location.pathname.startsWith("/admissions");
@@ -127,6 +152,13 @@ function Sidebar({ isOpen }) {
     const billingActive = location.pathname.startsWith("/billing");
     const visibleBillingLinks = BILLING_LINKS.filter(
         (link) => ambulanceEnabled || link.to !== "/billing/ambulance"
+    );
+    const labsActive = location.pathname.startsWith("/labs");
+    const financeActive = location.pathname.startsWith("/finance");
+    // Mirror the route guards: a doctor/staff session shouldn't be shown links
+    // that would only bounce them to /unauthorized.
+    const visibleFinanceLinks = FINANCE_LINKS.filter(
+        (link) => !link.adminOnly || isFinanceAdmin
     );
 
     const renderLink = (link, isSubmenu = false) => {
@@ -249,12 +281,28 @@ function Sidebar({ isOpen }) {
                 )}
                 {checkupsEnabled && renderLink(CHECKUP_LINK)}
                 {renderAccordionSection(
+                    LAB_LINKS,
+                    "Labs",
+                    FlaskConical,
+                    labsOpen,
+                    setLabsOpen,
+                    labsActive
+                )}
+                {renderAccordionSection(
                     visibleBillingLinks,
                     "Billing",
                     ReceiptText,
                     billingOpen,
                     setBillingOpen,
                     billingActive
+                )}
+                {renderAccordionSection(
+                    visibleFinanceLinks,
+                    "Finance",
+                    BarChart2,
+                    financeOpen,
+                    setFinanceOpen,
+                    financeActive
                 )}
                 {filteredAdminLinks.map((link) => renderLink(link))}
                 {isHrAdmin &&

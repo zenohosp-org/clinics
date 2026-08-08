@@ -45,6 +45,14 @@ import BloodBankStock from "@/pages/blood-bank/BloodBankStock";
 import BloodDonors from "@/pages/blood-bank/BloodDonors";
 import BiomedicalWasteLog from "@/pages/biomedical-waste/BiomedicalWasteLog";
 import BiomedicalWasteHandovers from "@/pages/biomedical-waste/BiomedicalWasteHandovers";
+import LabQueue from "@/pages/labs/LabQueue";
+import CollectionQueue from "@/pages/labs/CollectionQueue";
+import LabReports from "@/pages/labs/LabReports";
+import RadiologyQueue from "@/pages/labs/RadiologyQueue";
+import DayBook from "@/pages/finance/DayBook";
+import Expenses from "@/pages/finance/Expenses";
+import Receivables from "@/pages/finance/Receivables";
+import TaxReports from "@/pages/finance/TaxReports";
 import UiGallery from "@/pages/dev/UiGallery";
 import UserProfile from "@/pages/UserProfile";
 import GlobalLoader from "@/components/ui/GlobalLoader";
@@ -104,6 +112,22 @@ const router = createBrowserRouter(
         <Route path="billing/ipd" element={<IPDBilling />} />
         <Route path="billing/ambulance" element={<AmbulanceBilling />} />
         
+        {/* Labs — the clinic's own bench, backed by the labs service */}
+        <Route path="labs" element={<Navigate to="/labs/queue" replace />} />
+        <Route path="labs/queue" element={<LabQueue />} />
+        <Route path="labs/collection" element={<CollectionQueue />} />
+        <Route path="labs/reports" element={<LabReports />} />
+        <Route path="labs/radiology" element={<RadiologyQueue />} />
+
+        {/* Finance — money in, money out, and what's owed.
+            Receivables is readable by any clinical user (they chase dues at the
+            desk); the rest is admin-only, matching how billing is gated. */}
+        <Route path="finance" element={<Navigate to="/finance/day-book" replace />} />
+        <Route path="finance/day-book" element={<ProtectedRoute allowedRoles={["super_admin", "hospital_admin"]}><DayBook /></ProtectedRoute>} />
+        <Route path="finance/expenses" element={<ProtectedRoute allowedRoles={["super_admin", "hospital_admin"]}><Expenses /></ProtectedRoute>} />
+        <Route path="finance/receivables" element={<Receivables />} />
+        <Route path="finance/gst" element={<ProtectedRoute allowedRoles={["super_admin", "hospital_admin"]}><TaxReports /></ProtectedRoute>} />
+
         {/* Appointments */}
         <Route path="appointments" element={<AppointmentsDashboard />} />
         

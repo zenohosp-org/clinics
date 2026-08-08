@@ -38,12 +38,38 @@ const labsApi = axios.create({
   withCredentials: true
 });
 
+// Finance service axios instance — day book, expenses, GST registers.
+// Same auth model as `api` and `labsApi`: the shared HttpOnly sso_token rides
+// along via withCredentials, and the finance backend authorises on a valid JWT
+// alone (its /api/** rules require .authenticated(), with no modules gate), so
+// a clinics session is accepted as-is.
+//
+// Routed through the same-origin /finance-api prefix rather than calling
+// https://api-finance.zenohosp.com directly, for the same reason labs is: a
+// same-origin request sends no Origin header, so there is no CORS preflight and
+// no need to add clinics to the finance service's allowed-origins list. nginx
+// (prod) and the Vite proxy (dev) both rewrite /finance-api → /api upstream.
+const financeApi = axios.create({
+  baseURL: (() => {
+    const rawUrl = import.meta.env.VITE_FINANCE_API_URL || "/finance-api";
+    if (rawUrl === "/finance-api") return "/finance-api";
+    const baseUrl = rawUrl.replace(/\/$/, "");
+    return baseUrl.endsWith("/api") ? baseUrl : `${baseUrl}/api`;
+  })(),
+  headers: { "Content-Type": "application/json" },
+  withCredentials: true
+});
+
 if (DEV_MOCK_AUTH && import.meta.env.VITE_MOCK_JWT) {
   api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${import.meta.env.VITE_MOCK_JWT}`;
     return config;
   });
   labsApi.interceptors.request.use((config) => {
+    config.headers.Authorization = `Bearer ${import.meta.env.VITE_MOCK_JWT}`;
+    return config;
+  });
+  financeApi.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${import.meta.env.VITE_MOCK_JWT}`;
     return config;
   });
@@ -94,6 +120,7 @@ const htmlBodyRedirect = (res) => {
 
 api.interceptors.response.use(htmlBodyRedirect, unauthorizedRedirect);
 labsApi.interceptors.response.use(htmlBodyRedirect, unauthorizedRedirect);
+financeApi.interceptors.response.use(htmlBodyRedirect, unauthorizedRedirect);
 const authApi = {
   login: async (email, password) => {
     const { data } = await api.post("/auth/login", { email, password });
@@ -1194,8 +1221,131 @@ const consultationDraftsApi = {
   },
 };
 
+// ══════════════════════════════════════════════════════════════════════════
+//  Labs — hospital-wide queues, result entry, catalog
+//
+//  The existing labOrderApi/radiologyApi above are patient- and admission-
+//  scoped: they answer "what was ordered for this patient". These are the
+//  hospital-wide equivalents that back the Labs section's own pages — the
+//  queues a technician works through. Endpoint shapes mirror the labs app's
+//  own client so both stay in step.
+// ══════════════════════════════════════════════════════════════════════════
+
+const labQueueApi = {
+  /** Whole-hospital lab orders, optionally narrowed to one status. */
+  list: async (hospitalId, status) => {
+    const params = { hospitalId };
+    if (status && status !== "ALL") params.status = status;
+    const { data } = await labsApi.get("/lab", { params });
+    return Array.isArray(data) ? data : (data?.content ?? []);
+  },
+  get: (id) => labsApi.get(`/lab/${id}`).then((r) => r.data),
+  stats: (hospitalId) => labsApi.get("/lab/stats", { params: { hospitalId } }).then((r) => r.data),
+
+  // Lifecycle. The labs service owns the state machine; these just drive it:
+  //   PENDING_COLLECTION → (collect) → AWAITING_REPORT → (receive)
+  //   → (start) → IN_PROGRESS → (report) → (complete) → REPORT_GENERATED
+  markCollected: (id) => labsApi.patch(`/lab/${id}/collect`).then((r) => r.data),
+  markReceived: (id) => labsApi.patch(`/lab/${id}/receive`).then((r) => r.data),
+  markStarted: (id) => labsApi.patch(`/lab/${id}/start`).then((r) => r.data),
+  generateReport: (id, findings, observation) =>
+    labsApi.patch(`/lab/${id}/report`, { findings, observation }).then((r) => r.data),
+  markCompleted: (id) => labsApi.patch(`/lab/${id}/complete`).then((r) => r.data),
+  cancelOrder: (id, reason) =>
+    labsApi.patch(`/lab/${id}/cancel`, reason ? { reason } : {}).then((r) => r.data),
+};
+
+const collectionApi = {
+  /** Phlebotomy worklist — patients with samples still to be drawn. */
+  queue: () => labsApi.get("/collection/queue").then((r) => r.data),
+  forPatient: (patientId) => labsApi.get(`/collection/queue/${patientId}`).then((r) => r.data),
+  /** Draw several orders for one patient in a single visit. */
+  bulkCollect: (payload) => labsApi.post("/collection/bulk-collect", payload).then((r) => r.data),
+  stats: () => labsApi.get("/collection/stats").then((r) => r.data),
+};
+
+const labResultApi = {
+  listForOrder: (labOrderId) => labsApi.get(`/lab/${labOrderId}/results`).then((r) => r.data),
+  create: (labOrderId, payload) =>
+    labsApi.post(`/lab/${labOrderId}/results`, payload).then((r) => r.data),
+  /** Save a whole analyte panel at once — the normal path for result entry. */
+  createBulk: (labOrderId, results) =>
+    labsApi.post(`/lab/${labOrderId}/results/bulk`, { results }).then((r) => r.data),
+  verify: (id, payload = {}) => labsApi.patch(`/results/${id}/verify`, payload).then((r) => r.data),
+  authorise: (id, payload = {}) => labsApi.patch(`/results/${id}/authorise`, payload).then((r) => r.data),
+};
+
+const labServiceApi = {
+  /** Test catalog — what this clinic offers, with prices. */
+  catalog: (params) => labsApi.get("/lab-services/catalog", { params }).then((r) => r.data),
+  search: (q) => labsApi.get("/lab-services/search", { params: { q } }).then((r) => r.data),
+  /** Reference ranges drive the high/low flags shown during result entry. */
+  ranges: (id) => labsApi.get(`/lab-services/${id}/ranges`).then((r) => r.data),
+};
+
+const radiologyQueueApi = {
+  list: async (hospitalId, status) => {
+    const params = { hospitalId };
+    if (status && status !== "ALL") params.status = status;
+    const { data } = await labsApi.get("/radiology", { params });
+    return Array.isArray(data) ? data : (data?.content ?? []);
+  },
+  get: (id) => labsApi.get(`/radiology/${id}`).then((r) => r.data),
+  stats: (hospitalId) => labsApi.get("/radiology/stats", { params: { hospitalId } }).then((r) => r.data),
+  markScanned: (id) => labsApi.patch(`/radiology/${id}/scan`).then((r) => r.data),
+  markStarted: (id) => labsApi.patch(`/radiology/${id}/start`).then((r) => r.data),
+  generateReport: (id, findings, impression) =>
+    labsApi.patch(`/radiology/${id}/report`, { findings, impression }).then((r) => r.data),
+  markCompleted: (id) => labsApi.patch(`/radiology/${id}/complete`).then((r) => r.data),
+  cancelOrder: (id, reason) =>
+    labsApi.patch(`/radiology/${id}/cancel`, reason ? { reason } : {}).then((r) => r.data),
+};
+
+// ══════════════════════════════════════════════════════════════════════════
+//  Finance — day book, expenses, GST
+//
+//  Receivables are deliberately NOT here: they are derived from this app's own
+//  invoices (see financeSelectors.buildReceivables), so asking the finance
+//  service for them would round-trip to a service that reads the same rows.
+// ══════════════════════════════════════════════════════════════════════════
+
+const financeReportApi = {
+  /** Cash in/out for one day, with opening and closing balances. */
+  dayBook: (date) => financeApi.get("/finance/reports/day-book", { params: { date } }).then((r) => r.data),
+  summary: (from, to) => financeApi.get("/finance/reports/summary", { params: { from, to } }).then((r) => r.data),
+  daily: (from, to) => financeApi.get("/finance/reports/daily", { params: { from, to } }).then((r) => r.data),
+  expenseCategories: (from, to) =>
+    financeApi.get("/finance/reports/expense-categories", { params: { from, to } }).then((r) => r.data),
+  /** Input-tax register (purchases). Inclusive dates. */
+  gst: (from, to) => financeApi.get("/finance/reports/tax/gst", { params: { from, to } }).then((r) => r.data),
+  /** Output-GST (sales) register — the GSTR-1 prep view. */
+  outputGst: (from, to) =>
+    financeApi.get("/finance/reports/tax/output-gst", { params: { from, to } }).then((r) => r.data),
+};
+
+const expenseApi = {
+  list: (params) => financeApi.get("/finance/bank-accounts/expenses", { params }).then((r) => r.data),
+  log: (bankAccountId, payload) =>
+    financeApi.post(`/finance/bank-accounts/${bankAccountId}/transactions`, payload).then((r) => r.data),
+  categories: () => financeApi.get("/finance/expense-categories").then((r) => r.data),
+};
+
+const bankAccountApi = {
+  list: () => financeApi.get("/finance/bank-accounts").then((r) => r.data),
+  balance: (id) => financeApi.get(`/finance/bank-accounts/${id}/balance`).then((r) => r.data),
+};
+
 var stdin_default = api;
 export {
+  labQueueApi,
+  collectionApi,
+  labResultApi,
+  labServiceApi,
+  radiologyQueueApi,
+  financeReportApi,
+  expenseApi,
+  bankAccountApi,
+  financeApi,
   admissionApi,
   roomApi,
   ambulanceApi,

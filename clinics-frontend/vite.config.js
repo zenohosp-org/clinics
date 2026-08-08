@@ -40,6 +40,15 @@ export default defineConfig({
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/labs-api/, '/api'),
             },
+            // Finance service (day book, expenses, GST registers). Same
+            // same-origin reasoning as /labs-api: proxying here means the
+            // browser never makes a cross-origin call, so no CORS preflight
+            // and no need to add clinics to the finance allowed-origins list.
+            '/finance-api': {
+                target: 'http://localhost:8083',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/finance-api/, '/api'),
+            },
             '/oauth2': {
                 target: 'http://localhost:9003',
                 changeOrigin: true,

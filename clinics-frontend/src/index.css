@@ -23,6 +23,7 @@
 @import './styles/modules/zema-ai.css';
 @import './styles/modules/blood-bank.css';
 @import './styles/modules/biomedical-waste.css';
+@import './styles/modules/labs-finance.css';
 
 /* Base styles */
 * {
