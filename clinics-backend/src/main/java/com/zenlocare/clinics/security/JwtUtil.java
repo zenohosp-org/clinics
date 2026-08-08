@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -75,6 +76,43 @@ public class JwtUtil {
         } catch (IllegalArgumentException e) {
             log.warn("Invalid hospitalId UUID in token: {}", val);
             return null;
+        }
+    }
+
+    /**
+     * The {@code modules} claim Directory stamps into the token: the lowercase
+     * codes of every module the user's hospital has active AND the user is
+     * personally entitled to (e.g. {@code ["hms","pharmacy","clinics"]}).
+     *
+     * <p>Returns an empty list when the claim is absent or malformed, which
+     * callers must treat as "no entitlements" rather than "unrestricted".
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> extractModules(String token) {
+        try {
+            Object raw = parseClaims(token).get("modules");
+            if (!(raw instanceof List<?> list)) return List.of();
+            return list.stream()
+                    .filter(java.util.Objects::nonNull)
+                    .map(m -> m.toString().toLowerCase(java.util.Locale.ROOT))
+                    .toList();
+        } catch (Exception e) {
+            log.warn("Could not read modules claim: {}", e.getMessage());
+            return List.of();
+        }
+    }
+
+    /**
+     * Whether the token carries a {@code modules} claim at all — distinct from
+     * carrying an empty one. An absent claim means the token was not minted by
+     * Directory (local dev mock auth); an empty claim is a real entitlement
+     * decision meaning "no modules".
+     */
+    public boolean hasModulesClaim(String token) {
+        try {
+            return parseClaims(token).get("modules") != null;
+        } catch (Exception e) {
+            return false;
         }
     }
 

@@ -27,6 +27,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
+    private static final String CLINICS_MODULE = "clinics";
+
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
 
@@ -46,7 +48,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             log.debug("JWT Auth: Token valid for email: {}, role: {}", email, role);
 
             Optional<User> userOpt = userRepository.findByEmail(email);
-            if (userOpt.isPresent() && !Boolean.FALSE.equals(userOpt.get().getIsActive())) {
+            if (!hasClinicsModule(token)) {
+                // Directory gates auth-code issuance on the clinics module, so a
+                // user without it can never complete a fresh sign-in. But tokens
+                // live 24h: revoking access in Directory would otherwise leave an
+                // already-issued sso_token working here until it expired — and
+                // the cookie is shared across every *.zenohosp.com app, so any
+                // HMS user's token would be accepted. Re-check the claim on each
+                // request so a revocation takes effect on the next call.
+                log.warn("JWT Auth: User {} has no 'clinics' module entitlement; rejecting token.", email);
+                SecurityContextHolder.clearContext();
+            } else if (userOpt.isPresent() && !Boolean.FALSE.equals(userOpt.get().getIsActive())) {
                 User user = userOpt.get();
                 // Keep the raw JWT in the credentials slot so downstream
                 // services (LabsClient et al.) can forward the caller's
@@ -85,6 +97,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * True when the token carries the {@code clinics} module entitlement.
+     *
+     * <p>Dev mock-auth tokens are minted locally and carry no modules claim; the
+     * gate is therefore skipped when the modules claim is entirely absent, which
+     * only happens for tokens Directory did not issue. Directory always stamps
+     * the claim (possibly empty) on real tokens, and an empty list correctly
+     * denies.
+     */
+    private boolean hasClinicsModule(String token) {
+        List<String> modules = jwtUtil.extractModules(token);
+        if (modules.isEmpty() && !jwtUtil.hasModulesClaim(token)) {
+            return true; // locally-minted dev token — not a Directory entitlement decision
+        }
+        return modules.contains(CLINICS_MODULE);
     }
 
     /**

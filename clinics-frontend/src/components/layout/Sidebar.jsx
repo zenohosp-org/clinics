@@ -14,13 +14,9 @@ import {
     Calendar,
     Stethoscope,
     BookOpen,
-    Boxes,
-    BarChart2,
-    LayoutGrid,
     ChevronDown,
     UserSquare2,
     CalendarDays,
-    FlaskConical,
     Award,
     Ambulance,
     HeartPulse,
@@ -28,7 +24,6 @@ import {
     ConciergeBell,
     Droplet,
     Percent,
-    Pill,
     Trash2,
     Truck,
 } from "lucide-react";
@@ -78,15 +73,13 @@ const BILLING_LINKS = [
     { label: "IPD Billing", to: "/billing/ipd", icon: ReceiptText },
     { label: "Ambulance Billing", to: "/billing/ambulance", icon: Ambulance },
 ];
-const EXTERNAL_APPS = [
-    { label: "OT Room", href: "https://ot.zenohosp.com", icon: Stethoscope },
-    { label: "Lab", href: "https://labs.zenohosp.com", icon: FlaskConical },
-    { label: "Pharmacy", href: "https://pharmacy.zenohosp.com", icon: Pill },
-    { label: "Finance", href: "https://finance.zenohosp.com", icon: BarChart2 },
-    { label: "Inventory", href: "https://inventory.zenohosp.com", icon: Boxes },
-    { label: "Assets", href: "https://asset.zenohosp.com", icon: LayoutGrid },
-    { label: "People", href: "https://people.zenohosp.com", icon: UserSquare2 },
-];
+// No EXTERNAL_APPS list here, unlike HMS.
+//
+// Clinics is a standalone product, not a console inside the multi-app ZenoHosp
+// suite. A clinic running it has no OT theatre, no separate pharmacy or labs
+// deployment to switch to, so an "Other Apps" footer would advertise products
+// the user does not have and cannot open. Labs and finance capability lives
+// inside this app instead — see the Labs and Finance sections above.
 
 function Sidebar({ isOpen }) {
     const { user } = useAuth();
@@ -170,36 +163,6 @@ function Sidebar({ isOpen }) {
                     </div>
                 </button>
             </div>
-        );
-    };
-
-    const renderExternalApp = (app) => {
-        const Icon = app.icon;
-        const baseCls = `sidebar-ext${isOpen ? "" : " is-icon-only"}`;
-        return isOpen ? (
-            <a
-                key={app.href}
-                href={app.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={baseCls}
-            >
-                <div className="sidebar-nav-label">
-                    <Icon className="sidebar-nav-icon" />
-                    <span>{app.label}</span>
-                </div>
-            </a>
-        ) : (
-            <a
-                key={app.href}
-                href={app.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={app.label}
-                className={baseCls}
-            >
-                <Icon className="sidebar-nav-icon" />
-            </a>
         );
     };
 
@@ -313,13 +276,6 @@ function Sidebar({ isOpen }) {
                         settingsActive
                     )}
             </nav>
-
-            <div className="sidebar-footer">
-                {isOpen && (
-                    <div className="sidebar-section-label">Other Apps</div>
-                )}
-                {EXTERNAL_APPS.map((app) => renderExternalApp(app))}
-            </div>
         </aside>
     );
 }
