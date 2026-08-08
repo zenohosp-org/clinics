@@ -600,6 +600,12 @@ const claimsApi = {
     return data;
   },
 };
+// Bank accounts live in the shared `bank_accounts` table, which the finance
+// service maps too — an account added here is the same row the finance app's
+// day book and reconciliation read. Managed through this app's own backend
+// rather than /finance-api so account management keeps working when the
+// finance service is down, and so the hospital-scoping guard is applied by the
+// service that owns the caller's session.
 const bankApi = {
   // types: optional array or comma-string of accountType filters (e.g. ["SAVINGS","CURRENT"] or "CASH").
   // Omitted → returns all accounts for the hospital.
@@ -610,6 +616,17 @@ const bankApi = {
     }
     const { data } = await api.get("/bank-accounts", { params });
     return data;
+  },
+  create: async (hospitalId, payload) => {
+    const { data } = await api.post("/bank-accounts", payload, { params: { hospitalId } });
+    return data;
+  },
+  update: async (hospitalId, id, payload) => {
+    const { data } = await api.put(`/bank-accounts/${id}`, payload, { params: { hospitalId } });
+    return data;
+  },
+  remove: async (hospitalId, id) => {
+    await api.delete(`/bank-accounts/${id}`, { params: { hospitalId } });
   }
 };
 

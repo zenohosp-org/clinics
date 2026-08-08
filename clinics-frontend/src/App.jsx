@@ -49,6 +49,7 @@ import LabQueue from "@/pages/labs/LabQueue";
 import CollectionQueue from "@/pages/labs/CollectionQueue";
 import LabReports from "@/pages/labs/LabReports";
 import RadiologyQueue from "@/pages/labs/RadiologyQueue";
+import BankAccounts from "@/pages/finance/BankAccounts";
 import DayBook from "@/pages/finance/DayBook";
 import Expenses from "@/pages/finance/Expenses";
 import Receivables from "@/pages/finance/Receivables";
@@ -126,6 +127,10 @@ const router = createBrowserRouter(
         <Route path="finance/day-book" element={<ProtectedRoute allowedRoles={["super_admin", "hospital_admin"]}><DayBook /></ProtectedRoute>} />
         <Route path="finance/expenses" element={<ProtectedRoute allowedRoles={["super_admin", "hospital_admin"]}><Expenses /></ProtectedRoute>} />
         <Route path="finance/receivables" element={<Receivables />} />
+        {/* Readable by any clinical user (the payment dropdown draws on the same
+            list); the page hides its own create/edit/delete controls for
+            non-admins, and the backend enforces that with @PreAuthorize. */}
+        <Route path="finance/bank-accounts" element={<BankAccounts />} />
         <Route path="finance/gst" element={<ProtectedRoute allowedRoles={["super_admin", "hospital_admin"]}><TaxReports /></ProtectedRoute>} />
 
         {/* Appointments */}

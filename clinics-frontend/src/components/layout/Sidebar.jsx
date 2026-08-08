@@ -21,6 +21,7 @@ import {
     NotebookPen,
     Wallet,
     Coins,
+    Landmark,
     BarChart2,
     ChevronDown,
     UserSquare2,
@@ -90,6 +91,7 @@ const LAB_LINKS = [
     { label: "Radiology", to: "/labs/radiology", icon: ScanLine },
 ];
 const FINANCE_LINKS = [
+    { label: "Bank Accounts", to: "/finance/bank-accounts", icon: Landmark },
     { label: "Day Book", to: "/finance/day-book", icon: NotebookPen, adminOnly: true },
     { label: "Expenses", to: "/finance/expenses", icon: Wallet, adminOnly: true },
     { label: "Receivables", to: "/finance/receivables", icon: Coins },

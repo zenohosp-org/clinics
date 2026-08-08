@@ -15,11 +15,48 @@ import java.util.UUID;
 public class BankAccountController {
 
     private final BankAccountService bankAccountService;
+    private final com.zenlocare.clinics.security.HospitalAccessGuard hospitalAccessGuard;
+
+    // Managing accounts is an owner-level act — it decides where the clinic's
+    // money is recorded. Reading the list stays open to any authenticated user
+    // because payment-collection flows need it to populate their dropdown.
+    private static final String MANAGE_ROLES =
+            "hasAnyRole('SUPER_ADMIN','HOSPITAL_ADMIN')";
+
+    @PostMapping
+    @org.springframework.security.access.prepost.PreAuthorize(MANAGE_ROLES)
+    public ResponseEntity<BankAccountDTO> create(
+            @RequestParam UUID hospitalId,
+            @RequestBody BankAccountDTO body) {
+        hospitalAccessGuard.requireAccess(hospitalId);
+        return ResponseEntity.ok(bankAccountService.create(hospitalId, body));
+    }
+
+    @PutMapping("/{id}")
+    @org.springframework.security.access.prepost.PreAuthorize(MANAGE_ROLES)
+    public ResponseEntity<BankAccountDTO> update(
+            @PathVariable UUID id,
+            @RequestParam UUID hospitalId,
+            @RequestBody BankAccountDTO body) {
+        hospitalAccessGuard.requireAccess(hospitalId);
+        return ResponseEntity.ok(bankAccountService.update(hospitalId, id, body));
+    }
+
+    @DeleteMapping("/{id}")
+    @org.springframework.security.access.prepost.PreAuthorize(MANAGE_ROLES)
+    public ResponseEntity<Void> delete(
+            @PathVariable UUID id,
+            @RequestParam UUID hospitalId) {
+        hospitalAccessGuard.requireAccess(hospitalId);
+        bankAccountService.delete(hospitalId, id);
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping
     public ResponseEntity<List<BankAccountDTO>> list(
             @RequestParam UUID hospitalId,
             @RequestParam(required = false) String type) {
+        hospitalAccessGuard.requireAccess(hospitalId);
         // type accepts a single value or comma-separated list, e.g. "CASH" or "SAVINGS,CURRENT".
         // Omitted or blank → return all accounts for the hospital (backward compatible).
         if (type == null || type.isBlank()) {

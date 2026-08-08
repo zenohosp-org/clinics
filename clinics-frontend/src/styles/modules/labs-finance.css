@@ -328,6 +328,71 @@ button.clinic-fin-bucket.is-active {
     color: var(--hms-gray-500);
 }
 
+/* ── Bank accounts ───────────────────────────────────────────────── */
+.clinic-bank-default {
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.clinic-bank-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.clinic-bank-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--zu-space-sm);
+}
+
+.clinic-bank-form__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--zu-space-sm);
+}
+
+.clinic-bank-form__check {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--hms-gray-700);
+    cursor: pointer;
+    line-height: 1.45;
+}
+
+.clinic-bank-form__check input {
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+/* ── Destructive confirmation ────────────────────────────────────── */
+.clinic-confirm {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--zu-space-sm);
+}
+
+.clinic-confirm__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--zu-radius-full);
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.clinic-confirm__body {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--hms-gray-700);
+}
+
 /* ── Narrow screens ──────────────────────────────────────────────── */
 @media (max-width: 720px) {
     .clinic-lab-toolbar {
@@ -353,5 +418,9 @@ button.clinic-fin-bucket.is-active {
 
     .clinic-fin-range {
         flex-wrap: wrap;
+    }
+
+    .clinic-bank-form__row {
+        grid-template-columns: 1fr;
     }
 }
