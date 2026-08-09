@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
-import api, { authApi, directoryLogout } from "@/utils/api";
+import api, { authApi, directoryLogout, isClinicsAccessDenied } from "@/utils/api";
 import SSOCookieManager from "@/utils/ssoManager";
 import { DEV_MOCK_AUTH } from "@/utils/devMockAuth";
 
@@ -75,7 +75,9 @@ function AuthProvider({ children }) {
       if (!userRef.current || document.visibilityState !== "visible") return;
       try {
         await authApi.me();
-      } catch {
+      } catch (err) {
+        // Not a dead session — api.js already routed them to /unauthorized.
+        if (isClinicsAccessDenied(err)) return;
         forceLogout();
       }
     }, SESSION_POLL_MS);
@@ -90,7 +92,8 @@ function AuthProvider({ children }) {
       if (document.visibilityState !== "visible" || !userRef.current) return;
       try {
         await authApi.me();
-      } catch {
+      } catch (err) {
+        if (isClinicsAccessDenied(err)) return;
         forceLogout();
       }
     };

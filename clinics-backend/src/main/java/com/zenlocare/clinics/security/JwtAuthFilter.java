@@ -29,6 +29,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private static final String CLINICS_MODULE = "clinics";
 
+    /** Error code the frontend matches on to show "no access" instead of logging out. */
+    public static final String CLINICS_ACCESS_DENIED = "clinics_access_denied";
+
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
 
@@ -56,8 +59,24 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 // the cookie is shared across every *.zenohosp.com app, so any
                 // HMS user's token would be accepted. Re-check the claim on each
                 // request so a revocation takes effect on the next call.
-                log.warn("JWT Auth: User {} has no 'clinics' module entitlement; rejecting token.", email);
+                //
+                // Answer 403 with an explicit code rather than falling through to
+                // an anonymous 401. The distinction matters: this token is
+                // perfectly VALID, the user simply isn't entitled to Clinics.
+                // Reported as 401, the frontend's session poll reads it as
+                // "session died", force-logs-out and bounces to Directory — so a
+                // correct authorization decision looked like a random logout to
+                // an HMS user who merely opened clinics.zenohosp.com.
+                log.warn("JWT Auth: User {} has no 'clinics' module entitlement; denying with 403.", email);
                 SecurityContextHolder.clearContext();
+                if (request.getRequestURI().startsWith("/api/")) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.setContentType("application/json");
+                    response.getWriter().write(
+                            "{\"error\":\"" + CLINICS_ACCESS_DENIED + "\","
+                                    + "\"message\":\"Clinics access is not enabled for your account.\"}");
+                    return; // stop the chain — do not let this fall through as anonymous
+                }
             } else if (userOpt.isPresent() && !Boolean.FALSE.equals(userOpt.get().getIsActive())) {
                 User user = userOpt.get();
                 // Keep the raw JWT in the credentials slot so downstream

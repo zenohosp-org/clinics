@@ -75,7 +75,29 @@ if (DEV_MOCK_AUTH && import.meta.env.VITE_MOCK_JWT) {
   });
 }
 
+/** Backend code meaning "valid session, but this user isn't entitled to Clinics". */
+export const CLINICS_ACCESS_DENIED = "clinics_access_denied";
+
+export const isClinicsAccessDenied = (err) =>
+  err?.response?.status === 403 &&
+  err?.response?.data?.error === CLINICS_ACCESS_DENIED;
+
 const unauthorizedRedirect = (err) => {
+  // A 403 clinics_access_denied is NOT a dead session — the token is valid, the
+  // user just has no Clinics entitlement (e.g. an HMS user who opened
+  // clinics.zenohosp.com carrying the shared *.zenohosp.com cookie). Send them
+  // to the explicit "no access" page instead of the login flow, and above all
+  // do not clear their session: it is still good for the apps they DO have.
+  if (isClinicsAccessDenied(err)) {
+    if (
+      typeof window !== "undefined" &&
+      !window.location.pathname.startsWith("/unauthorized")
+    ) {
+      window.location.href = "/unauthorized?reason=no_clinics_access";
+    }
+    return Promise.reject(err);
+  }
+
   if (err.response?.status === 401) {
     const url = err.config?.url || "";
     // Don't bounce on /auth/me — the AuthContext handles 401 there itself

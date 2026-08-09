@@ -1,11 +1,47 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 
 function Unauthorized() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const isUnregisteredStaff =
         user && ["DOCTOR", "STAFF"].includes(user.role) && !user.hospitalId;
+
+    // Set by api.js when the backend answers 403 clinics_access_denied: the
+    // session is valid, the account simply isn't entitled to Clinics. Handled
+    // first because it is the common case for someone arriving from another
+    // ZenoHosp app on the shared cookie, and it must NOT read as "signed out".
+    const noClinicsAccess = searchParams.get("reason") === "no_clinics_access";
+
+    if (noClinicsAccess) {
+        return (
+            <div className="hms-page-center">
+                <div className="hms-page-center__card">
+                    <div className="hms-page-center__emoji">{"\u{1FA7A}"}</div>
+                    <h1 className="hms-page-center__title">Clinics isn&apos;t enabled for your account</h1>
+                    <p className="hms-page-center__desc">
+                        You&apos;re still signed in
+                        {user?.email ? (
+                            <> as <span className="font-medium text-gray-700">{user.email}</span></>
+                        ) : null}
+                        {" "}— this app just isn&apos;t part of your access yet.
+                        <br /><br />
+                        Ask your administrator to enable <strong>Clinics</strong> for you in
+                        ZenoHosp Directory, under Users &amp; Roles → Manage Modules.
+                    </p>
+                    <div className="hms-page-center__actions">
+                        <button
+                            className="hms-page-center__action-secondary"
+                            onClick={() => { window.location.href = "https://directory.zenohosp.com"; }}
+                        >
+                            Go to ZenoHosp Directory
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="hms-page-center">
