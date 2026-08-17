@@ -11,6 +11,8 @@ import { useInvestigationCatalog } from "@/hooks/useInvestigationCatalog";
 import RequestInvestigationForm from "@/components/investigations/RequestInvestigationForm";
 import InternalInvestigationsSection from "@/components/investigations/InternalInvestigationsSection";
 import { useConsultationDraft } from "@/hooks/useConsultationDraft";
+import DictateButton from "@/components/consultation/DictateButton";
+import { routeDictation } from "@/utils/dictationRouter";
 import { fmtId } from "@/utils/idFormat";
 import { PrescriptionDrugRow } from "@/components/prescription/PrescriptionDrugRow";
 import PastRecordDetailModal from "@/components/modals/PastRecordDetailModal";
@@ -784,7 +786,31 @@ function TabButton({ active, onClick, icon, label, count }) {
 }
 
 function ConsultTab({ draft, zemaResult, zemaAnalysisState, setZemaAnalysisState }) {
+  const { user } = useAuth();
+  const { notify } = useNotification();
   const [isZemaCollapsed, setIsZemaCollapsed] = useState(false);
+
+  const appendTo = (current, setter) => (text) => {
+    const sep = current && !current.endsWith(" ") && !current.endsWith("\n") ? " " : "";
+    setter((current ?? "") + sep + text);
+  };
+
+  const handleDictation = async (transcript) => {
+    const { unmatchedPrescriptionText } = await routeDictation(transcript, {
+      hospitalId: user?.hospitalId,
+      appendChiefComplaint: appendTo(draft.chiefComplaint, draft.setChiefComplaint),
+      appendNotes: appendTo(draft.notes, draft.setNotes),
+      appendInstructions: appendTo(draft.instructions, draft.setInstructions),
+      addDrug: draft.addDrugFromMatch,
+    });
+    if (unmatchedPrescriptionText) {
+      notify(
+        `Heard "${unmatchedPrescriptionText}" but no matching drug was found in the catalog — added to notes instead`,
+        "warning"
+      );
+    }
+  };
+
   const vitals = draft.vitals;
   const hasVitals = vitals && (
     vitals.bpSystolic != null ||
@@ -980,6 +1006,18 @@ function ConsultTab({ draft, zemaResult, zemaAnalysisState, setZemaAnalysisState
           )}
         </div>
       )}
+
+      <div className="clinic-dictate-banner">
+        <div>
+          <p className="clinic-dictate-banner__title">Dictate the whole consultation</p>
+          <p className="clinic-dictate-banner__hint">
+            Say a heading to route what follows — "chief complaint…", "notes…",
+            "prescribe…", "instructions…". Everything lands in its field, editable
+            before you save.
+          </p>
+        </div>
+        <DictateButton onTranscript={handleDictation} label="Dictate consultation" />
+      </div>
 
       <Section icon={<ClipboardList className="w-4 h-4" />} title="Chief complaint" hint="What brought the patient in today">
         <textarea
