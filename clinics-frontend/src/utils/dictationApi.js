@@ -12,7 +12,16 @@ function getClient() {
   // Connecting is the slow part (Space cold-start if it's been idle); do it
   // once and reuse the connection for every subsequent dictation in the
   // session instead of reconnecting per recording.
-  if (!clientPromise) clientPromise = Client.connect(SPACE_ID);
+  //
+  // token: an unauthenticated ZeroGPU call only gets the 2min/day anonymous
+  // quota; an authenticated one gets the calling account's own 5min/day
+  // quota — a completely separate pool. VITE_HF_TOKEN is a Vite build-time
+  // value, which means it ships inside the public JS bundle like any other
+  // VITE_* var — there is no way to keep it server-side in a static build.
+  // Use a low-privilege, easily-revocable token here, and rotate/remove it
+  // once this stopgap is replaced by the self-hosted service.
+  const token = import.meta.env.VITE_HF_TOKEN;
+  if (!clientPromise) clientPromise = Client.connect(SPACE_ID, token ? { token } : undefined);
   return clientPromise;
 }
 
