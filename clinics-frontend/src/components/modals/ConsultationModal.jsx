@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { PrescriptionDrugRow } from "@/components/prescription/PrescriptionDrugRow";
 import { useConsultationDraft } from "@/hooks/useConsultationDraft";
+import DictateButton from "@/components/consultation/DictateButton";
 import VitalsModal from "@/components/modals/VitalsModal";
 import Modal from "@/components/ui/Modal";
 import {
@@ -381,7 +382,12 @@ export default function ConsultationModal({ appointment, onClose, onSaved }) {
                   />
                 </Section>
 
-                <Section icon={<FileText className="w-3.5 h-3.5" />} title="Doctor's notes" hint="Examination findings, diagnosis, plan">
+                <Section
+                  icon={<FileText className="w-3.5 h-3.5" />}
+                  title="Doctor's notes"
+                  hint="Examination findings, diagnosis, plan"
+                  actions={<DictateButton value={notes} onChange={setNotes} />}
+                >
                   <textarea
                     rows={7}
                     value={notes}
@@ -679,7 +685,7 @@ function PreField({ icon, label, value, mono }) {
   );
 }
 
-function Section({ icon, title, hint, children }) {
+function Section({ icon, title, hint, actions, children }) {
   return (
     <div className="hms-clinical-section">
       <div className="hms-clinical-section__head">
@@ -692,6 +698,7 @@ function Section({ icon, title, hint, children }) {
             {hint}
           </span>
         )}
+        {actions}
       </div>
       {children}
     </div>

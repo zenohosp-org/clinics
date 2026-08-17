@@ -393,6 +393,72 @@ button.clinic-fin-bucket.is-active {
     color: var(--hms-gray-700);
 }
 
+/* ── Dictation ────────────────────────────────────────────────────
+   Sits in a Section's actions slot (.hms-clinical-section__head is
+   already display:flex with space-between), so no positioning needed
+   here beyond the button's own look. */
+.clinic-dictate {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.clinic-dictate__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border: 1px solid var(--hms-gray-200);
+    border-radius: var(--zu-radius-full);
+    background: var(--hms-white);
+    color: var(--hms-gray-600);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.clinic-dictate__btn:hover:not(:disabled) {
+    border-color: var(--hms-gray-300);
+    color: var(--hms-gray-900);
+}
+
+.clinic-dictate__btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+/* Recording: a warm, unmissable state — this is live audio capture, the
+   doctor needs to see at a glance that the mic is on. */
+.clinic-dictate__btn.is-recording {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #dc2626;
+}
+
+.clinic-dictate__btn.is-recording:hover {
+    background: #fee2e2;
+}
+
+.clinic-dictate__spin {
+    animation: clinic-dictate-spin 1s linear infinite;
+}
+
+@keyframes clinic-dictate-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.clinic-dictate__error {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #dc2626;
+}
+
 /* ── Narrow screens ──────────────────────────────────────────────── */
 @media (max-width: 720px) {
     .clinic-lab-toolbar {
