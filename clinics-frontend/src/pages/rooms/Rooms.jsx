@@ -2,7 +2,7 @@ import { CenterLoader } from "@/components/ui/Loader";
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import api, { infrastructureApi } from "@/utils/api";
+import api, { infrastructureApi, bedApi } from "@/utils/api";
 import {
     Bed,
     CalendarClock,
@@ -305,7 +305,7 @@ function Rooms() {
     const [showAttenderModal, setShowAttenderModal] = useState({ open: false, room: null });
     const [showGenerateModal, setShowGenerateModal] = useState(false);
     const [infrastructure, setInfrastructure] = useState([]);
-
+    const [wardBeds, setWardBeds] = useState([]);
 
     const fetchRooms = async () => {
         try {
@@ -325,11 +325,27 @@ function Rooms() {
         }
     };
 
+    // Beds can be configured straight on a ward (Infrastructure Master's
+    // per-ward bed list) without ever going through a Room — the admit
+    // form's bed picker already includes these (bedApi.getAvailable has no
+    // room requirement), so they're real, admittable beds. This page's tree
+    // is otherwise Room-shaped, so without this fetch a ward with only
+    // direct beds — and any patient already admitted to one — is invisible
+    // here even though the bed and admission both exist.
+    const fetchWardBeds = async () => {
+        try {
+            const data = await bedApi.getAll(user.hospitalId);
+            setWardBeds((data || []).filter((b) => !b.roomId));
+        } catch {
+            setWardBeds([]);
+        }
+    };
+
     useEffect(() => {
         if (!user?.hospitalId) return;
         const load = async () => {
             setLoading(true);
-            await Promise.all([fetchRooms(), fetchInfrastructure()]);
+            await Promise.all([fetchRooms(), fetchInfrastructure(), fetchWardBeds()]);
             setLoading(false);
         };
         load();
@@ -369,6 +385,20 @@ function Rooms() {
         return keys;
     }, [infrastructure]);
 
+    // Keyed by ward name — the same join key this file already uses for
+    // rooms (roomMap above). BedDto carries wardName, not wardId, so name is
+    // what's available; ward names are effectively unique within a hospital
+    // in practice (the Infrastructure Master ward editor is the only writer).
+    const wardDirectBedsByWardKey = useMemo(() => {
+        const m = new Map();
+        wardBeds.forEach((b) => {
+            const key = normalizeKey(b.wardName);
+            if (!m.has(key)) m.set(key, []);
+            m.get(key).push(b);
+        });
+        return m;
+    }, [wardBeds]);
+
     const matchesSearch = (room, q) => {
         if (!q) return true;
         if (room?.roomNumber?.toLowerCase().includes(q)) return true;
@@ -401,37 +431,53 @@ function Rooms() {
                     .map((floor) => ({
                         ...floor,
                         wards: (floor.wards || [])
-                            .map((ward) => ({
-                                ...ward,
-                                rooms: (ward.rooms || [])
-                                    .map((room) => ({
-                                        ...room,
-                                        roomData: roomMap.get(normalizeKey(room.name)),
-                                    }))
-                                    .filter((room) => {
-                                        if (
-                                            filter === "AVAILABLE" &&
-                                            (room.roomData?.occupied || room.roomData?.underMaintenance)
-                                        )
-                                            return false;
-                                        if (
-                                            filter === "OCCUPIED" &&
-                                            !room.roomData?.occupied
-                                        )
-                                            return false;
-                                        return (
-                                            !q ||
-                                            room.name?.toLowerCase().includes(q) ||
-                                            matchesSearch(room.roomData, q)
-                                        );
-                                    }),
-                            }))
-                            .filter((w) => w.rooms.length > 0),
+                            .map((ward) => {
+                                const directBeds = (
+                                    wardDirectBedsByWardKey.get(normalizeKey(ward.name)) || []
+                                ).filter((bed) => {
+                                    if (filter === "AVAILABLE" && (bed.occupied || bed.underMaintenance))
+                                        return false;
+                                    if (filter === "OCCUPIED" && !bed.occupied) return false;
+                                    return (
+                                        !q ||
+                                        bed.bedNumber?.toLowerCase().includes(q) ||
+                                        bed.patientName?.toLowerCase().includes(q) ||
+                                        bed.patientUhid?.toLowerCase().includes(q)
+                                    );
+                                });
+                                return {
+                                    ...ward,
+                                    directBeds,
+                                    rooms: (ward.rooms || [])
+                                        .map((room) => ({
+                                            ...room,
+                                            roomData: roomMap.get(normalizeKey(room.name)),
+                                        }))
+                                        .filter((room) => {
+                                            if (
+                                                filter === "AVAILABLE" &&
+                                                (room.roomData?.occupied || room.roomData?.underMaintenance)
+                                            )
+                                                return false;
+                                            if (
+                                                filter === "OCCUPIED" &&
+                                                !room.roomData?.occupied
+                                            )
+                                                return false;
+                                            return (
+                                                !q ||
+                                                room.name?.toLowerCase().includes(q) ||
+                                                matchesSearch(room.roomData, q)
+                                            );
+                                        }),
+                                };
+                            })
+                            .filter((w) => w.rooms.length > 0 || w.directBeds.length > 0),
                     }))
                     .filter((f) => f.wards.length > 0),
             }))
             .filter((b) => b.floors.length > 0);
-    }, [infrastructure, roomMap, filter, search]);
+    }, [infrastructure, roomMap, filter, search, wardDirectBedsByWardKey]);
 
     const unmappedRooms = useMemo(
         () =>
@@ -453,27 +499,40 @@ function Rooms() {
         r.bedsTotal > 0
             ? Math.min(r.bedsOccupied ?? 0, r.bedsTotal)
             : r.occupied ? 1 : 0;
-    const availableCount = rooms.reduce((sum, r) => {
-        if (r.underMaintenance) return sum;
-        return sum + (slotsOf(r) - occupiedSlotsOf(r));
-    }, 0);
-    const occupiedCount = rooms.reduce((sum, r) => sum + occupiedSlotsOf(r), 0);
-    const icuAvailable = rooms.reduce((sum, r) => {
-        if (r.roomType !== "ICU" || r.underMaintenance) return sum;
-        return sum + (slotsOf(r) - occupiedSlotsOf(r));
-    }, 0);
-    const icuOccupied = rooms.reduce(
-        (sum, r) => (r.roomType === "ICU" ? sum + occupiedSlotsOf(r) : sum),
-        0,
-    );
-    const otAvailable = rooms.reduce((sum, r) => {
-        if (r.roomType !== "OT" || r.underMaintenance) return sum;
-        return sum + (slotsOf(r) - occupiedSlotsOf(r));
-    }, 0);
-    const otOccupied = rooms.reduce(
-        (sum, r) => (r.roomType === "OT" ? sum + occupiedSlotsOf(r) : sum),
-        0,
-    );
+    // Ward-direct beds are real, admittable beds with no Room, so they count
+    // toward Available/Occupied (and ICU/OT, keyed off the ward's own room
+    // type) the same as a room's beds do — otherwise these KPIs undercount
+    // whenever a ward skips Room creation entirely.
+    const availableCount =
+        rooms.reduce((sum, r) => {
+            if (r.underMaintenance) return sum;
+            return sum + (slotsOf(r) - occupiedSlotsOf(r));
+        }, 0) + wardBeds.filter((b) => !b.underMaintenance && !b.occupied).length;
+    const occupiedCount =
+        rooms.reduce((sum, r) => sum + occupiedSlotsOf(r), 0)
+        + wardBeds.filter((b) => b.occupied).length;
+    const icuAvailable =
+        rooms.reduce((sum, r) => {
+            if (r.roomType !== "ICU" || r.underMaintenance) return sum;
+            return sum + (slotsOf(r) - occupiedSlotsOf(r));
+        }, 0)
+        + wardBeds.filter((b) => b.roomType === "ICU" && !b.underMaintenance && !b.occupied).length;
+    const icuOccupied =
+        rooms.reduce(
+            (sum, r) => (r.roomType === "ICU" ? sum + occupiedSlotsOf(r) : sum),
+            0,
+        ) + wardBeds.filter((b) => b.roomType === "ICU" && b.occupied).length;
+    const otAvailable =
+        rooms.reduce((sum, r) => {
+            if (r.roomType !== "OT" || r.underMaintenance) return sum;
+            return sum + (slotsOf(r) - occupiedSlotsOf(r));
+        }, 0)
+        + wardBeds.filter((b) => b.roomType === "OT" && !b.underMaintenance && !b.occupied).length;
+    const otOccupied =
+        rooms.reduce(
+            (sum, r) => (r.roomType === "OT" ? sum + occupiedSlotsOf(r) : sum),
+            0,
+        ) + wardBeds.filter((b) => b.roomType === "OT" && b.occupied).length;
 
     const totalBuildings = infrastructure.length;
     const totalFloors = infrastructure.reduce((s, b) => s + (b.floors?.length || 0), 0);
@@ -508,6 +567,15 @@ function Rooms() {
                                     {rooms.length}
                                 </span>
                                 <span>rooms</span>
+                                {wardBeds.length > 0 && (
+                                    <>
+                                        <span className="hms-rooms-banner__meta-sep">·</span>
+                                        <span className="hms-rooms-banner__meta-num">
+                                            {wardBeds.length}
+                                        </span>
+                                        <span>{wardBeds.length === 1 ? "ward bed" : "ward beds"}</span>
+                                    </>
+                                )}
                                 {showInfrastructureView && (
                                     <>
                                         <span className="hms-rooms-banner__meta-sep">·</span>
@@ -597,7 +665,10 @@ function Rooms() {
                                 building.floors.flatMap((floor, fIdx) =>
                                     floor.wards.map((ward, wIdx) => {
                                         const wRooms = ward.rooms.map((r) => r.roomData).filter(Boolean);
-                                        const wOcc = wRooms.filter((r) => r.occupied).length;
+                                        const dBeds = ward.directBeds || [];
+                                        const wOcc =
+                                            wRooms.filter((r) => r.occupied).length
+                                            + dBeds.filter((b) => b.occupied).length;
                                         const bName = building.name || `Building ${bIdx + 1}`;
                                         const fName = floor.name || `Floor ${fIdx + 1}`;
                                         const wName = ward.name || `Ward ${wIdx + 1}`;
@@ -609,19 +680,57 @@ function Rooms() {
                                                         {bName} <span className="hms-room-section__sep">/</span> {fName} <span className="hms-room-section__sep">/</span> {wName}
                                                     </h3>
                                                     <div className="hms-room-section__occupancy">
-                                                        <OccupancyBar occupied={wOcc} total={wRooms.length} size="sm" />
+                                                        <OccupancyBar occupied={wOcc} total={wRooms.length + dBeds.length} size="sm" />
                                                     </div>
                                                 </div>
-                                                <div className="hms-room-grid">
-                                                    {ward.rooms.map((room) => (
-                                                        <InfrastructureRoomCard
-                                                            key={room.name}
-                                                            roomInfo={room}
-                                                            roomData={room.roomData}
-                                                            {...cardProps(room.roomData)}
-                                                        />
-                                                    ))}
-                                                </div>
+                                                {ward.rooms.length > 0 && (
+                                                    <div className="hms-room-grid">
+                                                        {ward.rooms.map((room) => (
+                                                            <InfrastructureRoomCard
+                                                                key={room.name}
+                                                                roomInfo={room}
+                                                                roomData={room.roomData}
+                                                                {...cardProps(room.roomData)}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                )}
+                                                {dBeds.length > 0 && (
+                                                    <div className="hms-room-grid is-padded">
+                                                        <p
+                                                            className="hms-rooms-unmapped__desc"
+                                                            style={{ gridColumn: "1 / -1", margin: "0 0 -2px" }}
+                                                        >
+                                                            Ward beds — configured directly on this ward, not linked to a room
+                                                        </p>
+                                                        {dBeds.map((bed) => (
+                                                            <div
+                                                                key={bed.id}
+                                                                className={`hms-room-bed${bed.occupied ? " is-occupied" : ""}`}
+                                                            >
+                                                                <div className="hms-room-bed__row">
+                                                                    <div className="hms-room-bed__lead">
+                                                                        <div className={`hms-room-bed__dot${bed.occupied ? " is-occupied" : ""}`} />
+                                                                        <div className="min-w-0">
+                                                                            <p className="hms-room-bed__number">
+                                                                                {bed.bedNumber}
+                                                                            </p>
+                                                                            {bed.patientName ? (
+                                                                                <p className="hms-room-bed__name">
+                                                                                    {bed.patientName}
+                                                                                </p>
+                                                                            ) : (
+                                                                                <p className="hms-room-bed__name is-available">
+                                                                                    Available
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
                                         );
                                     })
