@@ -23,7 +23,10 @@ function getClient() {
  */
 export async function transcribeAudio(audioBlob) {
   const client = await getClient();
-  const result = await client.predict("/predict", [handle_file(audioBlob)]);
+  // Gradio 6 names the API endpoint after the Python function (app.py's
+  // `def transcribe(...)`), not a generic /predict — confirmed against the
+  // Space's own error message listing its actual named endpoints.
+  const result = await client.predict("/transcribe", [handle_file(audioBlob)]);
   const text = result?.data?.[0];
   return typeof text === "string" ? text.trim() : "";
 }
