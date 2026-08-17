@@ -59,6 +59,18 @@ public class MedicationAdministration {
     @JoinColumn(name = "administered_by", nullable = false)
     private User administeredBy;
 
+    /**
+     * Who physically gave this dose, frozen at write time — a medico-legal
+     * fact that must not change if this user is later renamed or leaves.
+     * Write-once, projection-only; query by {@code administered_by}.
+     *
+     * <p>NOT NULL on the shared table (added by HMS after clinics forked);
+     * this entity never mapped it, so every dose recorded in clinics was
+     * failing this constraint. Same class of bug as invoices.patient_name_snapshot.
+     */
+    @Column(name = "administered_by_name_snapshot", length = 255)
+    private String administeredByNameSnapshot;
+
     /** GIVEN | HELD | REFUSED — validated in controller before save. */
     @Column(name = "status", nullable = false, length = 16)
     private String status;

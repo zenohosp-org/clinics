@@ -8,6 +8,7 @@ import com.zenlocare.clinics.entity.User;
 import com.zenlocare.clinics.exception.ResourceNotFoundException;
 import com.zenlocare.clinics.repository.HospitalRepository;
 import com.zenlocare.clinics.repository.PatientRecordRepository;
+import com.zenlocare.clinics.util.PersonNames;
 import com.zenlocare.clinics.repository.PatientRepository;
 import com.zenlocare.clinics.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -179,6 +180,12 @@ public class RecordService {
                 .patient(patient)
                 .createdBy(creator)
                 .attendingDoctor(attendingDoctor)
+                // Frozen at write time: a clinical record must keep naming who
+                // authored it, and in what role, regardless of later renames,
+                // promotions, or the person leaving the hospital.
+                .createdByNameSnapshot(PersonNames.of(creator))
+                .createdByRoleSnapshot(PersonNames.roleOf(creator))
+                .attendingDoctorNameSnapshot(PersonNames.of(attendingDoctor))
                 .historyType(type)
                 .description(description)
                 .instructions(instructions)

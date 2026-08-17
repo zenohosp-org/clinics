@@ -10,6 +10,7 @@ import com.zenlocare.clinics.repository.AdmissionRepository;
 import com.zenlocare.clinics.repository.MedicationAdministrationRepository;
 import com.zenlocare.clinics.repository.PrescriptionItemRepository;
 import com.zenlocare.clinics.repository.UserRepository;
+import com.zenlocare.clinics.util.PersonNames;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -181,6 +182,9 @@ public class MedicationAdministrationController {
                 .patientId(admission.getPatient().getId())
                 .administeredAt(req.getAdministeredAt())
                 .administeredBy(recorder)
+                // Frozen now: who gave this dose is a medico-legal fact and
+                // must not change when this user is renamed or leaves.
+                .administeredByNameSnapshot(PersonNames.of(recorder))
                 .status(status)
                 .doseGiven(blank(req.getDoseGiven())  ? null : req.getDoseGiven().trim())
                 .reason(blank(req.getReason())         ? null : req.getReason().trim())

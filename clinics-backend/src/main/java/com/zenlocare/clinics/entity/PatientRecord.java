@@ -102,6 +102,31 @@ public class PatientRecord {
     @JoinColumn(name = "attending_doctor_id")
     private User attendingDoctor;
 
+    // The FKs above stay as the live pointers and remain the query keys — these
+    // columns are display-only. Write-once; re-derive only if the FK itself is
+    // reassigned to a different person.
+    //
+    // These three columns already existed on the shared `patient_records`
+    // table (added by HMS after clinics forked); this entity never mapped
+    // them. created_by_name_snapshot is NOT NULL — every record creation was
+    // failing until this was added, same as invoices.patient_name_snapshot.
+
+    /** Author's name as it stood when the record was written. */
+    @Column(name = "created_by_name_snapshot", length = 255)
+    private String createdByNameSnapshot;
+
+    /**
+     * Author's role as it stood when the record was written. Frozen separately
+     * because the discharge summary prints it beside the name, and a later
+     * promotion must not change who signed as what.
+     */
+    @Column(name = "created_by_role_snapshot", length = 100)
+    private String createdByRoleSnapshot;
+
+    /** Attending doctor's name at write time. Null when none was recorded. */
+    @Column(name = "attending_doctor_name_snapshot", length = 255)
+    private String attendingDoctorNameSnapshot;
+
     @Builder.Default
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
