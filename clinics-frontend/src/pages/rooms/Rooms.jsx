@@ -19,11 +19,13 @@ import {
     X,
     ChevronsUpDown,
     Link2Off,
+    Plus,
 } from "lucide-react";
 import { formatDateTime } from "@/utils/validators";
 import { fmtId } from "@/utils/idFormat";
 import AssignAttenderModal from "./AssignAttenderModal";
 import RoomDetailPanel from "./RoomDetailPanel";
+import GenerateRoomsModal from "./GenerateRoomsModal";
 import {
     Badge,
     Button,
@@ -301,6 +303,7 @@ function Rooms() {
     const [search, setSearch] = useState("");
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [showAttenderModal, setShowAttenderModal] = useState({ open: false, room: null });
+    const [showGenerateModal, setShowGenerateModal] = useState(false);
     const [infrastructure, setInfrastructure] = useState([]);
 
 
@@ -524,6 +527,9 @@ function Rooms() {
                             </p>
                         </div>
                     </div>
+                    <Button variant="primary" onClick={() => setShowGenerateModal(true)}>
+                        <Plus size={14} /> Generate rooms
+                    </Button>
                     <Button variant="secondary" onClick={() => navigate("/rooms/logs")}>
                         <ScrollText size={14} /> Logs
                     </Button>
@@ -733,6 +739,16 @@ function Rooms() {
                     onClose={() => setShowAttenderModal({ open: false, room: null })}
                     onSuccess={() => {
                         setShowAttenderModal({ open: false, room: null });
+                        fetchRooms();
+                    }}
+                />
+            )}
+
+            {showGenerateModal && (
+                <GenerateRoomsModal
+                    onClose={() => setShowGenerateModal(false)}
+                    onSuccess={() => {
+                        setShowGenerateModal(false);
                         fetchRooms();
                     }}
                 />
