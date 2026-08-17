@@ -111,6 +111,44 @@ public class Invoice {
     @Builder.Default
     private Long version = 0L;
 
+    /**
+     * The patient's name as the bill was issued to them, frozen at creation.
+     *
+     * <p>Patients legitimately change name — marriage, or a spelling
+     * correction. Resolving the name live would mean such a change rewrites
+     * the name on every invoice already issued.
+     *
+     * <p>Write-once, projection-only. Query by {@code patient_id}.
+     *
+     * <p>This column already exists on the shared `invoices` table — HMS
+     * added it (and this same lifecycle hook) after clinics forked from HMS,
+     * and clinics never picked up the change. Every invoice insert failed a
+     * NOT NULL constraint on this column until this field was added here.
+     */
+    @Column(name = "patient_name_snapshot", length = 255)
+    private String patientNameSnapshot;
+
+    /**
+     * Freezes the patient name at insert.
+     *
+     * <p>Deliberately a lifecycle hook rather than a line in each service:
+     * invoices are built in multiple places (InvoiceService, AdmissionService,
+     * BloodBankService, ...), and a snapshot any one of them could forget is
+     * not a guarantee. JPA gives us the single choke point instead.
+     *
+     * <p>Only ever sets the value when absent, so it can never overwrite an
+     * already-issued name.
+     */
+    @PrePersist
+    public void onCreate() {
+        if (this.patientNameSnapshot == null && this.patient != null) {
+            String first = this.patient.getFirstName() != null ? this.patient.getFirstName() : "";
+            String last = this.patient.getLastName() != null ? " " + this.patient.getLastName() : "";
+            String name = (first + last).trim();
+            this.patientNameSnapshot = name.isEmpty() ? null : name;
+        }
+    }
+
     @PreUpdate
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
