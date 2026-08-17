@@ -34,6 +34,34 @@ public class Admission {
     @JoinColumn(name = "admitting_doctor_id")
     private Doctor admittingDoctor;
 
+    /**
+     * The admitting doctor's name, frozen at admission time.
+     *
+     * <p>A {@link Doctor} has no name of its own — it hangs off
+     * {@code doctors.user_id}, so resolving a name live is a two-hop join into
+     * {@code users}, whose first/last name are freely editable. The discharge
+     * summary prints this value in its signature block, so without a frozen
+     * copy a rename would retroactively alter every summary that doctor ever
+     * signed.
+     *
+     * <p><b>Write-once, with one exception:</b> re-derive it whenever
+     * {@link #admittingDoctor} itself is reassigned — a different person is a
+     * different fact, not a rewrite of history. Never update it merely because
+     * the underlying user's name changed; that is precisely what this column
+     * exists to resist.
+     *
+     * <p><b>Projection only.</b> Query and join on {@code admitting_doctor_id};
+     * this column is for display. Null when no doctor was assigned.
+     *
+     * <p>Nullable at the DB level, unlike {@code invoices.patient_name_snapshot}
+     * — mapping it doesn't fix a crash, it stops clinics from silently leaving
+     * it blank on every admission. HMS sets it wherever admittingDoctor is
+     * assigned in its AdmissionService; clinics' AdmissionService does not yet
+     * do the same, so this column will still write NULL until that's ported.
+     */
+    @Column(name = "admitting_doctor_name_snapshot", length = 255)
+    private String admittingDoctorNameSnapshot;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "department_id")
     private Department department;
