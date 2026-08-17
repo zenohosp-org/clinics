@@ -2,19 +2,27 @@ import { Mic, Square, Loader2, AlertCircle } from "lucide-react";
 import { useDictation } from "@/hooks/useDictation";
 
 /**
- * Mic button that appends a transcribed clip into a text field.
+ * Mic button that turns a recorded clip into text.
  *
- * Deliberately appends rather than replaces: dictation is meant to speed up
- * writing notes, not to be trusted as the sole source of them — a doctor
- * typing partial notes, then dictating an addition, then editing the result
- * is the expected flow, not "dictate once and never touch it again".
+ * Two modes, chosen by which props are passed:
+ *  - value + onChange: append the raw transcript into one field (simple case).
+ *  - onTranscript: hand the raw transcript to the caller instead — used by
+ *    the consultation form to route one dictation across several fields
+ *    (chief complaint / notes / instructions / prescription) by spoken
+ *    heading, rather than dumping everything into a single box.
  *
- * @param {string} value - current field value
- * @param {(next: string) => void} onChange - field setter
+ * Deliberately appends rather than replaces in the simple mode: dictation
+ * speeds up writing notes, it isn't meant to be trusted as the sole source
+ * of them — a doctor typing partial notes, then dictating an addition, then
+ * editing the result is the expected flow.
  */
-export default function DictateButton({ value, onChange }) {
+export default function DictateButton({ value, onChange, onTranscript, label = "Dictate" }) {
   const handleResult = (text) => {
     if (!text) return;
+    if (onTranscript) {
+      onTranscript(text);
+      return;
+    }
     const sep = value && !value.endsWith(" ") && !value.endsWith("\n") ? " " : "";
     onChange((value ?? "") + sep + text);
   };
@@ -42,7 +50,7 @@ export default function DictateButton({ value, onChange }) {
         ) : (
           <Mic className="w-3.5 h-3.5" />
         )}
-        <span>{isRecording ? "Stop" : isBusy ? "Transcribing…" : "Dictate"}</span>
+        <span>{isRecording ? "Stop" : isBusy ? "Transcribing…" : label}</span>
       </button>
       {error && (
         <span className="clinic-dictate__error">

@@ -393,6 +393,37 @@ button.clinic-fin-bucket.is-active {
     color: var(--hms-gray-700);
 }
 
+.clinic-dictate-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--zu-space-md);
+    padding: 10px 14px;
+    margin-bottom: var(--zu-space-sm);
+    background: #f8fafc;
+    border: 1px dashed var(--hms-gray-300);
+    border-radius: var(--zu-radius);
+}
+
+.clinic-dictate-banner__title {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--hms-gray-900);
+}
+
+.clinic-dictate-banner__hint {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--hms-gray-500);
+    max-width: 46ch;
+}
+
+.clinic-dictate-banner .clinic-dictate {
+    margin-left: 0;
+    flex-shrink: 0;
+}
+
 /* ── Dictation ────────────────────────────────────────────────────
    Sits in a Section's actions slot (.hms-clinical-section__head is
    already display:flex with space-between), so no positioning needed

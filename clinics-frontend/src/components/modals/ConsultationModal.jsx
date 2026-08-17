@@ -11,6 +11,7 @@ import {
 import { PrescriptionDrugRow } from "@/components/prescription/PrescriptionDrugRow";
 import { useConsultationDraft } from "@/hooks/useConsultationDraft";
 import DictateButton from "@/components/consultation/DictateButton";
+import { routeDictation } from "@/utils/dictationRouter";
 import VitalsModal from "@/components/modals/VitalsModal";
 import Modal from "@/components/ui/Modal";
 import {
@@ -94,7 +95,7 @@ export default function ConsultationModal({ appointment, onClose, onSaved }) {
     notes, setNotes,
     instructions, setInstructions,
     nextVisitDate, setNextVisitDate,
-    items, setItemField, addItem, removeItem,
+    items, setItemField, addItem, removeItem, addDrugFromMatch,
     drugCount, vitals, setVitals, vitalsStatus, hydrating, autosaveStatus, saving,
     saveConsultation,
   } = useConsultationDraft({
@@ -152,6 +153,27 @@ export default function ConsultationModal({ appointment, onClose, onSaved }) {
   const handleCancel = () => {
     if (!isDirty) { onClose(); return; }
     setShowDiscardConfirm(true);
+  };
+
+  const appendTo = (current, setter) => (text) => {
+    const sep = current && !current.endsWith(" ") && !current.endsWith("\n") ? " " : "";
+    setter((current ?? "") + sep + text);
+  };
+
+  const handleDictation = async (transcript) => {
+    const { unmatchedPrescriptionText } = await routeDictation(transcript, {
+      hospitalId: user?.hospitalId,
+      appendChiefComplaint: appendTo(chiefComplaint, setChiefComplaint),
+      appendNotes: appendTo(notes, setNotes),
+      appendInstructions: appendTo(instructions, setInstructions),
+      addDrug: addDrugFromMatch,
+    });
+    if (unmatchedPrescriptionText) {
+      notify(
+        `Heard "${unmatchedPrescriptionText}" but no matching drug was found in the catalog — added to notes instead`,
+        "warning"
+      );
+    }
   };
 
   return (
@@ -372,6 +394,18 @@ export default function ConsultationModal({ appointment, onClose, onSaved }) {
                   </div>
                 )}
 
+                <div className="clinic-dictate-banner">
+                  <div>
+                    <p className="clinic-dictate-banner__title">Dictate the whole consultation</p>
+                    <p className="clinic-dictate-banner__hint">
+                      Say a heading to route what follows — "chief complaint…", "notes…",
+                      "prescribe…", "instructions…". Everything lands in its field, editable
+                      before you save.
+                    </p>
+                  </div>
+                  <DictateButton onTranscript={handleDictation} label="Dictate consultation" />
+                </div>
+
                 <Section icon={<ClipboardList className="w-3.5 h-3.5" />} title="Chief complaint" hint="What brought the patient in today">
                   <textarea
                     rows={2}
@@ -382,12 +416,7 @@ export default function ConsultationModal({ appointment, onClose, onSaved }) {
                   />
                 </Section>
 
-                <Section
-                  icon={<FileText className="w-3.5 h-3.5" />}
-                  title="Doctor's notes"
-                  hint="Examination findings, diagnosis, plan"
-                  actions={<DictateButton value={notes} onChange={setNotes} />}
-                >
+                <Section icon={<FileText className="w-3.5 h-3.5" />} title="Doctor's notes" hint="Examination findings, diagnosis, plan">
                   <textarea
                     rows={7}
                     value={notes}

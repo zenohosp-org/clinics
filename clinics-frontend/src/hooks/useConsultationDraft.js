@@ -169,6 +169,31 @@ export function useConsultationDraft({ appointment, hospitalId, notify, onSaved 
     setItems(prev => [...prev, newBlankDrugItem()]);
   }, []);
 
+  /**
+   * Append a drug that was already resolved against the catalog (e.g. by
+   * dictation matching a spoken drug name via drugsApi.search) — same field
+   * shape drug-select in PrescriptionDrugRow writes, so it renders and
+   * submits identically to a manually picked drug.
+   *
+   * Replaces the list's single still-blank starter row instead of appending
+   * after it, so dictating one drug doesn't leave an empty row above it.
+   */
+  const addDrugFromMatch = useCallback((drug) => {
+    const filled = {
+      ...newBlankDrugItem(),
+      drugId: drug.id ?? null,
+      drugName: drug.brandName || drug.genericName || "",
+      drugGeneric: drug.genericName || "",
+      drugStrength: drug.strength || "",
+      drugForm: drug.form || "",
+    };
+    setItems(prev =>
+      prev.length === 1 && !prev[0].drugName?.trim()
+        ? [filled]
+        : [...prev, filled]
+    );
+  }, []);
+
   // Compose chief-complaint header into the narrative so the print
   // view can split on the leading "Chief complaint:" line without
   // touching the schema.
@@ -248,7 +273,7 @@ export function useConsultationDraft({ appointment, hospitalId, notify, onSaved 
     notes, setNotes,
     instructions, setInstructions,
     nextVisitDate, setNextVisitDate,
-    items, setItemField, addItem, removeItem,
+    items, setItemField, addItem, removeItem, addDrugFromMatch,
     drugCount,
     // sidecar
     vitals, setVitals, vitalsStatus,
