@@ -390,9 +390,17 @@
 /* ── Instructions sub-row ────────────────────────────────────────────────── */
 
 .hms-rx-row__instr {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     padding: 2px 8px 7px;
     padding-left: 36px; /* indent past num column */
     border-top: 1px solid var(--hms-gray-50);
+}
+
+.hms-rx-row__instr .hms-rx-instr-input {
+    flex: 1;
+    min-width: 0;
 }
 
 .hms-rx-instr-input {

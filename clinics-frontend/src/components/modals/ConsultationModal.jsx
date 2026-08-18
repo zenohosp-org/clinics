@@ -406,7 +406,12 @@ export default function ConsultationModal({ appointment, onClose, onSaved }) {
                   <DictateButton onTranscript={handleDictation} label="Dictate consultation" />
                 </div>
 
-                <Section icon={<ClipboardList className="w-3.5 h-3.5" />} title="Chief complaint" hint="What brought the patient in today">
+                <Section
+                  icon={<ClipboardList className="w-3.5 h-3.5" />}
+                  title="Chief complaint"
+                  hint="What brought the patient in today"
+                  actions={<DictateButton value={chiefComplaint} onChange={setChiefComplaint} iconOnly label="Dictate chief complaint" />}
+                >
                   <textarea
                     rows={2}
                     value={chiefComplaint}
@@ -416,7 +421,12 @@ export default function ConsultationModal({ appointment, onClose, onSaved }) {
                   />
                 </Section>
 
-                <Section icon={<FileText className="w-3.5 h-3.5" />} title="Doctor's notes" hint="Examination findings, diagnosis, plan">
+                <Section
+                  icon={<FileText className="w-3.5 h-3.5" />}
+                  title="Doctor's notes"
+                  hint="Examination findings, diagnosis, plan"
+                  actions={<DictateButton value={notes} onChange={setNotes} iconOnly label="Dictate notes" />}
+                >
                   <textarea
                     rows={7}
                     value={notes}
@@ -426,7 +436,12 @@ export default function ConsultationModal({ appointment, onClose, onSaved }) {
                   />
                 </Section>
 
-                <Section icon={<ListChecks className="w-3.5 h-3.5" />} title="Instructions for patient" hint="Diet, rest, when to come back">
+                <Section
+                  icon={<ListChecks className="w-3.5 h-3.5" />}
+                  title="Instructions for patient"
+                  hint="Diet, rest, when to come back"
+                  actions={<DictateButton value={instructions} onChange={setInstructions} iconOnly label="Dictate instructions" />}
+                >
                   <textarea
                     rows={4}
                     value={instructions}

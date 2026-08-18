@@ -1019,7 +1019,12 @@ function ConsultTab({ draft, zemaResult, zemaAnalysisState, setZemaAnalysisState
         <DictateButton onTranscript={handleDictation} label="Dictate consultation" />
       </div>
 
-      <Section icon={<ClipboardList className="w-4 h-4" />} title="Chief complaint" hint="What brought the patient in today">
+      <Section
+        icon={<ClipboardList className="w-4 h-4" />}
+        title="Chief complaint"
+        hint="What brought the patient in today"
+        actions={<DictateButton value={draft.chiefComplaint} onChange={draft.setChiefComplaint} iconOnly label="Dictate chief complaint" />}
+      >
         <textarea
           rows={2}
           value={draft.chiefComplaint}
@@ -1029,7 +1034,12 @@ function ConsultTab({ draft, zemaResult, zemaAnalysisState, setZemaAnalysisState
         />
       </Section>
 
-      <Section icon={<FileText className="w-4 h-4" />} title="Doctor's notes" hint="Examination findings, diagnosis, plan">
+      <Section
+        icon={<FileText className="w-4 h-4" />}
+        title="Doctor's notes"
+        hint="Examination findings, diagnosis, plan"
+        actions={<DictateButton value={draft.notes} onChange={draft.setNotes} iconOnly label="Dictate notes" />}
+      >
         <textarea
           rows={9}
           value={draft.notes}
@@ -1039,7 +1049,12 @@ function ConsultTab({ draft, zemaResult, zemaAnalysisState, setZemaAnalysisState
         />
       </Section>
 
-      <Section icon={<ListChecks className="w-4 h-4" />} title="Instructions for patient" hint="Diet, rest, when to come back">
+      <Section
+        icon={<ListChecks className="w-4 h-4" />}
+        title="Instructions for patient"
+        hint="Diet, rest, when to come back"
+        actions={<DictateButton value={draft.instructions} onChange={draft.setInstructions} iconOnly label="Dictate instructions" />}
+      >
         <textarea
           rows={5}
           value={draft.instructions}
@@ -1443,7 +1458,7 @@ function AutosaveIndicator({ status, hydrating }) {
 // ────────────────────────────────────────────────────────────────────────
 // SHARED
 // ────────────────────────────────────────────────────────────────────────
-function Section({ icon, title, hint, children }) {
+function Section({ icon, title, hint, actions, children }) {
   return (
     <div className="hms-cv-section">
       <div className="hms-cv-section__head">
@@ -1456,6 +1471,7 @@ function Section({ icon, title, hint, children }) {
             {hint}
           </span>
         )}
+        {actions}
       </div>
       {children}
     </div>

@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { drugsApi } from "@/utils/api";
 import { Search, Trash2, AlertCircle, AlertTriangle } from "lucide-react";
 import SearchableSelect from "@/components/ui/SearchableSelect";
+import DictateButton from "@/components/consultation/DictateButton";
 import { fmtDateMed } from "@/utils/date";
 import "@/styles/modules/prescription-table.css";
 
@@ -160,6 +161,9 @@ export function PrescriptionDrugRow({ index, item, allergyMatch, duplicateOrder,
               className="hms-rx-drug-input"
             />
             {searching && <Spinner className="w-3 h-3" />}
+            <div className="hms-rx-drug-mic">
+              <DictateButton value={query} onChange={onQueryChange} replace iconOnly label="Dictate drug name" />
+            </div>
           </div>
 
           {item.drugId && (() => {
@@ -317,6 +321,14 @@ export function PrescriptionDrugRow({ index, item, allergyMatch, duplicateOrder,
           placeholder="Instructions: after meals, with milk, taper over 5 days…"
           className="hms-rx-instr-input"
         />
+        <div className="hms-rx-instr-mic">
+          <DictateButton
+            value={item.instructions}
+            onChange={v => onChange("instructions", v)}
+            iconOnly
+            label="Dictate drug instructions"
+          />
+        </div>
       </div>
 
     </div>

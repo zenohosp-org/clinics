@@ -490,6 +490,41 @@ button.clinic-fin-bucket.is-active {
     color: #dc2626;
 }
 
+/* ── Icon-only mic — sits directly on a field/card, not on the banner ── */
+.clinic-dictate.is-icon-only {
+    margin-left: 0;
+    flex-shrink: 0;
+}
+
+.clinic-dictate__btn.is-icon-only {
+    padding: 4px;
+    width: 24px;
+    height: 24px;
+    justify-content: center;
+    border-radius: var(--zu-radius-full);
+}
+
+/* Inline placement inside a drug row's input group (search box, instructions
+   input) rather than a section header — sized to match the surrounding
+   compact row controls. */
+.hms-rx-drug-mic,
+.hms-rx-instr-mic {
+    flex-shrink: 0;
+}
+.hms-rx-drug-mic .clinic-dictate__btn.is-icon-only,
+.hms-rx-instr-mic .clinic-dictate__btn.is-icon-only {
+    width: 20px;
+    height: 20px;
+    border-color: transparent;
+    background: transparent;
+    color: var(--hms-gray-400);
+}
+.hms-rx-drug-mic .clinic-dictate__btn.is-icon-only:hover:not(:disabled),
+.hms-rx-instr-mic .clinic-dictate__btn.is-icon-only:hover:not(:disabled) {
+    color: var(--hms-gray-700);
+    background: var(--hms-gray-100);
+}
+
 /* ── Narrow screens ──────────────────────────────────────────────── */
 @media (max-width: 720px) {
     .clinic-lab-toolbar {
