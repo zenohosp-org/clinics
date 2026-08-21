@@ -4810,6 +4810,152 @@
     text-decoration: underline;
 }
 
+/* Vaccines tab — rows mirror .hms-pat-rad-row; grouped under .hms-pat-rec-group headers */
+.hms-pat-vax-list {
+    background: var(--hms-white);
+    border: 1px solid var(--hms-gray-200);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.hms-pat-vax-row {
+    padding: var(--hms-space-md) var(--hms-space-20);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hms-space-md);
+    border-bottom: 1px solid var(--hms-gray-100);
+    transition: background 0.15s;
+}
+
+.hms-pat-vax-row:last-child {
+    border-bottom: none;
+}
+
+.hms-pat-vax-row:hover {
+    background: var(--hms-gray-50);
+}
+
+.hms-pat-vax-row__body {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.hms-pat-vax-row__icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--hms-gray-100);
+    border: 1px solid var(--hms-gray-200);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--hms-gray-700);
+}
+
+.hms-pat-vax-row__name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--hms-gray-800);
+}
+
+.hms-pat-vax-row__meta {
+    margin: 2px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--hms-gray-600);
+}
+
+.hms-pat-vax-row__sep {
+    color: var(--hms-gray-300);
+}
+
+.hms-pat-vax-row__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.hms-pat-vax-status {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    border: 1px solid;
+    white-space: nowrap;
+}
+
+.hms-pat-vax-status.is-overdue {
+    background: var(--hms-danger-bg, rgba(239, 68, 68, 0.1));
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+.hms-pat-vax-status.is-due-soon {
+    background: var(--hms-warning-bg);
+    color: #b45309;
+    border-color: #fde68a;
+}
+
+.hms-pat-vax-status.is-upcoming {
+    background: var(--hms-gray-100);
+    color: var(--hms-gray-700);
+    border-color: var(--hms-gray-200);
+}
+
+.hms-pat-vax-status.is-administered {
+    background: rgba(16, 185, 129, 0.1);
+    color: #047857;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.hms-pat-vax-status.is-skipped {
+    background: var(--hms-gray-50);
+    color: var(--hms-gray-400);
+    border-color: var(--hms-gray-200);
+}
+
+.hms-pat-vax-record-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--hms-gray-900);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--hms-font-family);
+}
+
+.hms-pat-vax-record-btn:hover {
+    text-decoration: underline;
+}
+
+/* Group tag colour variants — extends .hms-pat-rec-group__general-tag for non-neutral groups */
+.hms-pat-rec-group__general-tag.is-danger {
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+.hms-pat-rec-group__general-tag.is-warning {
+    color: #b45309;
+    border-color: #fde68a;
+}
+
+.hms-pat-rec-group__general-tag.is-success {
+    color: #047857;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
 /* Billing rows */
 .hms-pat-bill-list {
     display: flex;

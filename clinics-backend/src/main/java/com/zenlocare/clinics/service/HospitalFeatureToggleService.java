@@ -31,7 +31,8 @@ public class HospitalFeatureToggleService {
             "AMBULANCE",
             "RADIOLOGY",
             "HEALTH_CHECKUPS",
-            "IPD"
+            "IPD",
+            "VACCINES"
     );
 
     private final HospitalFeatureToggleRepository repository;

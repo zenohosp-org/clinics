@@ -2,7 +2,7 @@ import { Spinner } from "@/components/ui/Loader";
 import { useMemo, useState } from "react";
 import { useFeatureFlags } from "@/context/FeatureFlagsContext";
 import { useNotification } from "@/context/NotificationContext";
-import { Ambulance, ScanLine, HeartPulse, BedDouble, Settings as SettingsIcon,  } from "lucide-react";
+import { Ambulance, ScanLine, HeartPulse, BedDouble, Syringe, Settings as SettingsIcon,  } from "lucide-react";
 import { Badge, Card, PageHeader } from "@/components/ui";
 
 const FEATURE_META = {
@@ -25,6 +25,11 @@ const FEATURE_META = {
         label: "IPD management",
         description: "Show room allocation, room logs and IPD admissions.",
         icon: BedDouble,
+    },
+    VACCINES: {
+        label: "Vaccines",
+        description: "Show the Vaccines tab on patient records for tracking pediatric immunizations.",
+        icon: Syringe,
     },
 };
 

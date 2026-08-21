@@ -1158,6 +1158,20 @@ const allergyApi = {
   remove: (patientId, allergyId)  => api.delete(`/patients/${patientId}/allergies/${allergyId}`).then((r) => r.data),
 };
 
+// Standard immunization schedule (hospital-agnostic reference catalog).
+const vaccineCatalogApi = {
+  list: (activeOnly = true) => api.get("/vaccines/catalog", { params: { activeOnly } }).then((r) => r.data),
+};
+
+// Per-patient vaccination timeline — due (SCHEDULED) and given (ADMINISTERED) doses.
+const patientVaccinationApi = {
+  list:             (patientId, hospitalId) => api.get(`/patients/${patientId}/vaccinations`, { params: { hospitalId } }).then((r) => r.data),
+  generateSchedule: (patientId)             => api.post(`/patients/${patientId}/vaccinations/generate-schedule`).then((r) => r.data),
+  add:              (patientId, payload)    => api.post(`/patients/${patientId}/vaccinations`, payload).then((r) => r.data),
+  update:           (patientId, vaccinationId, payload) => api.put(`/patients/${patientId}/vaccinations/${vaccinationId}`, payload).then((r) => r.data),
+  remove:           (patientId, vaccinationId) => api.delete(`/patients/${patientId}/vaccinations/${vaccinationId}`).then((r) => r.data),
+};
+
 const ioApi = {
   list:   (admissionId)          => api.get(`/ipd/fluid/${admissionId}`).then((r) => r.data),
   add:    (admissionId, payload) => api.post(`/ipd/fluid/${admissionId}`, payload).then((r) => r.data),
@@ -1425,6 +1439,8 @@ export {
   ipdVitalsApi,
   marApi,
   allergyApi,
+  vaccineCatalogApi,
+  patientVaccinationApi,
   ioApi,
   labOrderApi,
   labCatalogApi,

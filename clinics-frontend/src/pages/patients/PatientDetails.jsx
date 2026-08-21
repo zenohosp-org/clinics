@@ -4,11 +4,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import api, { patientApi, recordApi, appointmentsApi, radiologyApi, invoiceApi } from "@/utils/api";
 import { useNotification } from "@/context/NotificationContext";
 import { useAuth } from "@/context/AuthContext";
+import { useFeatureFlag } from "@/context/FeatureFlagsContext";
 import { calcAge, formatDate, formatDateTime } from "@/utils/validators";
 import { fmtId } from "@/utils/idFormat";
 import PatientModal from "@/components/modals/PatientModal";
 import BookAppointmentModal from "@/components/modals/BookAppointmentModal";
-import { ArrowLeft, User, FileText, Phone, Mail, MapPin, Droplets, Calendar, Clock, Edit2, ClipboardList, ChevronRight, Activity, AlertCircle, Stethoscope, MoreHorizontal, Bed, CalendarClock, ScanLine } from "lucide-react";
+import VaccinesTab from "@/components/patients/VaccinesTab";
+import { ArrowLeft, User, FileText, Phone, Mail, MapPin, Droplets, Calendar, Clock, Edit2, ClipboardList, ChevronRight, Activity, AlertCircle, Stethoscope, MoreHorizontal, Bed, CalendarClock, ScanLine, Syringe } from "lucide-react";
 
 const TYPE_META = {
   PROGRESS_NOTE: { label: "Progress Note", dotMod: "is-progress-note", chipMod: "is-progress-note" },
@@ -150,6 +152,7 @@ function PatientDetails() {
   const navigate = useNavigate();
   const { notify } = useNotification();
   const { user } = useAuth();
+  const vaccinesEnabled = useFeatureFlag("VACCINES");
   const [patient, setPatient] = useState(null);
   const [records, setRecords] = useState([]);
   const [appointments, setAppointments] = useState([]);
@@ -360,7 +363,14 @@ function PatientDetails() {
       <div className="hms-detail-page__main">
         {/* Tab bar */}
         <div className="hms-pat-detail__tabs">
-          {["overview", "appointments", "records", "radiology", "billing"].map((t) => (
+          {[
+            "overview",
+            "appointments",
+            "records",
+            "radiology",
+            ...(vaccinesEnabled ? ["vaccines"] : []),
+            "billing",
+          ].map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -369,6 +379,7 @@ function PatientDetails() {
               {t === "records" ? `Records ${!recordsLoading ? `(${records.length})` : ""}`
                 : t === "appointments" ? `Appointments ${!appointmentsLoading ? `(${appointments.length})` : ""}`
                 : t === "radiology" ? `Radiology ${!radiologyLoading ? `(${radiologyOrders.length})` : ""}`
+                : t === "vaccines" ? "Vaccines"
                 : t === "billing" ? `Billing ${!invoicesLoading ? `(${invoices.length})` : ""}`
                 : "Overview"}
             </button>
@@ -697,6 +708,15 @@ function PatientDetails() {
                 </div>
               )}
             </div>
+          )}
+          {/* ── VACCINES TAB ── */}
+          {vaccinesEnabled && tab === "vaccines" && (
+            <VaccinesTab
+              patientId={Number(id)}
+              hospitalId={user?.hospitalId}
+              patientDob={patient.dob}
+              patientFirstName={patient.firstName}
+            />
           )}
           {/* ── Billing tab ── */}
           {tab === "billing" && (
