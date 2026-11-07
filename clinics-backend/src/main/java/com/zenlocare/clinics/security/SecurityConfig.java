@@ -51,6 +51,8 @@ public class SecurityConfig {
                 .securityContext(context -> context.securityContextRepository(new HttpSessionSecurityContextRepository()))
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints — no token required
+                        // Self sign-up handed out working tokens; no screen uses it.
+                        .requestMatchers("/api/auth/register").denyAll()
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/public/**",

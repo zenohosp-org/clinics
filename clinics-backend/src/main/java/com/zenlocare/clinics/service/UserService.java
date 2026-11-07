@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import com.zenlocare.clinics.security.HospitalAccessGuard;
+import org.springframework.security.access.AccessDeniedException;
 
 @Transactional(readOnly = true)
 @Service
@@ -19,6 +21,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final HospitalAccessGuard guard;
     private final HospitalRepository hospitalRepository;
     private final DepartmentRepository departmentRepository;
     private final DesignationRepository designationRepository;
@@ -44,6 +47,19 @@ public class UserService {
         return userRepository.searchUsers(hospitalId, query.trim(), role, limit);
     }
 
+    /**
+     * The role a caller may hand out. Super admin crosses every hospital, so
+     * only a super admin may give it; a hospital admin gets the rest.
+     */
+    private Role assignableRole(String roleName) {
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleName));
+        if ("super_admin".equalsIgnoreCase(role.getName()) && !guard.currentIsSuperAdmin()) {
+            throw new AccessDeniedException("Only a super admin can assign the super admin role");
+        }
+        return role;
+    }
+
     @Transactional
     public User createUser(String email, String password, String firstName, String lastName,
             String roleName, UUID hospitalId, String phone, String employeeCode, String designation,
@@ -57,8 +73,7 @@ public class UserService {
             throw new ConflictException("Email already exists: " + normalizedEmail);
         }
 
-        Role role = roleRepository.findByName(normalizedRoleName)
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + normalizedRoleName));
+        Role role = assignableRole(normalizedRoleName);
 
         Hospital hospital = hospitalRepository.findById(hospitalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hospital not found"));
@@ -118,9 +133,7 @@ public class UserService {
         user.setAadhaarNumber(aadhaarNumber != null ? aadhaarNumber.replaceAll("\\D", "") : null);
         user.setPanNumber(panNumber != null ? panNumber.trim().toUpperCase() : null);
         if (roleName != null && !roleName.isBlank()) {
-            Role role = roleRepository.findByName(roleName.toLowerCase().trim())
-                    .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleName));
-            user.setRole(role);
+            user.setRole(assignableRole(roleName.toLowerCase().trim()));
         }
 
         return userRepository.save(user);
