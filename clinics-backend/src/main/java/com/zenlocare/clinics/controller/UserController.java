@@ -12,11 +12,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import com.zenlocare.clinics.security.RecordOwnership;
 
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
+
+    private final RecordOwnership ownership;
 
     private final UserService userService;
 
@@ -29,6 +32,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUser(@PathVariable UUID id) {
+        ownership.require(User.class, id);
         User user = userService.getUserById(id);
         return ResponseEntity.ok(mapToDto(user));
     }
@@ -58,6 +62,7 @@ public class UserController {
     @PatchMapping("/{id}/deactivate")
     @PreAuthorize("hasRole('hospital_admin')")
     public ResponseEntity<Void> deactivateUser(@PathVariable java.util.UUID id) {
+        ownership.require(User.class, id);
         userService.deactivateUser(id);
         return ResponseEntity.noContent().build();
     }
@@ -65,6 +70,7 @@ public class UserController {
     @PatchMapping("/{id}/activate")
     @PreAuthorize("hasRole('hospital_admin')")
     public ResponseEntity<Void> activateUser(@PathVariable java.util.UUID id) {
+        ownership.require(User.class, id);
         userService.activateUser(id);
         return ResponseEntity.noContent().build();
     }
@@ -78,6 +84,7 @@ public class UserController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('hospital_admin')")
     public ResponseEntity<UserDto> updateUser(@PathVariable UUID id, @RequestBody UserDto req) {
+        ownership.require(User.class, id);
         User user = userService.updateUser(id, req.getFirstName(), req.getLastName(), req.getPhone(),
                 req.getRole(), req.getEmployeeCode(), req.getDesignation(),
                 req.getGender(), req.getDateOfJoining(), req.getState(),

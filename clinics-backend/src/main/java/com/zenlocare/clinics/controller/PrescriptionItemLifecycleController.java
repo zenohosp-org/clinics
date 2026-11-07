@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.PrescriptionItem;
 
 /**
  * Manages the ACTIVE → STOPPED lifecycle of a prescription order.
@@ -37,6 +39,8 @@ import java.util.UUID;
 @PreAuthorize("hasAnyRole('doctor', 'hospital_admin', 'super_admin')")
 public class PrescriptionItemLifecycleController {
 
+    private final RecordOwnership ownership;
+
     private final PrescriptionItemRepository prescriptionItemRepo;
     private final AdmissionRepository        admissionRepo;
     private final UserRepository             userRepo;
@@ -48,6 +52,7 @@ public class PrescriptionItemLifecycleController {
             @PathVariable UUID itemId,
             @RequestBody StopRequest req,
             @AuthenticationPrincipal User principal) {
+        ownership.require(PrescriptionItem.class, itemId);
 
         if (req.getReason() == null || req.getReason().isBlank())
             throw new BadRequestException("reason is required to stop an order");
@@ -111,6 +116,7 @@ public class PrescriptionItemLifecycleController {
             @PathVariable UUID itemId,
             @RequestBody PrescriptionReturnDtos.InitiateRequest req,
             @AuthenticationPrincipal User principal) {
+        ownership.require(PrescriptionItem.class, itemId);
         return ResponseEntity.ok(prescriptionReturnService.initiate(itemId, req, principal));
     }
 

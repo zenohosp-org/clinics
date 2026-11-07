@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.Patient;
 
 /**
  * Patient allergy CRUD — scoped per hospital (tenant isolation).
@@ -32,6 +34,8 @@ import java.util.UUID;
 @PreAuthorize("hasAnyRole('doctor', 'staff', 'nurse', 'hospital_admin', 'super_admin')")
 public class AllergyController {
 
+    private final RecordOwnership ownership;
+
     private static final Set<String> VALID_SEVERITIES = Set.of("MILD", "MODERATE", "SEVERE", "UNKNOWN");
 
     private final PatientAllergyRepository allergyRepo;
@@ -42,6 +46,7 @@ public class AllergyController {
     public ResponseEntity<List<AllergyDto>> list(
             @PathVariable Integer patientId,
             @RequestParam UUID hospitalId) {
+        ownership.require(Patient.class, patientId);
 
         return ResponseEntity.ok(
             allergyRepo.findByPatientIdAndHospitalIdOrderByCreatedAtAsc(patientId, hospitalId)
@@ -55,6 +60,7 @@ public class AllergyController {
             @PathVariable Integer patientId,
             @RequestBody AllergyRequest req,
             @AuthenticationPrincipal User principal) {
+        ownership.require(Patient.class, patientId);
 
         if (req.getAllergen() == null || req.getAllergen().isBlank())
             throw new BadRequestException("allergen is required");
@@ -91,6 +97,8 @@ public class AllergyController {
             @PathVariable Integer patientId,
             @PathVariable UUID allergyId,
             @AuthenticationPrincipal User principal) {
+        ownership.require(Patient.class, patientId);
+        ownership.require(PatientAllergy.class, allergyId);
 
         User caller = userRepo.findById(java.util.Objects.requireNonNull(principal.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));

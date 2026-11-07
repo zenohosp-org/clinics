@@ -9,11 +9,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
 
 @RestController
 @RequestMapping("/api/settings/room-types")
 @RequiredArgsConstructor
 public class RoomTypeConfigController {
+
+    private final RecordOwnership ownership;
 
     private final RoomTypeConfigService service;
 
@@ -36,6 +39,7 @@ public class RoomTypeConfigController {
     @PutMapping("/{id}")
     public ResponseEntity<RoomTypeDto> update(@PathVariable UUID id,
                                                @RequestBody UpdateRoomTypeRequest req) {
+        ownership.require(RoomTypeConfig.class, id);
         RoomTypeConfig updated = service.update(id, req.getLabel(), req.getCategory(),
                 req.getIcon(), req.getColor(), req.getHasBeds(), req.getHasDailyCharge(),
                 req.getBookableOt());
@@ -44,6 +48,7 @@ public class RoomTypeConfigController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        ownership.require(RoomTypeConfig.class, id);
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

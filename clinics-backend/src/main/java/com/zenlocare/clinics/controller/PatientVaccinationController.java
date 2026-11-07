@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
 
 /**
  * A patient's immunization timeline — scheduled and administered doses.
@@ -41,6 +42,8 @@ import java.util.UUID;
 @PreAuthorize("hasAnyRole('doctor', 'staff', 'nurse', 'hospital_admin', 'super_admin')")
 public class PatientVaccinationController {
 
+    private final RecordOwnership ownership;
+
     private static final Set<String> VALID_STATUSES = Set.of("SCHEDULED", "ADMINISTERED", "SKIPPED");
 
     private final PatientVaccinationRepository vaccinationRepo;
@@ -53,6 +56,7 @@ public class PatientVaccinationController {
     public ResponseEntity<List<VaccinationDto>> list(
             @PathVariable Integer patientId,
             @RequestParam UUID hospitalId) {
+        ownership.require(Patient.class, patientId);
 
         return ResponseEntity.ok(
             vaccinationRepo.findByPatientIdAndHospitalIdOrderByScheduledDateAsc(patientId, hospitalId)
@@ -72,6 +76,7 @@ public class PatientVaccinationController {
     public ResponseEntity<List<VaccinationDto>> generateSchedule(
             @PathVariable Integer patientId,
             @AuthenticationPrincipal User principal) {
+        ownership.require(Patient.class, patientId);
 
         UUID callerHospitalId = callerHospitalId(principal);
 
@@ -115,6 +120,7 @@ public class PatientVaccinationController {
             @PathVariable Integer patientId,
             @RequestBody VaccinationRequest req,
             @AuthenticationPrincipal User principal) {
+        ownership.require(Patient.class, patientId);
 
         UUID callerHospitalId = callerHospitalId(principal);
 
@@ -167,6 +173,8 @@ public class PatientVaccinationController {
             @PathVariable UUID vaccinationId,
             @RequestBody VaccinationRequest req,
             @AuthenticationPrincipal User principal) {
+        ownership.require(Patient.class, patientId);
+        ownership.require(PatientVaccination.class, vaccinationId);
 
         UUID callerHospitalId = callerHospitalId(principal);
 
@@ -207,6 +215,8 @@ public class PatientVaccinationController {
             @PathVariable Integer patientId,
             @PathVariable UUID vaccinationId,
             @AuthenticationPrincipal User principal) {
+        ownership.require(Patient.class, patientId);
+        ownership.require(PatientVaccination.class, vaccinationId);
 
         UUID callerHospitalId = callerHospitalId(principal);
 

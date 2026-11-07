@@ -13,17 +13,21 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import com.zenlocare.clinics.security.RecordOwnership;
 
 @RestController
 @RequestMapping("/api/doctors/{doctorId}/availability")
 @RequiredArgsConstructor
 public class DoctorAvailabilityController {
 
+    private final RecordOwnership ownership;
+
     private final DoctorAvailabilityRepository availabilityRepo;
     private final DoctorRepository doctorRepo;
 
     @GetMapping
     public ResponseEntity<List<AvailabilityDto>> list(@PathVariable UUID doctorId) {
+        ownership.require(Doctor.class, doctorId);
         List<DoctorAvailability> rows = availabilityRepo.findByDoctorIdOrderByDayOfWeek(doctorId);
         return ResponseEntity.ok(rows.stream().map(this::toDto).collect(Collectors.toList()));
     }
@@ -31,6 +35,7 @@ public class DoctorAvailabilityController {
     @PostMapping
     public ResponseEntity<AvailabilityDto> upsert(@PathVariable UUID doctorId,
                                                    @RequestBody AvailabilityDto req) {
+        ownership.require(Doctor.class, doctorId);
         Doctor doctor = doctorRepo.getReferenceById(doctorId);
         DoctorAvailability row = availabilityRepo
                 .findByDoctorIdAndDayOfWeek(doctorId, req.getDayOfWeek())
@@ -47,6 +52,8 @@ public class DoctorAvailabilityController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID doctorId, @PathVariable UUID id) {
+        ownership.require(Doctor.class, doctorId);
+        ownership.require(DoctorAvailability.class, id);
         availabilityRepo.deleteById(id);
         return ResponseEntity.noContent().build();
     }

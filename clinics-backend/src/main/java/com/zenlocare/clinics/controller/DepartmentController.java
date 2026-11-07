@@ -8,11 +8,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.Department;
 
 @RestController
 @RequestMapping("/api/departments")
 @RequiredArgsConstructor
 public class DepartmentController {
+
+    private final RecordOwnership ownership;
 
     private final DepartmentService departmentService;
 
@@ -31,11 +35,13 @@ public class DepartmentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<DepartmentDTO> update(@PathVariable UUID id, @RequestBody DepartmentRequest req) {
+        ownership.require(Department.class, id);
         return ResponseEntity.ok(departmentService.update(id, req));
     }
 
     @PatchMapping("/{id}/toggle")
     public ResponseEntity<DepartmentDTO> toggle(@PathVariable UUID id) {
+        ownership.require(Department.class, id);
         return ResponseEntity.ok(departmentService.toggle(id));
     }
 }

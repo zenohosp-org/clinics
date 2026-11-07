@@ -18,11 +18,15 @@ import com.zenlocare.clinics.security.ProfileVisibility;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.User;
 
 @RestController
 @RequestMapping("/api/doctors")
 @RequiredArgsConstructor
 public class DoctorController {
+
+    private final RecordOwnership ownership;
 
     private final DoctorService doctorService;
     private final SpecializationRepository specializationRepository;
@@ -43,12 +47,14 @@ public class DoctorController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DoctorDto> getDoctor(@PathVariable UUID id) {
+        ownership.require(Doctor.class, id);
         Doctor doctor = doctorService.getDoctorById(id);
         return ResponseEntity.ok(mapToDto(doctor));
     }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<DoctorDto> getDoctorByUserId(@PathVariable UUID userId) {
+        ownership.require(User.class, userId);
         Doctor doctor = doctorService.getDoctorByUserId(userId);
         return ResponseEntity.ok(mapToDto(doctor));
     }
@@ -83,6 +89,7 @@ public class DoctorController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('hospital_admin') or hasRole('doctor')")
     public ResponseEntity<DoctorDto> updateDoctor(@PathVariable UUID id, @RequestBody DoctorDto req) {
+        ownership.require(Doctor.class, id);
         Doctor updatedData = new Doctor();
         applySpecList(updatedData, req.getSpecializationIds());
         UUID firstId = req.getSpecializationIds() != null && !req.getSpecializationIds().isEmpty()
@@ -112,6 +119,7 @@ public class DoctorController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('hospital_admin')")
     public ResponseEntity<Void> deleteDoctor(@PathVariable UUID id) {
+        ownership.require(Doctor.class, id);
         doctorService.deleteDoctor(id);
         return ResponseEntity.noContent().build();
     }

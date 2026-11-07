@@ -15,11 +15,16 @@ import org.springframework.data.web.PageableDefault;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.Admission;
+import com.zenlocare.clinics.entity.Patient;
 
 @RestController
 @RequestMapping("/api/admissions")
 @RequiredArgsConstructor
 public class AdmissionController {
+
+    private final RecordOwnership ownership;
 
     private final AdmissionService admissionService;
 
@@ -42,11 +47,13 @@ public class AdmissionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<AdmissionDTO> get(@PathVariable UUID id) {
+        ownership.require(Admission.class, id);
         return ResponseEntity.ok(admissionService.get(id));
     }
 
     @GetMapping("/patient/{patientId}")
     public ResponseEntity<List<AdmissionDTO>> byPatient(@PathVariable Integer patientId) {
+        ownership.require(Patient.class, patientId);
         return ResponseEntity.ok(admissionService.getByPatient(patientId));
     }
 
@@ -59,6 +66,7 @@ public class AdmissionController {
     public ResponseEntity<AdmissionDTO> assignRoom(@PathVariable UUID id,
                                                     @RequestBody RoomAssignRequest req,
                                                     Authentication auth) {
+        ownership.require(Admission.class, id);
         return ResponseEntity.ok(admissionService.assignRoom(id, req.getRoomId(), resolveFullName(auth)));
     }
 
@@ -66,6 +74,7 @@ public class AdmissionController {
     public ResponseEntity<AdmissionDTO> discharge(@PathVariable UUID id,
                                                    @RequestBody DischargeRequest req,
                                                    Authentication auth) {
+        ownership.require(Admission.class, id);
         return ResponseEntity.ok(admissionService.discharge(id, req, resolveFullName(auth)));
     }
 
@@ -73,6 +82,7 @@ public class AdmissionController {
     public ResponseEntity<AdmissionDTO> moveToOT(@PathVariable UUID id,
                                                   @RequestBody MoveToOTRequest req,
                                                   Authentication auth) {
+        ownership.require(Admission.class, id);
         return ResponseEntity.ok(admissionService.moveToOT(id, req.getRoomId(), req.getDoctorId(), req.getOtBookingId(), resolveFullName(auth)));
     }
 
@@ -80,12 +90,14 @@ public class AdmissionController {
     public ResponseEntity<AdmissionDTO> returnFromOT(@PathVariable UUID id,
                                                       @RequestBody(required = false) ReturnFromOTRequest req,
                                                       Authentication auth) {
+        ownership.require(Admission.class, id);
         Long postOtRoomId = req != null ? req.getPostOtRoomId() : null;
         return ResponseEntity.ok(admissionService.returnFromOT(id, postOtRoomId, resolveFullName(auth)));
     }
 
     @PatchMapping("/{id}/return-to-ward")
     public ResponseEntity<AdmissionDTO> returnToWard(@PathVariable UUID id, Authentication auth) {
+        ownership.require(Admission.class, id);
         return ResponseEntity.ok(admissionService.returnToWard(id, resolveFullName(auth)));
     }
 
@@ -94,6 +106,7 @@ public class AdmissionController {
             @PathVariable UUID id,
             @RequestBody com.zenlocare.clinics.dto.AttenderUpdateRequest req,
             Authentication auth) {
+        ownership.require(Admission.class, id);
         return ResponseEntity.ok(admissionService.updateAttender(id, req, resolveFullName(auth)));
     }
 

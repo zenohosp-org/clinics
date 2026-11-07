@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.BiomedicalWasteHandover;
+import com.zenlocare.clinics.entity.BiomedicalWasteLog;
 
 /**
  * Bio-medical-waste API — daily category-wise waste logging and
@@ -22,6 +25,8 @@ import java.util.UUID;
 @RequestMapping("/api/biomedical-waste")
 @RequiredArgsConstructor
 public class BiomedicalWasteController {
+
+    private final RecordOwnership ownership;
 
     private final BiomedicalWasteService service;
 
@@ -61,6 +66,7 @@ public class BiomedicalWasteController {
             @PathVariable UUID id,
             @RequestParam UUID hospitalId,
             @RequestBody BiomedicalWasteDtos.LogRequest req) {
+        ownership.require(BiomedicalWasteLog.class, id);
         return ResponseEntity.ok(service.updateLog(id, hospitalId, req));
     }
 
@@ -68,6 +74,7 @@ public class BiomedicalWasteController {
     public ResponseEntity<Void> deleteLog(
             @PathVariable UUID id,
             @RequestParam UUID hospitalId) {
+        ownership.require(BiomedicalWasteLog.class, id);
         service.deleteLog(id, hospitalId);
         return ResponseEntity.noContent().build();
     }
@@ -102,6 +109,7 @@ public class BiomedicalWasteController {
     public ResponseEntity<BiomedicalWasteDtos.HandoverDto> getHandover(
             @PathVariable UUID id,
             @RequestParam UUID hospitalId) {
+        ownership.require(BiomedicalWasteHandover.class, id);
         return ResponseEntity.ok(service.getHandover(id, hospitalId));
     }
 }

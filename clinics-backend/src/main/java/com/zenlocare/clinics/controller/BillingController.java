@@ -20,12 +20,18 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.Admission;
+import com.zenlocare.clinics.entity.InvoiceItem;
+import com.zenlocare.clinics.entity.Patient;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/billing")
 @RequiredArgsConstructor
 public class BillingController {
+
+    private final RecordOwnership ownership;
 
     private final SmartBillingService smartBillingService;
     private final InvoiceService invoiceService;
@@ -35,11 +41,13 @@ public class BillingController {
     public ResponseEntity<SmartBillingSuggestion> getSuggestions(
             @RequestParam Integer patientId,
             @RequestParam(required = false) UUID admissionId) {
+        ownership.require(Patient.class, patientId);
         return ResponseEntity.ok(smartBillingService.getSuggestions(patientId, admissionId));
     }
 
     @GetMapping("/patient/{patientId}/invoices")
     public ResponseEntity<List<InvoiceDTO>> getPatientInvoices(@PathVariable Integer patientId) {
+        ownership.require(Patient.class, patientId);
         return ResponseEntity.ok(invoiceService.getPatientInvoices(patientId));
     }
 
@@ -48,6 +56,7 @@ public class BillingController {
             @PathVariable UUID id,
             @RequestBody(required = false) Map<String, String> body,
             @AuthenticationPrincipal User user) {
+        ownership.require(Invoice.class, id);
         UUID bankAccountId = (body != null && body.get("bankAccountId") != null)
                 ? UUID.fromString(body.get("bankAccountId")) : null;
         return ResponseEntity.ok(invoiceService.markAsPaid(id, bankAccountId, user));
@@ -55,6 +64,7 @@ public class BillingController {
 
     @GetMapping("/admissions/{admissionId}/invoice")
     public ResponseEntity<InvoiceDTO> getAdmissionInvoice(@PathVariable UUID admissionId) {
+        ownership.require(Admission.class, admissionId);
         return invoiceService.getAdmissionInvoice(admissionId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
@@ -65,6 +75,7 @@ public class BillingController {
             @PathVariable UUID id, 
             @RequestBody InvoiceRequest req,
             @AuthenticationPrincipal User user) {
+        ownership.require(Invoice.class, id);
         try {
             return ResponseEntity.ok(invoiceService.finalizeIPDInvoice(id, req, user));
         } catch (RuntimeException e) {
@@ -75,6 +86,7 @@ public class BillingController {
 
     @GetMapping("/invoices/{id}/detail")
     public ResponseEntity<InvoiceDTO> getInvoiceDetail(@PathVariable UUID id) {
+        ownership.require(Invoice.class, id);
         try {
             return ResponseEntity.ok(invoiceService.getInvoiceDetail(id));
         } catch (RuntimeException e) {
@@ -84,6 +96,7 @@ public class BillingController {
 
     @PatchMapping("/invoices/{id}/estimate")
     public ResponseEntity<Void> updateEstimate(@PathVariable UUID id, @RequestBody Map<String, Object> body) {
+        ownership.require(Invoice.class, id);
         try {
             BigDecimal total = new BigDecimal(body.getOrDefault("total", "0").toString());
             invoiceService.updateEstimatedTotal(id, total);
@@ -97,6 +110,7 @@ public class BillingController {
 
     @GetMapping("/admissions/{admissionId}/advances")
     public ResponseEntity<List<PatientAdvanceDTO>> getAdvancesForAdmission(@PathVariable UUID admissionId) {
+        ownership.require(Admission.class, admissionId);
         return ResponseEntity.ok(
                 patientAdvanceService.listByAdmission(admissionId)
                         .stream().map(patientAdvanceService::toDTO)
@@ -108,6 +122,7 @@ public class BillingController {
     public ResponseEntity<PatientAdvanceDTO> createAdmissionAdvance(
             @PathVariable UUID admissionId,
             @RequestBody AdvanceRequest req) {
+        ownership.require(Admission.class, admissionId);
         try {
             return ResponseEntity.ok(patientAdvanceService.toDTO(
                     patientAdvanceService.createAdmissionAdvance(
@@ -132,6 +147,7 @@ public class BillingController {
             @PathVariable UUID id,
             @RequestBody PaymentRequest req,
             @AuthenticationPrincipal User user) {
+        ownership.require(Invoice.class, id);
         try {
             return ResponseEntity.ok(invoiceService.collectPayment(
                     id, req.getAmount(), req.getPaymentMethod(),
@@ -155,6 +171,7 @@ public class BillingController {
             @PathVariable UUID id,
             @RequestBody CollectAndSaveRequest req,
             @AuthenticationPrincipal User user) {
+        ownership.require(Invoice.class, id);
         try {
             return ResponseEntity.ok(invoiceService.collectAndSave(
                     id, req,
@@ -180,6 +197,8 @@ public class BillingController {
             @PathVariable UUID itemId,
             @RequestBody Map<String, Object> body,
             @AuthenticationPrincipal User user) {
+        ownership.require(Invoice.class, invoiceId);
+        ownership.require(InvoiceItem.class, itemId);
         BigDecimal amount = new BigDecimal(body.getOrDefault("waiverAmount", "0").toString());
         String reason = (String) body.getOrDefault("waiverReason", "");
         try {
