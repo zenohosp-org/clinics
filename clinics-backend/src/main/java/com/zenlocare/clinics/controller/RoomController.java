@@ -17,11 +17,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.Bed;
 
 @RestController
 @RequestMapping("/api/rooms")
 @RequiredArgsConstructor
 public class RoomController {
+
+    private final RecordOwnership ownership;
 
     private final RoomService roomService;
 
@@ -35,6 +39,7 @@ public class RoomController {
     @PreAuthorize("hasAnyRole('hospital_admin', 'doctor', 'staff')")
     public ResponseEntity<List<BedDto>> getBedsByRoom(@PathVariable Long roomId,
             @RequestParam UUID hospitalId) {
+        ownership.require(Room.class, roomId);
         return ResponseEntity.ok(roomService.getBedsByRoom(roomId, hospitalId));
     }
 
@@ -72,6 +77,7 @@ public class RoomController {
     @PreAuthorize("hasAnyRole('hospital_admin', 'doctor', 'staff')")
     public ResponseEntity<RoomDto> deallocatePatient(@PathVariable Long roomId,
             @RequestParam UUID hospitalId, Authentication auth) {
+        ownership.require(Room.class, roomId);
         return ResponseEntity.ok(roomService.deallocatePatient(roomId, hospitalId, resolveFullName(auth)));
     }
 
@@ -79,6 +85,7 @@ public class RoomController {
     @PreAuthorize("hasAnyRole('hospital_admin', 'doctor', 'staff')")
     public ResponseEntity<BedDto> freeBed(@PathVariable Long bedId,
             @RequestParam UUID hospitalId, Authentication auth) {
+        ownership.require(Bed.class, bedId);
         return ResponseEntity.ok(roomService.freeBed(bedId, hospitalId, resolveFullName(auth)));
     }
 
@@ -86,6 +93,7 @@ public class RoomController {
     @PreAuthorize("hasRole('hospital_admin')")
     public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId,
             @RequestParam UUID hospitalId) {
+        ownership.require(Room.class, roomId);
         roomService.deleteRoom(roomId, hospitalId);
         return ResponseEntity.ok().build();
     }
@@ -101,6 +109,7 @@ public class RoomController {
     @PreAuthorize("hasAnyRole('hospital_admin', 'doctor', 'staff')")
     public ResponseEntity<List<RoomLogDTO>> getRoomLogs(@PathVariable Long roomId,
             @RequestParam UUID hospitalId) {
+        ownership.require(Room.class, roomId);
         return ResponseEntity.ok(roomService.getRoomLogs(roomId, hospitalId));
     }
 

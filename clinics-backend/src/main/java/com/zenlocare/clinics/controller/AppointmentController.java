@@ -18,11 +18,16 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.Doctor;
+import com.zenlocare.clinics.entity.Patient;
 
 @RestController
 @RequestMapping("/api/appointments")
 @RequiredArgsConstructor
 public class AppointmentController {
+
+    private final RecordOwnership ownership;
 
     private final AppointmentService appointmentService;
 
@@ -48,6 +53,7 @@ public class AppointmentController {
     public ResponseEntity<List<AppointmentDto>> getDoctorAppointments(
             @PathVariable UUID doctorId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        ownership.require(Doctor.class, doctorId);
         return ResponseEntity.ok(appointmentService.getAppointmentsByDoctor(doctorId, date));
     }
 
@@ -63,12 +69,14 @@ public class AppointmentController {
             @RequestParam UUID hospitalId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        ownership.require(User.class, userId);
         return ResponseEntity.ok(
                 appointmentService.getLeaveConflictsForDoctorUser(userId, hospitalId, from, to));
     }
 
     @GetMapping("/patient/{patientId}")
     public ResponseEntity<List<AppointmentDto>> getPatientAppointments(@PathVariable Integer patientId) {
+        ownership.require(Patient.class, patientId);
         return ResponseEntity.ok(appointmentService.getAppointmentsByPatient(patientId));
     }
 
@@ -76,6 +84,7 @@ public class AppointmentController {
     public ResponseEntity<List<AppointmentDto>> getPastDoctors(
             @PathVariable Integer patientId,
             @RequestParam UUID hospitalId) {
+        ownership.require(Patient.class, patientId);
         return ResponseEntity.ok(appointmentService.getPastDoctorsForPatient(patientId, hospitalId));
     }
 
@@ -87,6 +96,7 @@ public class AppointmentController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<AppointmentDto> getAppointmentById(@PathVariable UUID id) {
+        ownership.require(Appointment.class, id);
         return ResponseEntity.ok(appointmentService.getAppointmentById(id));
     }
 
@@ -102,6 +112,7 @@ public class AppointmentController {
             @PathVariable UUID id,
             @RequestBody AppointmentRequest request,
             @AuthenticationPrincipal User currentUser) {
+        ownership.require(Appointment.class, id);
         return ResponseEntity.ok(appointmentService.updateAppointment(id, request, currentUser));
     }
 
@@ -110,6 +121,7 @@ public class AppointmentController {
             @PathVariable UUID id,
             @RequestBody AppointmentRequest request,
             @AuthenticationPrincipal User currentUser) {
+        ownership.require(Appointment.class, id);
         return ResponseEntity
                 .ok(appointmentService.updateAppointmentStatus(
                         id, request.getStatus(), request.getCancelledReason(),

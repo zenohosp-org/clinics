@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.Appointment;
 
 /**
  * Server-side autosave for the in-flight consultation modal.
@@ -31,12 +33,15 @@ import java.util.UUID;
 @PreAuthorize("hasAnyRole('doctor', 'hospital_admin', 'super_admin')")
 public class ConsultationDraftController {
 
+    private final RecordOwnership ownership;
+
     private final ConsultationDraftRepository draftRepo;
     private final UserRepository userRepo;
 
     /** Single draft lookup — the modal calls this when it opens to hydrate from autosave. */
     @GetMapping("/by-appointment/{appointmentId}")
     public ResponseEntity<DraftDto> get(@PathVariable UUID appointmentId) {
+        ownership.require(Appointment.class, appointmentId);
         return draftRepo.findByAppointmentId(appointmentId)
                 .map(d -> ResponseEntity.ok(toDto(d)))
                 .orElseGet(() -> ResponseEntity.noContent().build());
@@ -64,6 +69,7 @@ public class ConsultationDraftController {
             @PathVariable UUID appointmentId,
             @RequestBody UpsertRequest req,
             @AuthenticationPrincipal User principal) {
+        ownership.require(Appointment.class, appointmentId);
 
         // Re-fetch the creator inside the TX — see RecordService.doCreate for
         // the full rationale (detached principal vs. EAGER role proxy).
@@ -92,6 +98,7 @@ public class ConsultationDraftController {
     @DeleteMapping("/by-appointment/{appointmentId}")
     @Transactional
     public ResponseEntity<Void> delete(@PathVariable UUID appointmentId) {
+        ownership.require(Appointment.class, appointmentId);
         draftRepo.deleteByAppointmentId(appointmentId);
         return ResponseEntity.noContent().build();
     }

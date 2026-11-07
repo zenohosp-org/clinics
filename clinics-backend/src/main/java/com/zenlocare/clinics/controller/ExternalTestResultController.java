@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.Appointment;
+import com.zenlocare.clinics.entity.Patient;
 
 /**
  * External lab / radiology / pathology results — typed in by the
@@ -34,6 +37,8 @@ import java.util.UUID;
 @RequestMapping("/api/external-results")
 @RequiredArgsConstructor
 public class ExternalTestResultController {
+
+    private final RecordOwnership ownership;
 
     private final ExternalTestResultService service;
 
@@ -66,6 +71,7 @@ public class ExternalTestResultController {
             @PathVariable UUID appointmentId,
             @RequestParam UUID hospitalId,
             @AuthenticationPrincipal User principal) {
+        ownership.require(Appointment.class, appointmentId);
         java.util.List<ExternalTestResultDto> rows = service
                 .listForAppointment(appointmentId, hospitalId, principal)
                 .stream().map(this::toDto).toList();
@@ -81,6 +87,7 @@ public class ExternalTestResultController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             @PageableDefault(size = 25) Pageable pageable,
             @AuthenticationPrincipal User principal) {
+        ownership.require(Patient.class, patientId);
 
         Page<ExternalTestResult> page = service.listForPatient(
                 hospitalId, patientId, category, from, to, pageable, principal);

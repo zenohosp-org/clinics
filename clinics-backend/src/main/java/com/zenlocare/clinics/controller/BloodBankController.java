@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.BloodDonor;
+import com.zenlocare.clinics.entity.BloodUnit;
 
 /**
  * Blood-bank API. Lookup configuration, donor registry, bag inventory,
@@ -20,6 +23,8 @@ import java.util.UUID;
 @RequestMapping("/api/blood-bank")
 @RequiredArgsConstructor
 public class BloodBankController {
+
+    private final RecordOwnership ownership;
 
     private final BloodBankService service;
 
@@ -43,6 +48,7 @@ public class BloodBankController {
     public ResponseEntity<BloodBankDtos.DonorDto> getDonor(
             @PathVariable UUID id,
             @RequestParam UUID hospitalId) {
+        ownership.require(BloodDonor.class, id);
         return ResponseEntity.ok(service.getDonor(id, hospitalId));
     }
 
@@ -58,6 +64,7 @@ public class BloodBankController {
             @PathVariable UUID id,
             @RequestParam UUID hospitalId,
             @RequestBody BloodBankDtos.DonorRequest req) {
+        ownership.require(BloodDonor.class, id);
         return ResponseEntity.ok(service.updateDonor(id, hospitalId, req));
     }
 
@@ -76,6 +83,7 @@ public class BloodBankController {
     public ResponseEntity<BloodBankDtos.UnitDto> getUnit(
             @PathVariable UUID id,
             @RequestParam UUID hospitalId) {
+        ownership.require(BloodUnit.class, id);
         return ResponseEntity.ok(service.getUnit(id, hospitalId));
     }
 
@@ -96,6 +104,7 @@ public class BloodBankController {
             @PathVariable UUID id,
             @RequestParam UUID hospitalId,
             @RequestBody StatusRequest req) {
+        ownership.require(BloodUnit.class, id);
         return ResponseEntity.ok(service.updateUnitStatus(id, hospitalId, req.getStatusCode()));
     }
 
@@ -103,6 +112,7 @@ public class BloodBankController {
     public ResponseEntity<BloodBankDtos.UnitDto> recordReplacement(
             @PathVariable UUID id,
             @RequestParam UUID hospitalId) {
+        ownership.require(BloodUnit.class, id);
         return ResponseEntity.ok(service.recordReplacement(id, hospitalId));
     }
 
@@ -112,6 +122,7 @@ public class BloodBankController {
             @RequestParam UUID hospitalId,
             @RequestBody BloodBankDtos.IssueUnitRequest req,
             Authentication auth) {
+        ownership.require(BloodUnit.class, id);
         UUID issuedBy = auth != null && auth.getPrincipal() instanceof User u ? u.getId() : null;
         return ResponseEntity.ok(service.issueUnit(id, hospitalId, req, issuedBy));
     }

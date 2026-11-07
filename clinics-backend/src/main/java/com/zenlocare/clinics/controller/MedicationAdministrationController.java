@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.Admission;
 
 /**
  * Medication Administration Record (MAR) endpoints for IPD admissions.
@@ -47,6 +49,8 @@ import java.util.stream.Collectors;
 @PreAuthorize("hasAnyRole('doctor', 'staff', 'hospital_admin', 'super_admin')")
 public class MedicationAdministrationController {
 
+    private final RecordOwnership ownership;
+
     private static final Set<String> VALID_STATUSES = Set.of("GIVEN", "HELD", "REFUSED");
 
     private final MedicationAdministrationRepository medAdminRepo;
@@ -67,6 +71,7 @@ public class MedicationAdministrationController {
     public ResponseEntity<List<OrderCardDto>> list(
             @PathVariable UUID admissionId,
             @AuthenticationPrincipal User principal) {
+        ownership.require(Admission.class, admissionId);
 
         User caller = userRepo.findById(java.util.Objects.requireNonNull(principal.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));

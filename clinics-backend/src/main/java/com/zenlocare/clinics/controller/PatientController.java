@@ -14,11 +14,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
 
 @RestController
 @RequestMapping("/api/patients")
 @RequiredArgsConstructor
 public class PatientController {
+
+    private final RecordOwnership ownership;
 
     private final PatientService patientService;
     private final PatientAdvanceService patientAdvanceService;
@@ -37,6 +40,7 @@ public class PatientController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Patient> getPatient(@PathVariable Integer id, @RequestParam UUID hospitalId) {
+        ownership.require(Patient.class, id);
         return ResponseEntity.ok(patientService.getPatientById(id, hospitalId));
     }
 
@@ -60,12 +64,14 @@ public class PatientController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Patient> updatePatient(@PathVariable Integer id, @RequestBody CreatePatientRequest req) {
+        ownership.require(Patient.class, id);
         Patient p = patientService.updatePatient(id, req);
         return ResponseEntity.ok(p);
     }
 
     @GetMapping("/{id}/advances")
     public ResponseEntity<List<PatientAdvanceDTO>> getPatientAdvances(@PathVariable Integer id) {
+        ownership.require(Patient.class, id);
         return ResponseEntity.ok(
                 patientAdvanceService.listByPatient(id)
                         .stream().map(patientAdvanceService::toDTO)

@@ -9,11 +9,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
 
 @RestController
 @RequestMapping("/api/hospital-services")
 @RequiredArgsConstructor
 public class HospitalServiceController {
+
+    private final RecordOwnership ownership;
 
     private final HospitalServiceService service;
 
@@ -31,12 +34,14 @@ public class HospitalServiceController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('hospital_admin')")
     public ResponseEntity<HospitalService> updateService(@PathVariable UUID id, @RequestBody HospitalService req) {
+        ownership.require(HospitalService.class, id);
         return ResponseEntity.ok(service.updateService(id, req));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('hospital_admin')")
     public ResponseEntity<Void> deleteService(@PathVariable UUID id) {
+        ownership.require(HospitalService.class, id);
         service.deleteService(id);
         return ResponseEntity.noContent().build();
     }
@@ -44,6 +49,7 @@ public class HospitalServiceController {
     @PatchMapping("/{id}/toggle-status")
     @PreAuthorize("hasRole('hospital_admin')")
     public ResponseEntity<Void> toggleStatus(@PathVariable UUID id) {
+        ownership.require(HospitalService.class, id);
         service.toggleStatus(id);
         return ResponseEntity.noContent().build();
     }

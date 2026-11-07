@@ -11,11 +11,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.PriceList;
+import com.zenlocare.clinics.entity.PriceListItem;
 
 @RestController
 @RequestMapping("/api/pricing")
 @RequiredArgsConstructor
 public class PricingController {
+
+    private final RecordOwnership ownership;
 
     private final PricingService pricingService;
 
@@ -32,11 +37,13 @@ public class PricingController {
 
     @PutMapping("/lists/{id}")
     public ResponseEntity<PriceListDto> updatePriceList(@PathVariable UUID id, @RequestBody PriceListRequest request) {
+        ownership.require(PriceList.class, id);
         return ResponseEntity.ok(pricingService.updatePriceList(id, request));
     }
 
     @DeleteMapping("/lists/{id}")
     public ResponseEntity<Void> deletePriceList(@PathVariable UUID id) {
+        ownership.require(PriceList.class, id);
         pricingService.deletePriceList(id);
         return ResponseEntity.noContent().build();
     }
@@ -44,6 +51,7 @@ public class PricingController {
     // Price List Items
     @GetMapping("/lists/{priceListId}/items")
     public ResponseEntity<List<PriceListItemDto>> getPriceListItems(@PathVariable UUID priceListId) {
+        ownership.require(PriceList.class, priceListId);
         return ResponseEntity.ok(pricingService.getItemsByPriceList(priceListId));
     }
 
@@ -55,11 +63,13 @@ public class PricingController {
     @PutMapping("/items/{id}")
     public ResponseEntity<PriceListItemDto> updatePriceListItem(@PathVariable UUID id,
             @RequestBody PriceListItemRequest request) {
+        ownership.require(PriceListItem.class, id);
         return ResponseEntity.ok(pricingService.updatePriceListItem(id, request));
     }
 
     @DeleteMapping("/items/{id}")
     public ResponseEntity<Void> deletePriceListItem(@PathVariable UUID id) {
+        ownership.require(PriceListItem.class, id);
         pricingService.deletePriceListItem(id);
         return ResponseEntity.noContent().build();
     }

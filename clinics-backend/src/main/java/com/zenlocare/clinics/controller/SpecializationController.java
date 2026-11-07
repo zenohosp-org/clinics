@@ -11,11 +11,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import com.zenlocare.clinics.security.RecordOwnership;
 
 @RestController
 @RequestMapping("/api/specializations")
 @RequiredArgsConstructor
 public class SpecializationController {
+
+    private final RecordOwnership ownership;
 
     private final SpecializationService specializationService;
 
@@ -40,6 +43,7 @@ public class SpecializationController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('hospital_admin')")
     public ResponseEntity<SpecializationDto> updateSpecialization(@PathVariable UUID id, @RequestBody Specialization req) {
+        ownership.require(Specialization.class, id);
         Specialization specialization = specializationService.updateSpecialization(id, req);
         return ResponseEntity.ok(mapToDto(specialization));
     }
@@ -47,6 +51,7 @@ public class SpecializationController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('hospital_admin')")
     public ResponseEntity<Void> deleteSpecialization(@PathVariable UUID id) {
+        ownership.require(Specialization.class, id);
         specializationService.deleteSpecialization(id);
         return ResponseEntity.noContent().build();
     }

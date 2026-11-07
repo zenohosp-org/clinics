@@ -8,11 +8,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.Designation;
 
 @RestController
 @RequestMapping("/api/designations")
 @RequiredArgsConstructor
 public class DesignationController {
+
+    private final RecordOwnership ownership;
 
     private final DesignationService designationService;
 
@@ -35,6 +39,7 @@ public class DesignationController {
 
     @PatchMapping("/{id}/toggle")
     public ResponseEntity<DesignationDTO> toggle(@PathVariable UUID id) {
+        ownership.require(Designation.class, id);
         return ResponseEntity.ok(designationService.toggle(id));
     }
 }

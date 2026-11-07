@@ -20,6 +20,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.Admission;
 
 /**
  * IPD vitals endpoints — one reading per nursing observation round, scoped
@@ -39,6 +41,8 @@ import java.util.UUID;
 @PreAuthorize("hasAnyRole('doctor', 'staff', 'hospital_admin', 'super_admin')")
 public class IpdVitalsController {
 
+    private final RecordOwnership ownership;
+
     private final IpdVitalsRepository ipdVitalsRepo;
     private final AdmissionRepository admissionRepo;
     private final UserRepository userRepo;
@@ -51,6 +55,7 @@ public class IpdVitalsController {
     @GetMapping("/admission/{admissionId}")
     @Transactional(readOnly = true)
     public ResponseEntity<List<IpdVitalsDto>> list(@PathVariable UUID admissionId) {
+        ownership.require(Admission.class, admissionId);
         return ResponseEntity.ok(
             ipdVitalsRepo.findByAdmissionIdOrderByRecordedAtDesc(admissionId)
                          .stream()

@@ -3,10 +3,22 @@ package com.zenlocare.clinics.config;
 import com.fasterxml.jackson.datatype.hibernate6.Hibernate6Module;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.zenlocare.clinics.security.TenantScopeInterceptor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class WebConfig {
+@RequiredArgsConstructor
+public class WebConfig implements WebMvcConfigurer {
+
+    private final TenantScopeInterceptor tenantScope;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(tenantScope).addPathPatterns("/api/**");
+    }
 
     @Bean
     public RestTemplate restTemplate() {

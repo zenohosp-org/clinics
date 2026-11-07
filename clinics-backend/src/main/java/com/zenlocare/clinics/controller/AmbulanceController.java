@@ -16,11 +16,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.AmbulanceBooking;
+import com.zenlocare.clinics.entity.AmbulanceType;
+import com.zenlocare.clinics.entity.AmbulanceVehicle;
+import com.zenlocare.clinics.entity.Patient;
 
 @RestController
 @RequestMapping("/api/ambulance")
 @RequiredArgsConstructor
 public class AmbulanceController {
+
+    private final RecordOwnership ownership;
 
     private final AmbulanceBookingRepository bookingRepo;
     private final AmbulanceTypeRepository typeRepo;
@@ -50,6 +57,7 @@ public class AmbulanceController {
 
     @DeleteMapping("/types/{id}")
     public ResponseEntity<Void> deleteType(@PathVariable Long id) {
+        ownership.require(AmbulanceType.class, id);
         typeRepo.findById(id).ifPresent(t -> {
             t.setActive(false);
             typeRepo.save(t);
@@ -90,6 +98,7 @@ public class AmbulanceController {
     @PutMapping("/vehicles/{id}")
     public ResponseEntity<AmbulanceVehicle> updateVehicle(@PathVariable Long id,
                                                            @RequestBody VehicleRequest req) {
+        ownership.require(AmbulanceVehicle.class, id);
         return vehicleRepo.findById(id).map(v -> {
             AmbulanceType type = req.getAmbulanceTypeId() != null
                     ? typeRepo.findById(req.getAmbulanceTypeId()).orElse(null) : null;
@@ -105,6 +114,7 @@ public class AmbulanceController {
     @PatchMapping("/vehicles/{id}/status")
     public ResponseEntity<AmbulanceVehicle> updateVehicleStatus(@PathVariable Long id,
                                                                   @RequestBody Map<String, String> body) {
+        ownership.require(AmbulanceVehicle.class, id);
         return vehicleRepo.findById(id).map(v -> {
             v.setStatus(AmbulanceVehicleStatus.valueOf(body.get("status")));
             return ResponseEntity.ok(vehicleRepo.save(v));
@@ -113,6 +123,7 @@ public class AmbulanceController {
 
     @DeleteMapping("/vehicles/{id}")
     public ResponseEntity<Void> deleteVehicle(@PathVariable Long id) {
+        ownership.require(AmbulanceVehicle.class, id);
         vehicleRepo.deleteById(id);
         return ResponseEntity.ok().build();
     }
@@ -180,6 +191,7 @@ public class AmbulanceController {
     @PatchMapping("/bookings/{id}/status")
     public ResponseEntity<AmbulanceBooking> updateStatus(@PathVariable Long id,
                                                           @RequestBody Map<String, String> body) {
+        ownership.require(AmbulanceBooking.class, id);
         return bookingRepo.findById(id).map(b -> {
             // Body may contain only `paymentStatus` (e.g. ambulance billing's
             // "Mark as Paid" action) — don't NPE when `status` is absent.
@@ -234,6 +246,7 @@ public class AmbulanceController {
     @PutMapping("/bookings/{id}")
     public ResponseEntity<AmbulanceBooking> updateBooking(@PathVariable Long id,
                                                            @RequestBody BookingRequest req) {
+        ownership.require(AmbulanceBooking.class, id);
         return bookingRepo.findById(id).map(b -> {
             if (req.getPatientId() != null) b.setPatient(patientRepo.findById(req.getPatientId()).orElse(null));
             if (req.getAmbulanceTypeId() != null) b.setAmbulanceType(typeRepo.findById(req.getAmbulanceTypeId()).orElse(null));
@@ -299,6 +312,7 @@ public class AmbulanceController {
 
     @DeleteMapping("/bookings/{id}")
     public ResponseEntity<Void> deleteBooking(@PathVariable Long id) {
+        ownership.require(AmbulanceBooking.class, id);
         bookingRepo.deleteById(id);
         return ResponseEntity.ok().build();
     }
@@ -307,12 +321,14 @@ public class AmbulanceController {
     public ResponseEntity<List<AmbulanceBooking>> getByPatient(
             @PathVariable Integer patientId,
             @RequestParam UUID hospitalId) {
+        ownership.require(Patient.class, patientId);
         return ResponseEntity.ok(bookingRepo.findByPatient_IdAndHospital_Id(patientId, hospitalId));
     }
 
     @Transactional
     @PatchMapping("/{id}/merge-ipd")
     public ResponseEntity<Void> mergeToIpd(@PathVariable Long id) {
+        ownership.require(AmbulanceBooking.class, id);
         bookingRepo.findById(id).ifPresent(b -> {
             b.setMergedToIpd(true);
             bookingRepo.save(b);

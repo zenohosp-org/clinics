@@ -11,12 +11,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.Appointment;
 
 @RestController
 @RequestMapping("/api/invoices")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class InvoiceController {
+
+    private final RecordOwnership ownership;
 
     private final InvoiceService invoiceService;
 
@@ -32,6 +36,7 @@ public class InvoiceController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Invoice> getInvoice(@PathVariable UUID id) {
+        ownership.require(Invoice.class, id);
         try {
             return ResponseEntity.ok(invoiceService.getInvoice(id));
         } catch (RuntimeException e) {
@@ -67,6 +72,7 @@ public class InvoiceController {
 
     @GetMapping("/appointment/{appointmentId}")
     public ResponseEntity<InvoiceDTO> getInvoiceByAppointment(@PathVariable UUID appointmentId) {
+        ownership.require(Appointment.class, appointmentId);
         return invoiceService.getInvoiceByAppointment(appointmentId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

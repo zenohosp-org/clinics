@@ -17,6 +17,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.Appointment;
+import com.zenlocare.clinics.entity.Patient;
 
 /**
  * Vital-sign capture endpoints, scoped per appointment. The nurse records
@@ -36,6 +39,8 @@ import java.util.UUID;
 @PreAuthorize("hasAnyRole('doctor', 'staff', 'hospital_admin', 'super_admin')")
 public class VitalsController {
 
+    private final RecordOwnership ownership;
+
     private final AppointmentVitalsRepository vitalsRepo;
     private final AppointmentRepository appointmentRepo;
     private final UserRepository userRepo;
@@ -50,6 +55,7 @@ public class VitalsController {
     @GetMapping("/appointment/{appointmentId}")
     @Transactional(readOnly = true)
     public ResponseEntity<VitalsDto> getForAppointment(@PathVariable UUID appointmentId) {
+        ownership.require(Appointment.class, appointmentId);
         return vitalsRepo.findByAppointmentId(appointmentId)
                 .map(v -> ResponseEntity.ok(toDto(v)))
                 .orElseGet(() -> ResponseEntity.noContent().build());
@@ -77,6 +83,7 @@ public class VitalsController {
     public ResponseEntity<List<VitalsDto>> historyForPatient(
             @PathVariable Integer patientId,
             @RequestParam UUID hospitalId) {
+        ownership.require(Patient.class, patientId);
         List<VitalsDto> dtos = vitalsRepo
                 .findTop5ByPatientIdAndHospitalIdOrderByRecordedAtDesc(patientId, hospitalId)
                 .stream().map(this::toDto).toList();
@@ -96,6 +103,7 @@ public class VitalsController {
             @PathVariable UUID appointmentId,
             @RequestBody VitalsRequest req,
             @AuthenticationPrincipal User principal) {
+        ownership.require(Appointment.class, appointmentId);
 
         // Tenant + appointment existence guard — without this any
         // authenticated user could write vitals for any UUID.

@@ -25,11 +25,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import com.zenlocare.clinics.security.RecordOwnership;
+import com.zenlocare.clinics.entity.Appointment;
+import com.zenlocare.clinics.entity.Patient;
 
 @RestController
 @RequestMapping("/api/records")
 @RequiredArgsConstructor
 public class RecordController {
+
+    private final RecordOwnership ownership;
 
     private final RecordService recordService;
     private final PrescriptionItemRepository prescriptionItemRepository;
@@ -42,6 +47,7 @@ public class RecordController {
             @PathVariable Integer patientId,
             @RequestParam UUID hospitalId,
             @RequestParam(required = false) UUID admissionId) {
+        ownership.require(Patient.class, patientId);
 
         List<PatientRecord> records = (admissionId != null)
                 ? recordService.getRecordsByPatientAndAdmission(patientId, hospitalId, admissionId)
@@ -54,6 +60,7 @@ public class RecordController {
     public ResponseEntity<List<RecordDto>> getRecordsByUser(
             @RequestParam UUID userId,
             @RequestParam UUID hospitalId) {
+        ownership.require(User.class, userId);
 
         List<PatientRecord> records = recordService.getRecordsByUser(userId, hospitalId);
         List<RecordDto> dtos = records.stream().map(this::mapToDto).collect(Collectors.toList());
@@ -76,6 +83,7 @@ public class RecordController {
             @PathVariable Integer patientId,
             @RequestParam UUID hospitalId,
             @RequestParam(required = false) UUID admissionId) {
+        ownership.require(Patient.class, patientId);
 
         List<PatientRecord> records = (admissionId != null)
                 ? recordService.getRecordsByPatientAndAdmissionAndType(patientId, hospitalId, admissionId, HistoryType.PRESCRIPTION)
@@ -95,6 +103,7 @@ public class RecordController {
     public ResponseEntity<List<RecordDto>> getRecordsByAppointment(
             @PathVariable UUID appointmentId,
             @RequestParam UUID hospitalId) {
+        ownership.require(Appointment.class, appointmentId);
 
         List<RecordDto> dtos = recordService
                 .getRecordsByAppointment(appointmentId, hospitalId)
@@ -238,6 +247,7 @@ public class RecordController {
     public ResponseEntity<Void> closeOpdPrescription(
             @PathVariable UUID recordId,
             @RequestBody ClosePrescriptionRequest req) {
+        ownership.require(PatientRecord.class, recordId);
             
         PatientRecord record = patientRecordRepository.findById(recordId).orElse(null);
         if (record == null) {
