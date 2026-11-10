@@ -25,6 +25,7 @@ public class HospitalServiceService {
 
     @Transactional
     public HospitalService createService(HospitalService service) {
+        service.setId(null); // always a new row — a supplied id must not overwrite an existing one
         validateDepartment(service.getHospitalId(), service.getDepartmentId());
         return repository.save(service);
     }

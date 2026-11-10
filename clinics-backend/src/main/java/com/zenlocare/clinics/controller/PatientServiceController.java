@@ -28,6 +28,8 @@ public class PatientServiceController {
     @PostMapping("/save")
     @PreAuthorize("hasRole('hospital_admin')")
     public ResponseEntity<List<PatientService>> saveServices(@RequestParam UUID hospitalId, @RequestBody List<PatientService> services) {
+        // A row that keeps its id is saved over that id: it must be one of ours.
+        services.forEach(s -> ownership.require(PatientService.class, s.getId()));
         service.saveOrUpdateServices(hospitalId, services);
         return ResponseEntity.ok(service.getServicesByHospital(hospitalId));
     }

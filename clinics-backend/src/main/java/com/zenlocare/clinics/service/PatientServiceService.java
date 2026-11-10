@@ -27,6 +27,7 @@ public class PatientServiceService {
 
     @Transactional
     public PatientService createService(PatientService service) {
+        service.setId(null); // always a new row — a supplied id must not overwrite an existing one
         return repository.save(service);
     }
 

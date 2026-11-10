@@ -28,6 +28,7 @@ public class SpecializationService {
 
     @Transactional
     public Specialization createSpecialization(Specialization specialization) {
+        specialization.setId(null); // always a new row — a supplied id must not overwrite an existing one
         return specializationRepository.save(specialization);
     }
 
