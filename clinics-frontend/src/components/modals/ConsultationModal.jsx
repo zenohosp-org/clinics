@@ -12,6 +12,7 @@ import { PrescriptionDrugRow } from "@/components/prescription/PrescriptionDrugR
 import { useConsultationDraft } from "@/hooks/useConsultationDraft";
 import DictateButton from "@/components/consultation/DictateButton";
 import { routeDictation } from "@/utils/dictationRouter";
+import { DICTATION_ENABLED } from "@/utils/dictationApi";
 import VitalsModal from "@/components/modals/VitalsModal";
 import Modal from "@/components/ui/Modal";
 import {
@@ -394,17 +395,19 @@ export default function ConsultationModal({ appointment, onClose, onSaved }) {
                   </div>
                 )}
 
-                <div className="clinic-dictate-banner">
-                  <div>
-                    <p className="clinic-dictate-banner__title">Dictate the whole consultation</p>
-                    <p className="clinic-dictate-banner__hint">
-                      Say a heading to route what follows — "chief complaint…", "notes…",
-                      "prescribe…", "instructions…". Everything lands in its field, editable
-                      before you save.
-                    </p>
+                {DICTATION_ENABLED && (
+                  <div className="clinic-dictate-banner">
+                    <div>
+                      <p className="clinic-dictate-banner__title">Dictate the whole consultation</p>
+                      <p className="clinic-dictate-banner__hint">
+                        Say a heading to route what follows — "chief complaint…", "notes…",
+                        "prescribe…", "instructions…". Everything lands in its field, editable
+                        before you save.
+                      </p>
+                    </div>
+                    <DictateButton onTranscript={handleDictation} label="Dictate consultation" />
                   </div>
-                  <DictateButton onTranscript={handleDictation} label="Dictate consultation" />
-                </div>
+                )}
 
                 <Section
                   icon={<ClipboardList className="w-3.5 h-3.5" />}

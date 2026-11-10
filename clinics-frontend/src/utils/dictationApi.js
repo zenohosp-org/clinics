@@ -1,4 +1,10 @@
-import { Client, handle_file } from "@gradio/client";
+// Dictation is OFF unless the build sets VITE_ENABLE_DICTATION=true. It sends
+// consultation audio to a public demo Space outside our infra, so it must not
+// ship in a real-patient build. With the flag unset this is a build-time
+// `false`: the buttons render nothing, and everything below that touches the
+// Space (its id, the HF token, @gradio/client) is dead code Vite drops from
+// the bundle.
+export const DICTATION_ENABLED = import.meta.env.VITE_ENABLE_DICTATION === "true";
 
 // Points at the MedASR demo Space (huggingface.co/spaces/adi0697/clinics-medasr-demo).
 // Temporary: this calls a public demo Space directly from the browser rather
@@ -20,8 +26,12 @@ function getClient() {
   // VITE_* var — there is no way to keep it server-side in a static build.
   // Use a low-privilege, easily-revocable token here, and rotate/remove it
   // once this stopgap is replaced by the self-hosted service.
-  const token = import.meta.env.VITE_HF_TOKEN;
-  if (!clientPromise) clientPromise = Client.connect(SPACE_ID, token ? { token } : undefined);
+  if (!clientPromise) {
+    clientPromise = import("@gradio/client").then(({ Client }) => {
+      const token = import.meta.env.VITE_HF_TOKEN;
+      return Client.connect(SPACE_ID, token ? { token } : undefined);
+    });
+  }
   return clientPromise;
 }
 
@@ -31,7 +41,11 @@ function getClient() {
  * @returns {Promise<string>}
  */
 export async function transcribeAudio(audioBlob) {
+  if (!DICTATION_ENABLED) {
+    throw new Error("Dictation is not enabled");
+  }
   const client = await getClient();
+  const { handle_file } = await import("@gradio/client");
   // Gradio 6 names the API endpoint after the Python function (app.py's
   // `def transcribe(...)`), not a generic /predict — confirmed against the
   // Space's own error message listing its actual named endpoints.

@@ -1,5 +1,6 @@
 import { Mic, Square, Loader2, AlertCircle } from "lucide-react";
 import { useDictation } from "@/hooks/useDictation";
+import { DICTATION_ENABLED } from "@/utils/dictationApi";
 
 /**
  * Mic button that turns a recorded clip into text.
@@ -26,7 +27,13 @@ import { useDictation } from "@/hooks/useDictation";
  * one mic for everything on accuracy: no heading to say, no routing to get
  * wrong, just talk and the words land exactly where the cursor already is.
  */
-export default function DictateButton({ value, onChange, onTranscript, replace = false, label = "Dictate", iconOnly = false }) {
+export default function DictateButton(props) {
+  // Off unless VITE_ENABLE_DICTATION=true — see utils/dictationApi.js.
+  if (!DICTATION_ENABLED) return null;
+  return <DictateButtonInner {...props} />;
+}
+
+function DictateButtonInner({ value, onChange, onTranscript, replace = false, label = "Dictate", iconOnly = false }) {
   const handleResult = (text) => {
     if (!text) return;
     if (onTranscript) {

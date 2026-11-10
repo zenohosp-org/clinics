@@ -13,6 +13,7 @@ import InternalInvestigationsSection from "@/components/investigations/InternalI
 import { useConsultationDraft } from "@/hooks/useConsultationDraft";
 import DictateButton from "@/components/consultation/DictateButton";
 import { routeDictation } from "@/utils/dictationRouter";
+import { DICTATION_ENABLED } from "@/utils/dictationApi";
 import { fmtId } from "@/utils/idFormat";
 import { PrescriptionDrugRow } from "@/components/prescription/PrescriptionDrugRow";
 import PastRecordDetailModal from "@/components/modals/PastRecordDetailModal";
@@ -1007,17 +1008,19 @@ function ConsultTab({ draft, zemaResult, zemaAnalysisState, setZemaAnalysisState
         </div>
       )}
 
-      <div className="clinic-dictate-banner">
-        <div>
-          <p className="clinic-dictate-banner__title">Dictate the whole consultation</p>
-          <p className="clinic-dictate-banner__hint">
-            Say a heading to route what follows — "chief complaint…", "notes…",
-            "prescribe…", "instructions…". Everything lands in its field, editable
-            before you save.
-          </p>
+      {DICTATION_ENABLED && (
+        <div className="clinic-dictate-banner">
+          <div>
+            <p className="clinic-dictate-banner__title">Dictate the whole consultation</p>
+            <p className="clinic-dictate-banner__hint">
+              Say a heading to route what follows — "chief complaint…", "notes…",
+              "prescribe…", "instructions…". Everything lands in its field, editable
+              before you save.
+            </p>
+          </div>
+          <DictateButton onTranscript={handleDictation} label="Dictate consultation" />
         </div>
-        <DictateButton onTranscript={handleDictation} label="Dictate consultation" />
-      </div>
+      )}
 
       <Section
         icon={<ClipboardList className="w-4 h-4" />}
