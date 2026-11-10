@@ -4,6 +4,7 @@ import com.zenlocare.clinics.entity.User;
 import com.zenlocare.clinics.service.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.springframework.http.ResponseEntity;
 import com.zenlocare.clinics.security.ProfileVisibility;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -135,6 +136,7 @@ public class UserController {
     public static class CreateUserRequest {
         private String email;
         private String workEmail;
+        @ToString.Exclude
         private String password;
         private String firstName;
         private String lastName;
