@@ -39,10 +39,12 @@ is cosmetic — see [DEPLOYMENT.md](DEPLOYMENT.md).
 Both need one-time setup:
 
 ```bash
-# Backend — real credentials, gitignored, never commit
-cp clinics-backend/src/main/resources/application.properties \
-   clinics-backend/src/main/resources/application-local.properties
-# then fill in the DB url/user/pass and jwt.secret
+# Backend — real credentials, gitignored, never commit. Put ONLY the secrets
+# in it (DB_URL/DB_USER/DB_PASS or spring.datasource.*, jwt.secret,
+# DIRECTORY_CLIENT_SECRET); the dev switches (CORS for :5177, mock-token
+# entitlement, verbose logging) already live in the `local` section at the
+# bottom of application.properties.
+touch clinics-backend/src/main/resources/application-local.properties
 
 # Frontend
 cp clinics-frontend/.env.example clinics-frontend/.env.local

@@ -37,7 +37,6 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
-    private final GoogleOAuth2SuccessHandler googleOAuth2SuccessHandler;
     private final DirectorySsoSuccessHandler directorySsoSuccessHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
 
@@ -102,21 +101,17 @@ public class SecurityConfig {
     }
 
     /**
-     * Routes OAuth2 login success to the correct handler based on the registration ID.
-     * - "google"    → GoogleOAuth2SuccessHandler
-     * - "directory" → DirectorySsoSuccessHandler
+     * Directory is the only sign-in provider. The direct Google login (which
+     * created a staff user for any Google account) is gone; anything that is
+     * not a Directory login is bounced back to the SPA login screen.
      */
     private AuthenticationSuccessHandler delegatingOAuth2SuccessHandler() {
         return (HttpServletRequest request, HttpServletResponse response, Authentication authentication) -> {
-            if (authentication instanceof OAuth2AuthenticationToken token) {
-                String registrationId = token.getAuthorizedClientRegistrationId();
-                AuthenticationSuccessHandler handler = switch (registrationId) {
-                    case "directory" -> directorySsoSuccessHandler;
-                    default -> googleOAuth2SuccessHandler; // "google" and any future providers
-                };
-                handler.onAuthenticationSuccess(request, response, authentication);
+            if (authentication instanceof OAuth2AuthenticationToken token
+                    && "directory".equals(token.getAuthorizedClientRegistrationId())) {
+                directorySsoSuccessHandler.onAuthenticationSuccess(request, response, authentication);
             } else {
-                googleOAuth2SuccessHandler.onAuthenticationSuccess(request, response, authentication);
+                response.sendRedirect(frontendUrl + "/login?error=sso_failed");
             }
         };
     }
@@ -124,18 +119,16 @@ public class SecurityConfig {
     @org.springframework.beans.factory.annotation.Value("${frontend.url}")
     private String frontendUrl;
 
+    // Extra CORS origins, comma-separated. Empty in production (nginx proxies
+    // /api same-origin); the local profile adds the Vite dev ports.
+    @org.springframework.beans.factory.annotation.Value("${cors.extra-allowed-origins:}")
+    private List<String> extraAllowedOrigins;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Use allowedOriginPatterns to support wildcards and credentials together
-        config.setAllowedOriginPatterns(List.of(
-                "http://localhost:3000",
-                "http://localhost:5173",
-                "http://localhost:5174",
-                "http://localhost:5175",
-                "http://localhost:5177",
-                "https://*.onrender.com",
-                "https://*.vercel.app",
+        // Explicit production origins only — no wildcard hosts with credentials.
+        List<String> origins = new java.util.ArrayList<>(List.of(
                 "https://ot.zenohosp.com",
                 "https://pharmacy.zenohosp.com",
                 "https://api-pharmacy.zenohosp.com",
@@ -152,6 +145,8 @@ public class SecurityConfig {
                 "https://clinics.zenohosp.com",
                 "https://api-clinics.zenohosp.com",
                 frontendUrl));
+        extraAllowedOrigins.stream().map(String::trim).filter(o -> !o.isEmpty()).forEach(origins::add);
+        config.setAllowedOrigins(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

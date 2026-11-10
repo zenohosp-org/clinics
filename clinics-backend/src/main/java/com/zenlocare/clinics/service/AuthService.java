@@ -33,74 +33,60 @@ public class AuthService {
 
     /**
      * Authenticate a user with email + password.
-     * Returns a JWT + user context on success.
+     * Directory is the only password authority: credentials are checked there
+     * and nowhere else. There is deliberately no local bcrypt fallback — it
+     * minted tokens without a modules claim and kept old local passwords alive
+     * after Directory changed or revoked them.
      */
     public AuthResponse login(LoginRequest request) {
         String requestEmail = request.getEmail() != null ? request.getEmail().toLowerCase().trim() : null;
-        // 1. Try to authenticate with Directory Backend first
+        java.util.Map<String, Object> body;
         try {
             log.info("Proxying login for {} to Directory Backend...", requestEmail);
             String directoryLoginUrl = directoryApiUrl + "/api/auth/login";
-            
             var responseEntity = restTemplate.postForEntity(directoryLoginUrl, request, java.util.Map.class);
-            
-            if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() != null) {
-                java.util.Map<String, Object> body = (java.util.Map<String, Object>) responseEntity.getBody();
-                if (Boolean.TRUE.equals(body.get("success"))) {
-                    java.util.Map<String, Object> data = (java.util.Map<String, Object>) body.get("data");
-                    String email = (String) data.get("email");
-                    
-                    log.info("Directory authentication successful for {}", email);
-                    
-                    // 2. Look up or sync user locally
-                    User user = userRepository.findByEmail(email).orElse(null);
-                    if (user == null) {
-                        log.warn("Directory login success but user {} does not exist in HMS DB. Cannot proceed.", email);
-                        throw new UnauthorizedException("Your account exists in Directory but is not linked to HMS. Please contact your Hospital Admin.");
-                    }
-                    
-                    if (!Boolean.TRUE.equals(user.getIsActive())) {
-                        throw new UnauthorizedException("Your account is inactive in HMS. Contact your administrator.");
-                    }
-
-                    // 3. Return the Directory token directly
-                    String token = (String) data.get("token");
-                    String roleName = user.getRole().getName();
-                    String roleDisplay = user.getRole().getDisplayName();
-                    UUID hospitalId = user.getHospital() != null ? user.getHospital().getId() : null;
-                    String hospitalName = user.getHospital() != null ? user.getHospital().getName() : null;
-
-                    return buildResponse(token, user, roleName, roleDisplay, hospitalId, hospitalName, "Login successful via Directory");
-                }
-            }
+            body = (java.util.Map<String, Object>) responseEntity.getBody();
+        } catch (org.springframework.web.client.HttpClientErrorException ex) {
+            // 4xx from Directory: wrong password, unknown or locked account.
+            log.warn("Directory rejected login for {}: {}", requestEmail, ex.getStatusCode());
+            throw new UnauthorizedException("Invalid email or password");
         } catch (Exception ex) {
-            log.warn("Directory login failed/skipped for {}: {}", request.getEmail(), ex.getMessage());
-            // Fallback to local login if needed, or re-throw
+            log.error("Directory login unavailable for {}: {}", requestEmail, ex.getMessage());
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE,
+                    "Sign-in service is temporarily unavailable. Please try again shortly.");
         }
 
-        // 4. Local Authentication Fallback
-        User user = userRepository.findByEmail(requestEmail)
-                .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
-
-        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+        if (body == null || !Boolean.TRUE.equals(body.get("success"))
+                || !(body.get("data") instanceof java.util.Map<?, ?> rawData)) {
+            throw new UnauthorizedException("Invalid email or password");
+        }
+        java.util.Map<String, Object> data = (java.util.Map<String, Object>) rawData;
+        String email = (String) data.get("email");
+        String token = (String) data.get("token");
+        if (email == null || token == null) {
             throw new UnauthorizedException("Invalid email or password");
         }
 
-        if (!Boolean.TRUE.equals(user.getIsActive())) {
-            throw new UnauthorizedException("Your account is inactive. Contact your administrator.");
+        log.info("Directory authentication successful for {}", email);
+
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            log.warn("Directory login success but user {} does not exist in HMS DB. Cannot proceed.", email);
+            throw new UnauthorizedException("Your account exists in Directory but is not linked to HMS. Please contact your Hospital Admin.");
         }
 
+        if (!Boolean.TRUE.equals(user.getIsActive())) {
+            throw new UnauthorizedException("Your account is inactive in HMS. Contact your administrator.");
+        }
+
+        // Return the Directory token directly
         String roleName = user.getRole().getName();
         String roleDisplay = user.getRole().getDisplayName();
         UUID hospitalId = user.getHospital() != null ? user.getHospital().getId() : null;
         String hospitalName = user.getHospital() != null ? user.getHospital().getName() : null;
 
-        String token = jwtUtil.generateToken(user.getEmail(), roleName,
-                hospitalId != null ? hospitalId.toString() : null);
-
-        log.info("User logged in: {} ({})", user.getEmail(), roleName);
-
-        return buildResponse(token, user, roleName, roleDisplay, hospitalId, hospitalName, "Login successful");
+        return buildResponse(token, user, roleName, roleDisplay, hospitalId, hospitalName, "Login successful via Directory");
     }
 
     /**

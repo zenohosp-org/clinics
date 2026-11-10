@@ -46,6 +46,9 @@ public class AuthController {
         if (authResponse.getToken() != null) {
             setJwtCookieHeader(response, authResponse.getToken());
         }
+        // The token lives only in the HttpOnly cookie; the SPA never reads it
+        // from the body, so keep it out of anything script can see.
+        authResponse.setToken(null);
         return ResponseEntity.ok(authResponse);
     }
 
@@ -103,15 +106,17 @@ public class AuthController {
      * Browsers need the leading dot to send the cookie to all subdomains (*.zenohosp.com).
      * Java's Cookie API cannot set this, so we write the header manually — same as Directory backend.
      *
-     * Production (secure=true):  Domain=.zenohosp.com; Secure; SameSite=None
+     * Production (secure=true):  Domain=.zenohosp.com; Secure; SameSite=Lax
      * Development (secure=false): no Domain; no Secure; SameSite=Lax
+     * Lax is enough for SSO: every app origin is *.zenohosp.com (same-site),
+     * and it stops other sites from riding the cookie on cross-site POSTs.
      */
     private void setJwtCookieHeader(HttpServletResponse response, String token) {
         String header;
         if (cookieSecure) {
             String domain = cookieDomain.startsWith(".") ? cookieDomain.substring(1) : cookieDomain;
             header = String.format(
-                "%s=%s; Domain=.%s; Path=/; Max-Age=%d; HttpOnly; Secure; SameSite=None",
+                "%s=%s; Domain=.%s; Path=/; Max-Age=%d; HttpOnly; Secure; SameSite=Lax",
                 cookieName, token, domain, cookieMaxAge);
         } else {
             header = String.format(
@@ -130,7 +135,7 @@ public class AuthController {
         if (cookieSecure) {
             String domain = cookieDomain.startsWith(".") ? cookieDomain.substring(1) : cookieDomain;
             header = String.format(
-                "%s=; Domain=.%s; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=None",
+                "%s=; Domain=.%s; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax",
                 cookieName, domain);
         } else {
             header = String.format(

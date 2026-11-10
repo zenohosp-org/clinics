@@ -38,6 +38,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Value("${sso.cookie.name:sso_token}")
     private String cookieName;
 
+    // Tokens without a modules claim were not issued by Directory. Denied in
+    // production; local dev with mock tokens sets this false.
+    @Value("${clinics.security.require-modules-claim:true}")
+    private boolean requireModulesClaim;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response,
@@ -121,18 +126,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     /**
      * True when the token carries the {@code clinics} module entitlement.
      *
-     * <p>Dev mock-auth tokens are minted locally and carry no modules claim; the
-     * gate is therefore skipped when the modules claim is entirely absent, which
-     * only happens for tokens Directory did not issue. Directory always stamps
-     * the claim (possibly empty) on real tokens, and an empty list correctly
-     * denies.
+     * <p>Directory always stamps the modules claim (possibly empty) on the
+     * tokens it issues, and an empty list correctly denies. A token with no
+     * modules claim at all was not issued by Directory and is denied, unless
+     * local dev turns {@code clinics.security.require-modules-claim} off for
+     * its mock tokens.
      */
     private boolean hasClinicsModule(String token) {
-        List<String> modules = jwtUtil.extractModules(token);
-        if (modules.isEmpty() && !jwtUtil.hasModulesClaim(token)) {
-            return true; // locally-minted dev token — not a Directory entitlement decision
+        if (!jwtUtil.hasModulesClaim(token)) {
+            return !requireModulesClaim;
         }
-        return modules.contains(CLINICS_MODULE);
+        return jwtUtil.extractModules(token).contains(CLINICS_MODULE);
     }
 
     /**
