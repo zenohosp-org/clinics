@@ -316,14 +316,9 @@ public interface InvitationRepository extends JpaRepository<Invitation, UUID> {
 `DataSeeder` runs on every startup and is **idempotent** (skips already-existing data):
 
 1. Seeds 4 system roles → `roles` table
-2. Creates `ZENO` hospital + `SUPER_ADMIN` user (if not present)
-
-**Default credentials:**
-| Field | Value |
-|-------|-------|
-| Email | `zenosuperadmin@gmail.com` |
-| Password | `admin123` |
-| Role | `SUPER_ADMIN` |
+2. Creates a demo hospital admin only when `app.seed.demo-users=true`, with the
+   password taken from `DEMO_USER_PASSWORD` (no default credentials are shipped).
+   Sign-in itself always goes through Directory.
 
 ---
 

@@ -385,7 +385,7 @@ Content-Type: application/json
 
 {
   "email": "admin@example.com",
-  "password": "admin123"
+  "password": "<your-password>"
 }
 ```
 

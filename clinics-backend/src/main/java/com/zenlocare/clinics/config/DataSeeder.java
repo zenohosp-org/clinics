@@ -50,6 +50,14 @@ public class DataSeeder implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
+    // Demo login seeding is opt-in, and the password comes from the environment
+    // (DEMO_USER_PASSWORD) — this repo is public, so never a literal here.
+    @org.springframework.beans.factory.annotation.Value("${app.seed.demo-users:false}")
+    private boolean seedDemoUsers;
+
+    @org.springframework.beans.factory.annotation.Value("${app.seed.demo-user-password:}")
+    private String demoUserPassword;
+
     @Override
     public void run(String... args) {
         try {
@@ -255,7 +263,9 @@ public class DataSeeder implements CommandLineRunner {
         ensureAttachmentSchema();
         seedRoomTypeConfigs();
         seedRoles();
-        seedHospitalAdmin();
+        if (seedDemoUsers) {
+            seedHospitalAdmin();
+        }
         ensureZemaRulesSchema();
         seedZemaRules();
         ensureBloodBankSchema();
@@ -1017,6 +1027,10 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedHospitalAdmin() {
+        if (demoUserPassword == null || demoUserPassword.isBlank()) {
+            log.warn("app.seed.demo-users=true but app.seed.demo-user-password is empty — skipping demo admin.");
+            return;
+        }
         Hospital hospital = hospitalRepository.findByCode("srm")
                 .orElseGet(() -> hospitalRepository.save(
                         Hospital.builder()
@@ -1040,13 +1054,13 @@ public class DataSeeder implements CommandLineRunner {
                         .hospital(hospital)
                         .role(adminRole)
                         .email("admin@gmail.com")
-                        .passwordHash(passwordEncoder.encode("admin123"))
+                        .passwordHash(passwordEncoder.encode(demoUserPassword))
                         .firstName("Zeno")
                         .lastName("Admin")
                         .isActive(true)
                         .build());
 
-        log.info("✅ Hospital admin seeded → admin@gmail.com / admin123  [Hospital: SRM Hospital]");
+        log.info("✅ Hospital admin seeded → admin@gmail.com  [Hospital: SRM Hospital]");
     }
 
     private void backfillHospitalNumericCodes() {
