@@ -60,7 +60,9 @@ const financeApi = axios.create({
   withCredentials: true
 });
 
-if (DEV_MOCK_AUTH && import.meta.env.VITE_MOCK_JWT) {
+// import.meta.env.DEV is a literal false in production builds, so Vite drops
+// this whole block — the mock JWT can never be baked into a deployed bundle.
+if (import.meta.env.DEV && DEV_MOCK_AUTH && import.meta.env.VITE_MOCK_JWT) {
   api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${import.meta.env.VITE_MOCK_JWT}`;
     return config;

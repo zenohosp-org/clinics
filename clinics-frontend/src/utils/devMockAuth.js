@@ -12,5 +12,6 @@ const onLocalDevHost =
         window.location.hostname === '127.0.0.1' ||
         window.location.hostname === '[::1]');
 
+// import.meta.env.DEV also makes it a build-time false in production bundles.
 export const DEV_MOCK_AUTH =
-    import.meta.env.VITE_DEV_MOCK_AUTH === 'true' && onLocalDevHost;
+    import.meta.env.DEV && import.meta.env.VITE_DEV_MOCK_AUTH === 'true' && onLocalDevHost;

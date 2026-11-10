@@ -2,6 +2,21 @@ import { FlaskConical, FileBarChart } from "lucide-react";
 import { CenterLoader } from "@/components/ui/Loader";
 import { LABS_FRONTEND_URL } from "@/utils/api";
 
+// reportUrl comes from the labs DB, so only follow it when it is an https
+// link on a zenohosp.com host; anything else falls back to the report id.
+function safeReportUrl(url) {
+    if (!url) return null;
+    try {
+        const u = new URL(url);
+        const host = u.hostname.toLowerCase();
+        return u.protocol === "https:" && (host === "zenohosp.com" || host.endsWith(".zenohosp.com"))
+            ? u.href
+            : null;
+    } catch {
+        return null;
+    }
+}
+
 /**
  * Shared read-only renderer for HMS-internal lab / radiology investigations.
  *
@@ -70,9 +85,9 @@ export default function InternalInvestigationsSection({ rows, loading, title, ki
                                 {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "—"}
                             </div>
                             <div className="hms-cv-rad-head__col-1 hms-cv-rad-row__report-cell">
-                                {order.reportUrl || order.reportId ? (
+                                {safeReportUrl(order.reportUrl) || order.reportId ? (
                                     <a
-                                        href={order.reportUrl || `${LABS_FRONTEND_URL}/${reportPath}/reports/${order.reportId}`}
+                                        href={safeReportUrl(order.reportUrl) || `${LABS_FRONTEND_URL}/${reportPath}/reports/${order.reportId}`}
                                         className="hms-cv-rad-row__report-link"
                                         target="_blank"
                                         rel="noreferrer"

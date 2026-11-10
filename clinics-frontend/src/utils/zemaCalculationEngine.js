@@ -17,6 +17,40 @@ const VALID_RANGES = {
   bloodGlucose: { min: 20, max: 1000 },
 };
 
+// Combination-rule condition_expr text comes from the database and is compiled
+// with new Function, so it is held to a strict whitelist first: only the
+// metric names the engine passes in (plus null/true/false), numbers,
+// whitespace, parentheses and comparison / logical / arithmetic operators.
+// No strings, dots, brackets, assignment or other identifiers can get through.
+const RULE_PARAMS = '{ sbp, dbp, map, bmi, spo2, pulse, shockIndex, pulsePressure, age, temperature }';
+const RULE_IDENTIFIERS = new Set([
+  'sbp', 'dbp', 'map', 'bmi', 'spo2', 'pulse', 'shockIndex', 'pulsePressure', 'age', 'temperature',
+  'null', 'true', 'false',
+]);
+const RULE_TOKEN = /\s+|\d+(?:\.\d+)?|[A-Za-z_][A-Za-z0-9_]*|===|!==|==|!=|<=|>=|&&|\|\||[<>+\-*/!()]/y;
+
+function isSafeRuleExpr(expr) {
+  if (typeof expr !== 'string') return false;
+  let i = 0;
+  while (i < expr.length) {
+    RULE_TOKEN.lastIndex = i;
+    const m = RULE_TOKEN.exec(expr);
+    if (!m) return false;
+    if (/^[A-Za-z_]/.test(m[0]) && !RULE_IDENTIFIERS.has(m[0])) return false;
+    i = RULE_TOKEN.lastIndex;
+  }
+  return true;
+}
+
+/** Compiles a rule condition, or returns null (with a warning) if it fails the whitelist. */
+function compileRuleCondition(condition) {
+  if (!isSafeRuleExpr(condition)) {
+    console.warn("Skipping rule with disallowed condition_expr:", condition);
+    return null;
+  }
+  return new Function(RULE_PARAMS, `return ${condition};`);
+}
+
 // Severity mappings for sorting
 const SEVERITY_WEIGHTS = {
   critical: 4,
@@ -481,7 +515,8 @@ export function calculateZemaVitals(inputs = {}, rules = []) {
       if (!condition) return;
 
       try {
-        const fn = new Function('{ sbp, dbp, map, bmi, spo2, pulse, shockIndex, pulsePressure, age, temperature }', `return ${condition};`);
+        const fn = compileRuleCondition(condition);
+        if (!fn) return;
         const matched = fn(values);
         if (matched) {
           bpOptions.push({
@@ -534,7 +569,8 @@ export function calculateZemaVitals(inputs = {}, rules = []) {
       if (!condition) return;
 
       try {
-        const fn = new Function('{ sbp, dbp, map, bmi, spo2, pulse, shockIndex, pulsePressure, age, temperature }', `return ${condition};`);
+        const fn = compileRuleCondition(condition);
+        if (!fn) return;
         const matched = fn(values);
         if (matched) {
           firedCombinationRules.push({
@@ -562,8 +598,8 @@ export function calculateZemaVitals(inputs = {}, rules = []) {
       if (c8Rule) {
         const condition = c8Rule.conditionExpr;
         try {
-          const fn = new Function('{ sbp, dbp, map, bmi, spo2, pulse, shockIndex, pulsePressure, age, temperature }', `return ${condition};`);
-          const matched = fn(values);
+          const fn = compileRuleCondition(condition);
+          const matched = fn ? fn(values) : false;
           if (matched) {
             firedCombinationRules.push({
               metric: "Combination",
