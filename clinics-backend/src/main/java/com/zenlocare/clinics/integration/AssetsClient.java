@@ -112,7 +112,7 @@ public class AssetsClient {
         } catch (Exception e) {
             log.error("Assets proxy {} {} unreachable: {}", method, path, e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                    "Asset-manager service unreachable: " + e.getMessage(), e);
+                    "Asset-manager service unreachable", e);
         }
     }
 

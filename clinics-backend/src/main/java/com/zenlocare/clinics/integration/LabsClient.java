@@ -69,7 +69,7 @@ public class LabsClient {
         } catch (Exception e) {
             log.error("Labs createHealthCheckupBooking unreachable: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                    "Labs service unreachable: " + e.getMessage(), e);
+                    "Labs service unreachable", e);
         }
     }
 
@@ -107,7 +107,7 @@ public class LabsClient {
         } catch (Exception e) {
             log.error("Labs getPendingRadiologyOrders(status={}) unreachable: {}", status, e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                    "Labs service unreachable: " + e.getMessage(), e);
+                    "Labs service unreachable", e);
         }
     }
 
@@ -134,7 +134,7 @@ public class LabsClient {
         } catch (Exception e) {
             log.error("Labs proxy {} {} unreachable: {}", method, path, e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                    "Labs service unreachable: " + e.getMessage(), e);
+                    "Labs service unreachable", e);
         }
     }
 

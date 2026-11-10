@@ -1,5 +1,6 @@
 package com.zenlocare.clinics.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -7,10 +8,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Global exception handler — returns consistent JSON error responses.
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -61,7 +64,28 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred: " + ex.getMessage());
+        // Plain RuntimeException / IllegalArgument / IllegalState thrown by our
+        // own code carry user-facing business messages the UI shows. Anything
+        // else (SQL, Jackson, NPE, HTTP client...) can leak internals, so log it
+        // under a short id and return only that id.
+        if (isOwnBusinessError(ex)) {
+            return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred: " + ex.getMessage());
+        }
+        String errorId = UUID.randomUUID().toString().substring(0, 8);
+        log.error("Unhandled exception [errorId={}]", errorId, ex);
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                "An unexpected error occurred. Reference: " + errorId);
+    }
+
+    private static boolean isOwnBusinessError(Exception ex) {
+        Class<?> type = ex.getClass();
+        if (type != RuntimeException.class && type != IllegalArgumentException.class
+                && type != IllegalStateException.class) {
+            return false;
+        }
+        StackTraceElement[] trace = ex.getStackTrace();
+        return ex.getMessage() != null && trace.length > 0
+                && trace[0].getClassName().startsWith("com.zenlocare.");
     }
 
     private ResponseEntity<Map<String, Object>> buildResponse(HttpStatus status, String message) {
