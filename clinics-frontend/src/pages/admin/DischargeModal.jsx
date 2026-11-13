@@ -106,7 +106,10 @@ export default function DischargeModal({ admission, onClose, onDischarged }) {
             onDischarged();
         } catch (err) {
             const msg = err?.response?.data?.message || err?.message || "";
-            if (msg.includes("INVOICE_UNPAID")) {
+            if (msg.includes("INVOICE_UNPAID") && msg.includes("issued separately")) {
+                // The inpatient bill is settled; a bill a service line issued on its own is not.
+                notify(msg.replace("INVOICE_UNPAID: ", ""), "error");
+            } else if (msg.includes("INVOICE_UNPAID")) {
                 setBillError(true);
                 setBillStatus((prev) =>
                     prev === "PAID" || prev === "SETTLED" ? prev : "UNSETTLED"

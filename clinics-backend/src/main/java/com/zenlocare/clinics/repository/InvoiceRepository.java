@@ -62,6 +62,9 @@ public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
     List<Invoice> findByPatientIdOrderByCreatedAtDesc(Integer patientId);
     Invoice findByInvoiceNumber(String invoiceNumber);
     List<Invoice> findAllByAdmission_IdOrderByCreatedAtDesc(UUID admissionId);
+
+    /** Bills a service line issued on its own for this stay (invoices.for_admission_id). */
+    List<Invoice> findByForAdmissionIdOrderByCreatedAtAsc(UUID forAdmissionId);
     Optional<Invoice> findByAppointment_Id(UUID appointmentId);
     boolean existsByAppointment_Id(UUID appointmentId);
 

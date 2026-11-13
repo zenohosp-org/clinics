@@ -33,12 +33,25 @@ public class GstBillingGuard {
         }
     }
 
-    /** The clear message when anything in the cause chain is the invoices trigger's GST refusal, else null. */
+    /**
+     * The message to show when anything in the cause chain is a GST refusal from the invoices triggers
+     * (no GSTIN in force, or a charge put on another unit's bill — HMS V11/V12), else null.
+     */
     public static String gstNotConfigured(Throwable ex) {
         for (Throwable t = ex; t != null; t = t.getCause() == t ? null : t.getCause()) {
-            String m = t.getMessage();
-            if (m != null && m.contains("GST_NOT_CONFIGURED")) return NOT_CONFIGURED;
+            String blocked = databaseMessage(t.getMessage(), "GST_NOT_CONFIGURED: ");
+            if (blocked != null) return "Billing is blocked: " + blocked;
+            String mismatch = databaseMessage(t.getMessage(), "GST_UNIT_MISMATCH: ");
+            if (mismatch != null) return mismatch;
         }
         return null;
+    }
+
+    private static String databaseMessage(String message, String marker) {
+        int i = message == null ? -1 : message.indexOf(marker);
+        if (i < 0) return null;
+        String text = message.substring(i + marker.length());
+        int end = text.indexOf('\n');
+        return end >= 0 ? text.substring(0, end) : text;
     }
 }

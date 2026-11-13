@@ -35,6 +35,7 @@ public class BillingController {
 
     private final SmartBillingService smartBillingService;
     private final InvoiceService invoiceService;
+    private final com.zenlocare.clinics.service.BillingUnits billingUnits;
     private final PatientAdvanceService patientAdvanceService;
 
     @GetMapping("/smart-suggestions")
@@ -70,6 +71,20 @@ public class BillingController {
                 .orElse(ResponseEntity.noContent().build());
     }
 
+    /** Bills issued separately for this stay by a service line with its own GSTIN. */
+    @GetMapping("/admissions/{admissionId}/separate-bills")
+    public ResponseEntity<List<InvoiceDTO>> getSeparateBills(@PathVariable UUID admissionId) {
+        ownership.require(Admission.class, admissionId);
+        return ResponseEntity.ok(invoiceService.getSeparateBillsForAdmission(admissionId));
+    }
+
+    /** Service lines (LAB, RADIOLOGY…) that issue their own bills in the caller's hospital. */
+    @GetMapping("/separate-service-lines")
+    public ResponseEntity<List<String>> getSeparateServiceLines(@AuthenticationPrincipal User user) {
+        if (user == null || user.getHospital() == null) return ResponseEntity.ok(List.of());
+        return ResponseEntity.ok(billingUnits.separateServiceLines(user.getHospital().getId()));
+    }
+
     @PutMapping("/invoices/{id}/finalize")
     public ResponseEntity<InvoiceDTO> finalizeIPDInvoice(
             @PathVariable UUID id, 
@@ -79,6 +94,8 @@ public class BillingController {
         try {
             return ResponseEntity.ok(invoiceService.finalizeIPDInvoice(id, req, user));
         } catch (RuntimeException e) {
+            // A GST refusal from the database carries the reason the user must see (422 via the handler).
+            if (com.zenlocare.clinics.service.GstBillingGuard.gstNotConfigured(e) != null) throw e;
             log.error("finalizeIPDInvoice failed for invoiceId={}", id, e);
             return ResponseEntity.badRequest().build();
         }
@@ -178,6 +195,7 @@ public class BillingController {
                     req.getAmount(), req.getPaymentMethod(),
                     req.getBankAccountId(), req.getCollectedBy(), user));
         } catch (RuntimeException e) {
+            if (com.zenlocare.clinics.service.GstBillingGuard.gstNotConfigured(e) != null) throw e;
             log.error("collectAndSave failed for invoiceId={}", id, e);
             return ResponseEntity.badRequest().body(
                     InvoiceDTO.builder().notes(e.getMessage()).build());

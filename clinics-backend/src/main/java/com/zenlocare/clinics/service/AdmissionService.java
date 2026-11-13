@@ -298,6 +298,22 @@ public class AdmissionService {
                 throw new RuntimeException("INVOICE_UNPAID: Patient bill must be fully settled before discharge. Please settle the outstanding balance in the Billing tab.");
             }
         });
+        // Bills a service line issued on its own for this stay (its own GSTIN) are not on the
+        // inpatient bill, so they are checked separately.
+        List<String> openSeparate = invoiceRepository.findByForAdmissionIdOrderByCreatedAtAsc(admissionId).stream()
+                .filter(inv -> InvoiceStatus.UNPAID.equals(inv.getStatus())
+                        || InvoiceStatus.PARTIAL.equals(inv.getStatus())
+                        || InvoiceStatus.UNSETTLED.equals(inv.getStatus()))
+                .filter(inv -> inv.getTotal() != null && inv.getTotal().signum() > 0)
+                .map(inv -> inv.getGstInvoiceNumber() != null ? inv.getGstInvoiceNumber() : inv.getInvoiceNumber())
+                .toList();
+        if (!openSeparate.isEmpty()) {
+            throw new RuntimeException("INVOICE_UNPAID: " + (openSeparate.size() == 1
+                    ? "Bill " + openSeparate.get(0) + ", issued separately for this stay, is unpaid."
+                    : openSeparate.size() + " bills issued separately for this stay are unpaid ("
+                            + String.join(", ", openSeparate) + ").")
+                    + " Collect payment in OPD Billing before discharge.");
+        }
 
         LocalDateTime dischargeTime = req.getActualDischargeDate() != null
                 ? req.getActualDischargeDate() : LocalDateTime.now();

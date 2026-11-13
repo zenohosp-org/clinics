@@ -51,6 +51,7 @@ public class InvoiceService {
     private final BankLedgerService bankLedgerService;
     private final PatientServiceRepository patientServiceRepository;
     private final AmbulanceBookingRepository ambulanceBookingRepository;
+    private final BillingUnits billingUnits;
 
     @Transactional
     public Invoice createInvoice(InvoiceRequest request) {
@@ -733,6 +734,17 @@ public class InvoiceService {
                 .stream().findFirst().map(this::toDTO);
     }
 
+    /**
+     * Bills issued separately for a stay: charges of a service line that has its own GSTIN (a laboratory
+     * that is its own legal entity, say). They are not part of the inpatient bill — a GST invoice has one
+     * supplier — and are collected on their own.
+     */
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<InvoiceDTO> getSeparateBillsForAdmission(UUID admissionId) {
+        return invoiceRepository.findByForAdmissionIdOrderByCreatedAtAsc(admissionId)
+                .stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public Optional<InvoiceDTO> getInvoiceByAppointment(UUID appointmentId) {
         return invoiceRepository.findByAppointment_Id(appointmentId).map(this::toDTO);
@@ -1011,6 +1023,13 @@ public class InvoiceService {
         InvoiceDTO.InvoiceDTOBuilder b = InvoiceDTO.builder();
         b.id(inv.getId().toString());
         b.invoiceNumber(inv.getInvoiceNumber());
+        b.serviceLine(inv.getServiceLine());
+        b.forAdmissionId(inv.getForAdmissionId());
+        BillingUnits.UnitLabel issuer = billingUnits.label(inv.getBillingUnitId());
+        if (issuer != null) {
+            b.issuedBy(issuer.name());
+            b.separateBill(issuer.separate());
+        }
         
         if (inv.getPatient() != null) {
             b.patientId(inv.getPatient().getId());

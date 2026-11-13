@@ -593,6 +593,16 @@ const invoiceApi = {
     const { data } = await api.get(`/billing/admissions/${admissionId}/invoice`);
     return data;
   },
+  // Bills a service line issued on its own for this stay (it has its own GSTIN in Directory).
+  getSeparateBills: async (admissionId) => {
+    const { data } = await api.get(`/billing/admissions/${admissionId}/separate-bills`);
+    return Array.isArray(data) ? data : [];
+  },
+  // Service lines (LAB, RADIOLOGY, HEALTH_CHECKUP, BLOOD_BANK) that issue their own bills in this hospital.
+  getSeparateServiceLines: async () => {
+    const { data } = await api.get('/billing/separate-service-lines');
+    return Array.isArray(data) ? data : [];
+  },
   finalizeIPD: async (invoiceId, payload) => {
     const { data } = await api.put(`/billing/invoices/${invoiceId}/finalize`, payload);
     return data;

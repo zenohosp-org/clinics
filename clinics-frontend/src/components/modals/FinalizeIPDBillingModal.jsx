@@ -135,6 +135,8 @@ export default function FinalizeIPDBillingModal({ admission, onClose, onFinalize
   // it silently returns nothing, so we surface this to stop the biller finalizing
   // a bill that's silently missing those charges.
   const [chargeLoadWarnings, setChargeLoadWarnings] = useState([])
+  // Bills a service line with its own GSTIN issued for this stay. They are not part of this bill.
+  const [separateBills, setSeparateBills] = useState([])
   const [items, setItems] = useState([])
   const [nextKey, setNextKey] = useState(0)
   const [discountPct, setDiscountPct] = useState(0)
@@ -182,7 +184,10 @@ export default function FinalizeIPDBillingModal({ admission, onClose, onFinalize
       patientAdvanceApi.listForAdmission(admission.id).catch(() => []),
       invoiceApi.getPatientInvoices(admission.patientId).catch(() => []),
       pharmacyApi.get('/api/pharmacy/bills', { params: { admissionId: admission.id, unbilled: true } }).catch(() => ({ data: [], __loadFailed: true })),
-    ]).then(([suggestions, services, accounts, radiologyOrders, patientServices, otRes, existingInvoice, ambulanceBookings, advanceList, allPatientInvoices, pharmacyRes]) => {
+      invoiceApi.getSeparateServiceLines().catch(() => []),
+      invoiceApi.getSeparateBills(admission.id).catch(() => []),
+    ]).then(([suggestions, services, accounts, radiologyOrders, patientServices, otRes, existingInvoice, ambulanceBookings, advanceList, allPatientInvoices, pharmacyRes, separateLines, separate]) => {
+      setSeparateBills(separate || [])
       // Flag any finance-critical source that failed to load so the biller is
       // warned its charges may be missing (rather than silently finalizing without them).
       const chargeWarns = []
@@ -333,7 +338,10 @@ export default function FinalizeIPDBillingModal({ admission, onClose, onFinalize
 
       // Radiology — skip already saved
       const EXCLUDED = ['CANCELLED', 'BILLED']
-      ;(Array.isArray(radiologyOrders) ? radiologyOrders.filter(r => !EXCLUDED.includes(r.status)) : []).forEach(r => {
+      // Radiology with its own GSTIN issues its own bills (from Labs, when the report is done);
+      // its orders cannot be lines on the hospital's bill.
+      const radiologyOnThisBill = !(separateLines || []).includes('RADIOLOGY')
+      ;(Array.isArray(radiologyOrders) && radiologyOnThisBill ? radiologyOrders.filter(r => !EXCLUDED.includes(r.status)) : []).forEach(r => {
         if (savedRadiologyIds.has(String(r.id))) return
         const name = r.serviceName || r.investigationName || r.testName || 'Radiology'
         const match = services.find(s => s.name.toLowerCase() === name.toLowerCase())
@@ -860,6 +868,23 @@ export default function FinalizeIPDBillingModal({ admission, onClose, onFinalize
                       Couldn't load charges from {chargeLoadWarnings.join(' and ')} — they may be
                       <strong> missing from this bill</strong>. Reopen the bill to retry before finalizing.
                     </p>
+                  </div>
+                )}
+                {separateBills.length > 0 && (
+                  <div className="hms-finalize-alert is-info">
+                    <Receipt className="hms-finalize-alert__icon w-4 h-4" />
+                    <div className="m-0">
+                      <strong>Billed separately for this stay</strong> — issued under a different GSTIN, so not part of
+                      this bill. Collect them in OPD Billing; discharge waits until they are paid.
+                      <ul className="m-0 mt-1 pl-4">
+                        {separateBills.map(b => (
+                          <li key={b.id}>
+                            {b.issuedBy || 'Separate bill'} · {fmtId(b.invoiceNumber)} · {fmt(b.total)} ·{' '}
+                            {b.status === 'PAID' || b.status === 'SETTLED' ? 'Paid' : b.status === 'CANCELLED' ? 'Cancelled' : 'Unpaid'}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 )}
                 {hasOpdCarryOver && (

@@ -596,6 +596,12 @@ export default function OPDBilling() {
                       </td>
                       <td>
                         <ItemTypePips items={inv.items} />
+                        {/* Issued by a service line with its own GSTIN; for an inpatient when linked to a stay. */}
+                        {inv.separateBill && (
+                          <p className="hms-billing-cell__secondary">
+                            {inv.issuedBy}{inv.forAdmissionId ? ' · inpatient stay' : ''}
+                          </p>
+                        )}
                       </td>
                       <td>
                         <p className="hms-billing-cell__primary">{fmt(inv.total)}</p>

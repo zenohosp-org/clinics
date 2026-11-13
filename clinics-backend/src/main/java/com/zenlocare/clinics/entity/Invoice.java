@@ -163,4 +163,20 @@ public class Invoice {
     @org.hibernate.annotations.Generated(event = org.hibernate.generator.EventType.INSERT)
     @Column(name = "gst_invoice_number", length = 16, insertable = false, updatable = false)
     private String gstInvoiceNumber;
+
+    // ── Issuing unit (HMS V12) ──────────────────────────────────────────────
+    // serviceLine says what the bill is for (a gst_service_lines code; null = hospital services) and is
+    // set by the code that creates the invoice. The database resolves it to the billing unit that issues
+    // the bill (billingUnitId): the line's own unit when Directory gives it one, otherwise hospital services.
+    @Column(name = "service_line", length = 30, updatable = false)
+    private String serviceLine;
+
+    @org.hibernate.annotations.Generated(event = org.hibernate.generator.EventType.INSERT)
+    @Column(name = "billing_unit_id", insertable = false, updatable = false)
+    private UUID billingUnitId;
+
+    // The stay a separately issued bill belongs to. Not `admission`: that marks the one inpatient bill of
+    // a stay, which every "find the IPD invoice" lookup relies on.
+    @Column(name = "for_admission_id", updatable = false)
+    private UUID forAdmissionId;
 }

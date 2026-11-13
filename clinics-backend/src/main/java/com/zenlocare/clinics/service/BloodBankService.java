@@ -94,6 +94,7 @@ public class BloodBankService {
     private final PatientRepository patientRepository;
     private final AdmissionRepository admissionRepository;
     private final UserRepository userRepository;
+    private final BillingUnits billingUnits;
 
     // ───── Lookups ────────────────────────────────────────────────────
 
@@ -424,8 +425,13 @@ public class BloodBankService {
         // Auto-bill — IPD path appends to admission invoice; OPD path
         // creates a standalone. Either way we capture the InvoiceItem
         // id on the bag for downstream reversal.
+        // A blood bank with its own GSTIN (Directory) issues its own bill even for an
+        // inpatient: a GST invoice has one supplier, so the charge cannot go on the
+        // hospital's inpatient bill. The bill is linked to the stay instead.
+        BillingUnits.IssuingUnit billedBy = billingUnits.requireIssuingUnit(
+                unit.getHospital().getId(), BillingUnits.BLOOD_BANK);
         Invoice invoice;
-        if (admission != null) {
+        if (admission != null && !billedBy.separate()) {
             invoice = invoiceRepository.findAllByAdmission_IdOrderByCreatedAtDesc(admission.getId())
                     .stream().findFirst()
                     .orElseGet(() -> createBlankAdmissionInvoice(unit.getHospital(), patient, admission));
@@ -468,6 +474,8 @@ public class BloodBankService {
                     .total(salePrice)
                     .status(InvoiceStatus.UNPAID)
                     .notes("Blood bag " + unit.getBagNumber())
+                    .serviceLine(BillingUnits.BLOOD_BANK)
+                    .forAdmissionId(admission != null ? admission.getId() : null)
                     .build();
             line.setInvoice(fresh);
             fresh.setItems(new ArrayList<>(List.of(line)));

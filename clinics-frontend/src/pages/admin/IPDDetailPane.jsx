@@ -230,6 +230,20 @@ export default function IPDDetailPane({
                 setDischargeBlock({ reason: "unpaid", amount: Number(unpaid.total || 0) });
                 return;
             }
+            // Bills a service line issued on its own for this stay (its own GSTIN).
+            const separateUnpaid = (invoices || []).filter(
+                (inv) =>
+                    String(inv.forAdmissionId) === String(admission.id) &&
+                    !["PAID", "SETTLED", "CANCELLED"].includes(inv.status) &&
+                    Number(inv.total || 0) > 0
+            );
+            if (separateUnpaid.length > 0) {
+                setDischargeBlock({
+                    reason: "unpaid",
+                    amount: separateUnpaid.reduce((sum, inv) => sum + Number(inv.total || 0) - Number(inv.paidAmount || 0), 0),
+                });
+                return;
+            }
             onDischarge();
         } catch {
             onDischarge();
@@ -559,7 +573,7 @@ export default function IPDDetailPane({
         let key = 0;
         const items = [];
         try {
-            const [suggestions, services, fullAdmission, radiologyOrders, labOrders, patientServices, allPatientInvoices, gstRates] =
+            const [suggestions, services, fullAdmission, radiologyOrders, labOrders, patientServices, allPatientInvoices, gstRates, separateLines] =
                 await Promise.all([
                     invoiceApi
                         .getSmartSuggestions(admission.patientId, admission.id)
@@ -571,7 +585,11 @@ export default function IPDDetailPane({
                     patientServicesApi.list(user.hospitalId).catch(() => []),
                     invoiceApi.getPatientInvoices(admission.patientId).catch(() => []),
                     gstRateApi.list(user.hospitalId, true).catch(() => []),
+                    invoiceApi.getSeparateServiceLines().catch(() => []),
                 ]);
+            // A service line with its own GSTIN issues its own bills; its orders are
+            // not part of the hospital bill, so they stay out of this estimate.
+            const onThisBill = (line) => !(separateLines || []).includes(line);
 
             const defaultGstRate = (gstRates || []).find((r) => r.isDefault);
             if (defaultGstRate) setGstRatePercent(Number(defaultGstRate.ratePercent));
@@ -625,7 +643,7 @@ export default function IPDDetailPane({
             });
 
             const EXCLUDED = ["CANCELLED", "BILLED"];
-            (Array.isArray(radiologyOrders) ? radiologyOrders : [])
+            (Array.isArray(radiologyOrders) && onThisBill("RADIOLOGY") ? radiologyOrders : [])
                 .filter((r) => !EXCLUDED.includes(r.status))
                 .forEach((r) => {
                     const name = r.serviceName || r.investigationName || "Radiology";
@@ -647,7 +665,7 @@ export default function IPDDetailPane({
             // Labs auto-bills on report generation as item_type='LAB_TEST'; this
             // block surfaces the same line pre-discharge so the estimate matches
             // what the final invoice will be.
-            (Array.isArray(labOrders) ? labOrders : [])
+            (Array.isArray(labOrders) && onThisBill("LAB") ? labOrders : [])
                 .filter((l) => !EXCLUDED.includes(l.status))
                 .forEach((l) => {
                     const name = l.serviceName || "Lab Test";

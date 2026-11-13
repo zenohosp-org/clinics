@@ -17,6 +17,13 @@ import java.util.UUID;
 public class InvoiceDTO {
     private String id;
     private String invoiceNumber;
+    // Issuing unit: serviceLine is what the bill is for; issuedBy names the unit ("Hospital services",
+    // "Laboratory"…); separateBill is true when a service line issued it under its own GSTIN;
+    // forAdmissionId is the stay such a bill belongs to.
+    private String serviceLine;
+    private String issuedBy;
+    private boolean separateBill;
+    private UUID forAdmissionId;
     private Integer patientId;
     private String patientName;
     private String patientUhid;
