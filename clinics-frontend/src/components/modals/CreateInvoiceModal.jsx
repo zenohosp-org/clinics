@@ -242,8 +242,8 @@ export default function CreateInvoiceModal({ onClose, onCreated }) {
       onCreated?.()
       onClose()
       window.print()
-    } catch {
-      notify('Failed to create invoice', 'error')
+    } catch (err) {
+      notify(err?.response?.data?.message || 'Failed to create invoice', 'error')
     } finally {
       setSaving(false)
     }

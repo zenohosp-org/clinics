@@ -325,6 +325,8 @@ export default function BookAppointmentModal({ isOpen, onClose, onSuccess, selec
             appointment = await appointmentsApi.updateStatus(appointment.id, 'CONFIRMED');
           } catch (err) {
             console.error("Failed to auto-confirm:", err);
+            // Booked but not confirmed — say why (e.g. billing blocked until a GSTIN is configured).
+            notify(`Appointment saved but not confirmed: ${err?.response?.data?.message || "confirmation failed"}`, "warning");
           }
         }
         const tokenMsg = appointment.tokenNumber ? ` (Token: ${appointment.tokenNumber})` : "";

@@ -37,6 +37,7 @@ public class AdmissionService {
     private final RoomLogRepository roomLogRepository;
     private final UserRepository userRepository;
     private final InvoiceService invoiceService;
+    private final GstBillingGuard gstBillingGuard;
     private final InvoiceRepository invoiceRepository;
     private final PatientAdvanceService patientAdvanceService;
     private final RoomTypeConfigRepository roomTypeConfigRepository;
@@ -101,6 +102,8 @@ public class AdmissionService {
     public AdmissionDTO admit(AdmissionRequest req, String performedBy) {
         Hospital hospital = hospitalRepository.findById(req.getHospitalId())
                 .orElseThrow(() -> new RuntimeException("Hospital not found"));
+        // Admission opens the IPD invoice; refuse up-front if the clinic cannot issue one.
+        gstBillingGuard.requireHospitalServicesGstin(hospital.getId());
         Patient patient = patientRepository.findById(req.getPatientId())
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
         assertSameHospital(req.getHospitalId(), patient.getHospital().getId(), "Patient");

@@ -157,4 +157,10 @@ public class Invoice {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by_id")
     private User updatedBy;
+
+    // GST series number, written only by the shared invoices trigger (HMS V11) from the GSTIN mapped to
+    // "Hospital services" in Directory. Read back after insert; never written by this app.
+    @org.hibernate.annotations.Generated(event = org.hibernate.generator.EventType.INSERT)
+    @Column(name = "gst_invoice_number", length = 16, insertable = false, updatable = false)
+    private String gstInvoiceNumber;
 }

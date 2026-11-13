@@ -42,6 +42,7 @@ public class AppointmentService {
         private final UserRepository userRepository;
         private final LabsClient labsClient;
         private final InvoiceService invoiceService;
+        private final GstBillingGuard gstBillingGuard;
         private final InvoiceRepository invoiceRepository;
 
         public List<AppointmentDto> getAppointmentsByHospital(UUID hospitalId, LocalDate date) {
@@ -325,6 +326,11 @@ public class AppointmentService {
                                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
                 Appointment.AppointmentStatus current = appointment.getStatus();
+                // Confirming opens the OPD invoice; refuse up-front if the clinic cannot issue one.
+                if (status == Appointment.AppointmentStatus.CONFIRMED && current != status
+                                && appointment.getHospital() != null) {
+                        gstBillingGuard.requireHospitalServicesGstin(appointment.getHospital().getId());
+                }
                 if (current != status) {
                         java.util.Set<Appointment.AppointmentStatus> allowed = ALLOWED_TRANSITIONS.get(current);
                         if (allowed == null || !allowed.contains(status)) {

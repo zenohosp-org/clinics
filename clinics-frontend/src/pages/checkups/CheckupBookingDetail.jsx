@@ -2,6 +2,7 @@ import { Spinner } from "@/components/ui/Loader";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { useNotification } from "@/context/NotificationContext";
 import { checkupApi } from "@/utils/api";
 import { fmtId } from "@/utils/idFormat";
 import SearchableSelect from "@/components/ui/SearchableSelect";
@@ -223,6 +224,7 @@ export default function CheckupBookingDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { notify } = useNotification();
 
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -256,6 +258,9 @@ export default function CheckupBookingDetail() {
     try {
       await checkupApi.updateStatus(booking.id, flow.next);
       await load();
+    } catch (err) {
+      // e.g. "Billing is blocked: hospital services has no GST registration in force…"
+      notify(err?.response?.data?.message || "Failed to update the booking", "error");
     } finally {
       setAdvancing(false); }
   };
@@ -266,6 +271,8 @@ export default function CheckupBookingDetail() {
     try {
       await checkupApi.updateStatus(booking.id, "CANCELLED");
       await load();
+    } catch (err) {
+      notify(err?.response?.data?.message || "Failed to cancel the booking", "error");
     } finally {
       setCancelling(false);
     }

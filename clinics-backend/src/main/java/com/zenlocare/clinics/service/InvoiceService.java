@@ -564,7 +564,15 @@ public class InvoiceService {
         if (invoice.getItems() != null) {
             invoice.getItems().removeIf(i -> "CONSULTATION".equals(i.getItemType()));
         }
-        if (invoice.getItems() == null || invoice.getItems().isEmpty()) {
+        if ((invoice.getItems() == null || invoice.getItems().isEmpty()) && invoice.getGstInvoiceNumber() != null) {
+            // A numbered invoice stays in its GSTIN's series (GST rule 46 — no gaps): cancel, don't delete.
+            invoice.setSubtotal(BigDecimal.ZERO);
+            invoice.setTax(BigDecimal.ZERO);
+            invoice.setTotal(BigDecimal.ZERO);
+            invoice.setStatus(InvoiceStatus.CANCELLED);
+            invoice.setUpdatedAt(LocalDateTime.now());
+            invoiceRepository.save(invoice);
+        } else if (invoice.getItems() == null || invoice.getItems().isEmpty()) {
             invoiceRepository.delete(invoice);
         } else {
             BigDecimal newSubtotal = invoice.getItems().stream()
